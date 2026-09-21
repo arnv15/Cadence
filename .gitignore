@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Python training pipeline
+training/.venv/
+training/data/
+training/models/
+training/outputs/
+__pycache__/
+*.pyc
+.pytest_cache/

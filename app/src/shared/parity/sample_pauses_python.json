@@ -1,0 +1,643 @@
+{
+  "segments": [
+    {
+      "text": "",
+      "t0": 0,
+      "t1": 2
+    },
+    {
+      "text": " I",
+      "t0": 2,
+      "t1": 13
+    },
+    {
+      "text": " see",
+      "t0": 13,
+      "t1": 53
+    },
+    {
+      "text": " a",
+      "t0": 53,
+      "t1": 66
+    },
+    {
+      "text": " kitchen",
+      "t0": 66,
+      "t1": 159
+    },
+    {
+      "text": ".",
+      "t0": 159,
+      "t1": 222
+    },
+    {
+      "text": " There",
+      "t0": 222,
+      "t1": 239
+    },
+    {
+      "text": " is",
+      "t0": 239,
+      "t1": 261
+    },
+    {
+      "text": " a",
+      "t0": 261,
+      "t1": 272
+    },
+    {
+      "text": " woman",
+      "t0": 272,
+      "t1": 300
+    },
+    {
+      "text": " washing",
+      "t0": 300,
+      "t1": 355
+    },
+    {
+      "text": " dishes",
+      "t0": 355,
+      "t1": 402
+    },
+    {
+      "text": " at",
+      "t0": 402,
+      "t1": 417
+    },
+    {
+      "text": " the",
+      "t0": 417,
+      "t1": 442
+    },
+    {
+      "text": " sink",
+      "t0": 442,
+      "t1": 471
+    },
+    {
+      "text": ".",
+      "t0": 471,
+      "t1": 497
+    },
+    {
+      "text": " The",
+      "t0": 497,
+      "t1": 649
+    },
+    {
+      "text": " water",
+      "t0": 649,
+      "t1": 653
+    },
+    {
+      "text": " is",
+      "t0": 653,
+      "t1": 686
+    },
+    {
+      "text": ",",
+      "t0": 686,
+      "t1": 723
+    },
+    {
+      "text": " um",
+      "t0": 723,
+      "t1": 760
+    },
+    {
+      "text": ",",
+      "t0": 760,
+      "t1": 800
+    },
+    {
+      "text": " overflowing",
+      "t0": 800,
+      "t1": 868
+    },
+    {
+      "text": " onto",
+      "t0": 868,
+      "t1": 893
+    },
+    {
+      "text": " the",
+      "t0": 893,
+      "t1": 920
+    },
+    {
+      "text": " floor",
+      "t0": 920,
+      "t1": 970
+    },
+    {
+      "text": ".",
+      "t0": 970,
+      "t1": 1184
+    },
+    {
+      "text": " A",
+      "t0": 1184,
+      "t1": 1200
+    },
+    {
+      "text": " boy",
+      "t0": 1200,
+      "t1": 1224
+    },
+    {
+      "text": " is",
+      "t0": 1224,
+      "t1": 1248
+    },
+    {
+      "text": " standing",
+      "t0": 1248,
+      "t1": 1272
+    },
+    {
+      "text": " on",
+      "t0": 1272,
+      "t1": 1288
+    },
+    {
+      "text": " a",
+      "t0": 1288,
+      "t1": 1296
+    },
+    {
+      "text": " stool",
+      "t0": 1296,
+      "t1": 1335
+    },
+    {
+      "text": " and",
+      "t0": 1335,
+      "t1": 1360
+    },
+    {
+      "text": " he",
+      "t0": 1360,
+      "t1": 1375
+    },
+    {
+      "text": " is",
+      "t0": 1375,
+      "t1": 1390
+    },
+    {
+      "text": " reaching",
+      "t0": 1390,
+      "t1": 1502
+    },
+    {
+      "text": " for",
+      "t0": 1502,
+      "t1": 1577
+    },
+    {
+      "text": " the",
+      "t0": 1577,
+      "t1": 1628
+    },
+    {
+      "text": " cookie",
+      "t0": 1628,
+      "t1": 1676
+    },
+    {
+      "text": " jar",
+      "t0": 1676,
+      "t1": 1719
+    },
+    {
+      "text": ".",
+      "t0": 1719,
+      "t1": 1762
+    },
+    {
+      "text": " The",
+      "t0": 1762,
+      "t1": 1805
+    },
+    {
+      "text": " stool",
+      "t0": 1805,
+      "t1": 1876
+    },
+    {
+      "text": " is",
+      "t0": 1876,
+      "t1": 1906
+    },
+    {
+      "text": " tipping",
+      "t0": 1906,
+      "t1": 2061
+    },
+    {
+      "text": " over",
+      "t0": 2061,
+      "t1": 2073
+    },
+    {
+      "text": " and",
+      "t0": 2073,
+      "t1": 2104
+    },
+    {
+      "text": " a",
+      "t0": 2104,
+      "t1": 2133
+    },
+    {
+      "text": " girl",
+      "t0": 2133,
+      "t1": 2175
+    },
+    {
+      "text": " is",
+      "t0": 2175,
+      "t1": 2203
+    },
+    {
+      "text": " laughing",
+      "t0": 2203,
+      "t1": 2317
+    },
+    {
+      "text": ".",
+      "t0": 2317,
+      "t1": 2379
+    },
+    {
+      "text": " Outside",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": " the",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": " window",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": ",",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": " there",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": " is",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": " a",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": " garden",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": " with",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": " a",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": " path",
+      "t0": 2379,
+      "t1": 2379
+    },
+    {
+      "text": ".",
+      "t0": 2379,
+      "t1": 3000
+    }
+  ],
+  "words": [
+    {
+      "text": "i",
+      "start": 0.02,
+      "end": 0.13
+    },
+    {
+      "text": "see",
+      "start": 0.13,
+      "end": 0.53
+    },
+    {
+      "text": "a",
+      "start": 0.53,
+      "end": 0.66
+    },
+    {
+      "text": "kitchen",
+      "start": 0.66,
+      "end": 2.22
+    },
+    {
+      "text": "there",
+      "start": 2.22,
+      "end": 2.39
+    },
+    {
+      "text": "is",
+      "start": 2.39,
+      "end": 2.61
+    },
+    {
+      "text": "a",
+      "start": 2.61,
+      "end": 2.72
+    },
+    {
+      "text": "woman",
+      "start": 2.72,
+      "end": 3.0
+    },
+    {
+      "text": "washing",
+      "start": 3.0,
+      "end": 3.55
+    },
+    {
+      "text": "dishes",
+      "start": 3.55,
+      "end": 4.02
+    },
+    {
+      "text": "at",
+      "start": 4.02,
+      "end": 4.17
+    },
+    {
+      "text": "the",
+      "start": 4.17,
+      "end": 4.42
+    },
+    {
+      "text": "sink",
+      "start": 4.42,
+      "end": 4.97
+    },
+    {
+      "text": "the",
+      "start": 4.97,
+      "end": 6.49
+    },
+    {
+      "text": "water",
+      "start": 6.49,
+      "end": 6.53
+    },
+    {
+      "text": "is",
+      "start": 6.53,
+      "end": 7.23
+    },
+    {
+      "text": "um",
+      "start": 7.23,
+      "end": 8.0
+    },
+    {
+      "text": "overflowing",
+      "start": 8.0,
+      "end": 8.68
+    },
+    {
+      "text": "onto",
+      "start": 8.68,
+      "end": 8.93
+    },
+    {
+      "text": "the",
+      "start": 8.93,
+      "end": 9.2
+    },
+    {
+      "text": "floor",
+      "start": 9.2,
+      "end": 11.84
+    },
+    {
+      "text": "a",
+      "start": 11.84,
+      "end": 12.0
+    },
+    {
+      "text": "boy",
+      "start": 12.0,
+      "end": 12.24
+    },
+    {
+      "text": "is",
+      "start": 12.24,
+      "end": 12.48
+    },
+    {
+      "text": "standing",
+      "start": 12.48,
+      "end": 12.72
+    },
+    {
+      "text": "on",
+      "start": 12.72,
+      "end": 12.88
+    },
+    {
+      "text": "a",
+      "start": 12.88,
+      "end": 12.96
+    },
+    {
+      "text": "stool",
+      "start": 12.96,
+      "end": 13.35
+    },
+    {
+      "text": "and",
+      "start": 13.35,
+      "end": 13.6
+    },
+    {
+      "text": "he",
+      "start": 13.6,
+      "end": 13.75
+    },
+    {
+      "text": "is",
+      "start": 13.75,
+      "end": 13.9
+    },
+    {
+      "text": "reaching",
+      "start": 13.9,
+      "end": 15.02
+    },
+    {
+      "text": "for",
+      "start": 15.02,
+      "end": 15.77
+    },
+    {
+      "text": "the",
+      "start": 15.77,
+      "end": 16.28
+    },
+    {
+      "text": "cookie",
+      "start": 16.28,
+      "end": 16.76
+    },
+    {
+      "text": "jar",
+      "start": 16.76,
+      "end": 17.62
+    },
+    {
+      "text": "the",
+      "start": 17.62,
+      "end": 18.05
+    },
+    {
+      "text": "stool",
+      "start": 18.05,
+      "end": 18.76
+    },
+    {
+      "text": "is",
+      "start": 18.76,
+      "end": 19.06
+    },
+    {
+      "text": "tipping",
+      "start": 19.06,
+      "end": 20.61
+    },
+    {
+      "text": "over",
+      "start": 20.61,
+      "end": 20.73
+    },
+    {
+      "text": "and",
+      "start": 20.73,
+      "end": 21.04
+    },
+    {
+      "text": "a",
+      "start": 21.04,
+      "end": 21.33
+    },
+    {
+      "text": "girl",
+      "start": 21.33,
+      "end": 21.75
+    },
+    {
+      "text": "is",
+      "start": 21.75,
+      "end": 22.03
+    },
+    {
+      "text": "laughing",
+      "start": 22.03,
+      "end": 23.79
+    },
+    {
+      "text": "outside",
+      "start": 23.79,
+      "end": 23.79
+    },
+    {
+      "text": "the",
+      "start": 23.79,
+      "end": 23.79
+    },
+    {
+      "text": "window",
+      "start": 23.79,
+      "end": 23.79
+    },
+    {
+      "text": "there",
+      "start": 23.79,
+      "end": 23.79
+    },
+    {
+      "text": "is",
+      "start": 23.79,
+      "end": 23.79
+    },
+    {
+      "text": "a",
+      "start": 23.79,
+      "end": 23.79
+    },
+    {
+      "text": "garden",
+      "start": 23.79,
+      "end": 23.79
+    },
+    {
+      "text": "with",
+      "start": 23.79,
+      "end": 23.79
+    },
+    {
+      "text": "a",
+      "start": 23.79,
+      "end": 23.79
+    },
+    {
+      "text": "path",
+      "start": 23.79,
+      "end": 30.0
+    }
+  ],
+  "features": {
+    "words_per_minute": 112.07471647765176,
+    "pause_rate": 0.0,
+    "mean_pause_s": 0.0,
+    "pause_time_ratio": 0.0,
+    "mattr": 0.7611111111111112,
+    "pronoun_ratio": 0.03636363636363636,
+    "filler_ratio": 0.017857142857142856,
+    "content_word_ratio": 0.4,
+    "repetition_rate": 0.0
+  },
+  "stats": {
+    "n_words": 56,
+    "n_lexical": 55,
+    "speaking_time_s": 29.98,
+    "n_long_pauses": 0
+  },
+  "whisper": {
+    "model": "tiny.en",
+    "params": {
+      "language": "en",
+      "token_timestamps": true,
+      "max_len": 1,
+      "split_on_word": false,
+      "initial_prompt": "Umm, let me think, uh... hmm. Okay, so, um, I see..."
+    }
+  }
+}

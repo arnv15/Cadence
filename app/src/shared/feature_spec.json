@@ -1,0 +1,54 @@
+{
+  "spec_version": 1,
+  "description": "Single source of truth for Cadence speech features. Read by app/src/features.ts AND training/features.py. Change both implementations and regenerate golden fixtures whenever this file changes.",
+  "feature_names": [
+    "words_per_minute",
+    "pause_rate",
+    "mean_pause_s",
+    "pause_time_ratio",
+    "mattr",
+    "pronoun_ratio",
+    "filler_ratio",
+    "content_word_ratio",
+    "repetition_rate"
+  ],
+  "concern_direction": {
+    "words_per_minute": -1,
+    "pause_rate": 1,
+    "mean_pause_s": 1,
+    "pause_time_ratio": 1,
+    "mattr": -1,
+    "pronoun_ratio": 1,
+    "filler_ratio": 1,
+    "content_word_ratio": -1,
+    "repetition_rate": 1
+  },
+  "pause_gap_s": 0.5,
+  "mattr_window": 20,
+  "quality_gate": {
+    "min_words": 15,
+    "min_speaking_time_s": 10
+  },
+  "recording": {
+    "max_duration_s": 60,
+    "min_duration_s": 20,
+    "sample_rate": 16000,
+    "channels": 1
+  },
+  "baseline": {
+    "baseline_days": 5,
+    "std_floor_fraction": 0.25,
+    "recent_window": 3
+  },
+  "whisper": {
+    "model": "tiny.en",
+    "model_file": "ggml-tiny.en.bin",
+    "model_url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin",
+    "model_size_bytes": 77704715,
+    "language": "en",
+    "token_timestamps": true,
+    "max_len": 1,
+    "split_on_word": false,
+    "initial_prompt": "Umm, let me think, uh... hmm. Okay, so, um, I see..."
+  }
+}

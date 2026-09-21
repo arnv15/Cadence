@@ -1,0 +1,21 @@
+# Cadence training pipeline — Python 3.14, installed into training/.venv
+#
+#   python3.14 -m venv training/.venv
+#   training/.venv/bin/pip install -r training/requirements.txt
+#
+# ffmpeg is NOT required: Pitt mp3 audio is decoded with soundfile (libsndfile >= 1.1 reads mp3),
+# with macOS `afconvert` as the fallback.
+
+numpy==2.5.3
+pandas==3.0.5
+scipy==1.18.1
+scikit-learn==1.9.1
+joblib==1.6.0
+
+# whisper.cpp bindings — must be the same model + decode params as whisper.rn in the app.
+pywhispercpp==1.5.1
+
+# Audio decoding (mp3/wav -> 16 kHz mono int16) without ffmpeg.
+soundfile==0.14.0
+
+pytest==9.1.1

@@ -1,0 +1,521 @@
+{
+  "model": {
+    "schema_version": 1,
+    "model_id": "synthetic-demo-v1",
+    "trained": false,
+    "trained_on": "synthetic data (not clinical)",
+    "created_at": "2026-09-20T21:34:13Z",
+    "spec_version": 1,
+    "feature_names": [
+      "words_per_minute",
+      "pause_rate",
+      "mean_pause_s",
+      "pause_time_ratio",
+      "mattr",
+      "pronoun_ratio",
+      "filler_ratio",
+      "content_word_ratio",
+      "repetition_rate"
+    ],
+    "scaler": {
+      "mean": [
+        111.74700651196505,
+        7.779305808000292,
+        1.0386717597059323,
+        0.13964541066300304,
+        0.7568641892830993,
+        0.1521603583108769,
+        0.0621521358538038,
+        0.40358791537775246,
+        0.026480683563143904
+      ],
+      "scale": [
+        26.511515131702442,
+        3.3630395758001352,
+        0.3175325325783437,
+        0.058471912357524025,
+        0.06732642509759333,
+        0.060003421423139684,
+        0.03067381173767695,
+        0.06588970813308817,
+        0.017265853072684984
+      ]
+    },
+    "coef": [
+      -0.16291405172784265,
+      0.19917599610655803,
+      0.16802811392147585,
+      0.15341534326607975,
+      -0.25468667302577774,
+      0.26143510317956065,
+      0.03074493909723899,
+      -0.12426252173595768,
+      0.17521447680739935
+    ],
+    "intercept": -0.15152820176583015,
+    "threshold": 0.3254382940179105,
+    "metrics": {
+      "cv_auc": 0.820555,
+      "cv_auc_ci": [
+        0.744682,
+        0.88856
+      ],
+      "sensitivity": 0.904494,
+      "specificity": 0.455882,
+      "n_participants": 150,
+      "n_samples": 382,
+      "cv_folds": 5
+    },
+    "notes": "DEMO MODEL. Fitted on synthetic feature vectors from training/synthetic.py, not on any real speech. The effect directions come from the literature but the numbers are invented, so the coefficients and the threshold are not clinically meaningful and this model must never be used to judge anyone's cognition. Replace it by running train.py on a Pitt feature CSV once DementiaBank access is granted."
+  },
+  "cases": [
+    {
+      "name": "all_zero",
+      "features": {
+        "words_per_minute": 0.0,
+        "pause_rate": 0.0,
+        "mean_pause_s": 0.0,
+        "pause_time_ratio": 0.0,
+        "mattr": 0.0,
+        "pronoun_ratio": 0.0,
+        "filler_ratio": 0.0,
+        "content_word_ratio": 0.0,
+        "repetition_rate": 0.0
+      },
+      "probability": 0.8567636623368724,
+      "logit": 1.7886661303624292
+    },
+    {
+      "name": "scaler_mean",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.46219026701890265,
+      "logit": -0.15152820176583015
+    },
+    {
+      "name": "typical_control",
+      "features": {
+        "words_per_minute": 138.0,
+        "pause_rate": 4.2,
+        "mean_pause_s": 0.72,
+        "pause_time_ratio": 0.06,
+        "mattr": 0.82,
+        "pronoun_ratio": 0.1,
+        "filler_ratio": 0.03,
+        "content_word_ratio": 0.47,
+        "repetition_rate": 0.01
+      },
+      "probability": 0.15534811629932566,
+      "logit": -1.6932560602833624
+    },
+    {
+      "name": "typical_concern",
+      "features": {
+        "words_per_minute": 92.0,
+        "pause_rate": 11.5,
+        "mean_pause_s": 1.35,
+        "pause_time_ratio": 0.24,
+        "mattr": 0.68,
+        "pronoun_ratio": 0.23,
+        "filler_ratio": 0.11,
+        "content_word_ratio": 0.34,
+        "repetition_rate": 0.07
+      },
+      "probability": 0.8650234777243223,
+      "logit": 1.857655794195935
+    },
+    {
+      "name": "all_high_extreme",
+      "features": {
+        "words_per_minute": 400.0,
+        "pause_rate": 60.0,
+        "mean_pause_s": 30.0,
+        "pause_time_ratio": 1.0,
+        "mattr": 1.0,
+        "pronoun_ratio": 1.0,
+        "filler_ratio": 1.0,
+        "content_word_ratio": 1.0,
+        "repetition_rate": 1.0
+      },
+      "probability": 0.9999999999999725,
+      "logit": 31.22151994176859
+    },
+    {
+      "name": "all_ratios_one",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 1.0,
+        "mattr": 1.0,
+        "pronoun_ratio": 1.0,
+        "filler_ratio": 1.0,
+        "content_word_ratio": 1.0,
+        "repetition_rate": 1.0
+      },
+      "probability": 0.9999995319355793,
+      "logit": 14.574659431645433
+    },
+    {
+      "name": "silent_sample",
+      "features": {
+        "words_per_minute": 12.0,
+        "pause_rate": 30.0,
+        "mean_pause_s": 3.4,
+        "pause_time_ratio": 0.85,
+        "mattr": 0.5,
+        "pronoun_ratio": 0.4,
+        "filler_ratio": 0.4,
+        "content_word_ratio": 0.2,
+        "repetition_rate": 0.3
+      },
+      "probability": 0.9999707778435927,
+      "logit": 10.440554132761783
+    },
+    {
+      "name": "rapid_fluent",
+      "features": {
+        "words_per_minute": 210.0,
+        "pause_rate": 0.0,
+        "mean_pause_s": 0.0,
+        "pause_time_ratio": 0.0,
+        "mattr": 0.93,
+        "pronoun_ratio": 0.04,
+        "filler_ratio": 0.0,
+        "content_word_ratio": 0.62,
+        "repetition_rate": 0.0
+      },
+      "probability": 0.0177259344366807,
+      "logit": -4.014841568984513
+    },
+    {
+      "name": "no_pauses_detected",
+      "features": {
+        "words_per_minute": 138.0,
+        "pause_rate": 0.0,
+        "mean_pause_s": 0.0,
+        "pause_time_ratio": 0.0,
+        "mattr": 0.82,
+        "pronoun_ratio": 0.1,
+        "filler_ratio": 0.03,
+        "content_word_ratio": 0.47,
+        "repetition_rate": 0.01
+      },
+      "probability": 0.07724177773785207,
+      "logit": -2.4804267794143375
+    },
+    {
+      "name": "huge_words_per_minute",
+      "features": {
+        "words_per_minute": 1000.0,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.0036481896619977652,
+      "logit": -5.609869356907057
+    },
+    {
+      "name": "words_per_minute_high",
+      "features": {
+        "words_per_minute": 400.0,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.1275439299136108,
+      "logit": -1.9228514497404408
+    },
+    {
+      "name": "pause_rate_high",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 60.0,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.9498479276092947,
+      "logit": 2.941242058183566
+    },
+    {
+      "name": "mean_pause_s_high",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 30.0,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.9999997429218089,
+      "logit": 15.173885296382545
+    },
+    {
+      "name": "pause_time_ratio_high",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 1.0,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.8914677789077369,
+      "logit": 2.1058221966036546
+    },
+    {
+      "name": "mattr_high",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 1.0,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.2551601627286185,
+      "logit": -1.0712777746141027
+    },
+    {
+      "name": "pronoun_ratio_high",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 1.0,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.9718734570165054,
+      "logit": 3.5425118870754817
+    },
+    {
+      "name": "filler_ratio_high",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 1.0,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.6875079517250025,
+      "logit": 0.7884943722865915
+    },
+    {
+      "name": "content_word_ratio_high",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 1.0,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.21817867363560556,
+      "logit": -1.2763119005988022
+    },
+    {
+      "name": "repetition_rate_high",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 1.0
+      },
+      "probability": 0.9999403990619414,
+      "logit": 9.727779642063458
+    },
+    {
+      "name": "words_per_minute_zero",
+      "features": {
+        "words_per_minute": 0.0,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.6306859075778676,
+      "logit": 0.5351604883706357
+    },
+    {
+      "name": "pause_rate_zero",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 0.0,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.35154439568843887,
+      "logit": -0.612257535573133
+    },
+    {
+      "name": "mean_pause_s_zero",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 0.0,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.33155503533550645,
+      "logit": -0.7011602515899784
+    },
+    {
+      "name": "pause_time_ratio_zero",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.0,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.373338257610416,
+      "logit": -0.5179220436741072
+    },
+    {
+      "name": "mattr_zero",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.0,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.9377068368168465,
+      "logit": 2.7115856799150144
+    },
+    {
+      "name": "pronoun_ratio_zero",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.0,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.30693423653697016,
+      "logit": -0.814491380053898
+    },
+    {
+      "name": "filler_ratio_zero",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.4467466304159235,
+      "logit": -0.21382445786631957
+    },
+    {
+      "name": "content_word_ratio_zero",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.0,
+        "repetition_rate": 0.026480683563143904
+      },
+      "probability": 0.6478507182638624,
+      "logit": 0.6096051152265592
+    },
+    {
+      "name": "repetition_rate_zero",
+      "features": {
+        "words_per_minute": 111.74700651196505,
+        "pause_rate": 7.779305808000292,
+        "mean_pause_s": 1.0386717597059323,
+        "pause_time_ratio": 0.13964541066300304,
+        "mattr": 0.7568641892830993,
+        "pronoun_ratio": 0.1521603583108769,
+        "filler_ratio": 0.0621521358538038,
+        "content_word_ratio": 0.40358791537775246,
+        "repetition_rate": 0.0
+      },
+      "probability": 0.39645570891193466,
+      "logit": -0.42025509851898496
+    }
+  ]
+}
