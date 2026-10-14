@@ -97,6 +97,7 @@ export function buildSessionRecord(args: BuildSessionArgs): SessionRecord {
   const score = scoreSession({
     features,
     stats,
+    audioQuality: args.audio.quality,
     model,
     history: driftHistory(history, model.model_id),
     current,

@@ -1,6 +1,7 @@
-import { FEATURE_NAMES, isScorable } from '@/features';
+import { FEATURE_NAMES, assessQuality } from '@/features';
 import spec from '@/shared/feature_spec.json';
 import type {
+  AudioQuality,
   CadenceModel,
   Contribution,
   DriftHistoryItem,
@@ -196,6 +197,8 @@ export function decideTier(input: TierInput): TierDecision {
 export interface ScoreInput {
   features: FeatureVector;
   stats: SpeechStats;
+  /** Absent only for synthetic inputs that never came from real audio. */
+  audioQuality?: AudioQuality;
   model: CadenceModel;
   history: DriftHistoryItem[];
   current: DriftHistoryItem;
@@ -212,9 +215,10 @@ export interface ScoreOutput {
 export function scoreSession(input: ScoreInput): ScoreOutput {
   const { features, stats, model, history, current } = input;
 
-  if (!isScorable(stats)) {
+  const quality = assessQuality({ stats, audioQuality: input.audioQuality });
+  if (quality !== 'ok') {
     return {
-      quality: 'insufficient_speech',
+      quality,
       prediction: null,
       drift: null,
       tier: null,

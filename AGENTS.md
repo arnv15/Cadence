@@ -117,5 +117,9 @@ whisper.rn is a native module, so **Expo Go will not work**. You need a dev buil
 - Do not commit `training/.venv`, `training/models/` (the 74 MB Whisper binary), `training/data/`,
   `training/outputs/`, or `app/ios` / `app/android`. They are already gitignored.
 - Owner intent from the original plan: the student (repo owner) meant to write the tier logic
-  (`decideTier`) and choose the pause-gap threshold (`pause_gap_s`) themselves, as learning exercises.
-  Keep those two pieces small and readable, and do not redesign them without the owner.
+  (`decideTier`), choose the pause-gap threshold (`pause_gap_s`), and set the noise policy
+  (`isTooNoisy`) themselves, as learning exercises. Keep those pieces small and readable, and do not
+  redesign them without the owner.
+- **The noise gate must fail safe.** Background noise fills silences, so an unmeasurable recording
+  looks like fluent speech. Anything that cannot be measured becomes `too_noisy` and shows no tier;
+  never let a thrown or uncertain policy fall through to `ok`.

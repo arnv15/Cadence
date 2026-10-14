@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "model_id": "synthetic-demo-v2",
+  "model_id": "synthetic-demo-v3",
   "trained": false,
   "trained_on": "synthetic data (not clinical)",
-  "created_at": "2026-09-21T07:22:28Z",
-  "spec_version": 2,
+  "created_at": "2026-10-14T04:21:10Z",
+  "spec_version": 3,
   "feature_names": [
     "words_per_minute",
     "pause_rate",

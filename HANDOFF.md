@@ -4,6 +4,36 @@ Project rules: [AGENTS.md](AGENTS.md). Algorithms and contracts:
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). This is the current implementation and verification
 snapshot; build success does not imply that the device checklist has passed.
 
+## 2026-10-13: noise robustness (feature spec v3)
+
+The v2 energy detector used a **fixed** 0.01 RMS threshold with no noise check. Mixing noise into
+the bundled sample showed the failure: at about -40 dB three of five pauses were lost, and at -30 dB
+(a fan or air conditioner) **all five disappeared** and the detector returned one continuous run.
+Word count and speaking time were unaffected, so the quality gate still passed and the session
+scored normally — reporting the reassuring answer to someone whose speech was never measured.
+
+- The threshold now adapts to each recording's own noise floor (10th-percentile frame RMS x 3),
+  and only when loud and quiet frames are far enough apart (90th percentile >= floor x 3). Without
+  that contrast check, a steady hum or perfectly level speech got a threshold above its own level
+  and read as pure silence.
+- `measureActivity` now reports `quality`: `threshold_rms`, `noise_floor_rms`, `active_fraction`,
+  `snr_db`. TS and Python are bit-identical on the same PCM (verified on the real sample).
+- New `SessionQuality` value `too_noisy`, with its own result screen and PDF row. The session is
+  saved but no tier is shown.
+- Clean audio is bit-identical to v2: the sample still gives five pauses and a 23.58 s span, so
+  this is strictly an extension of the usable range.
+- Measured after the fix: five pauses recovered at -40, -30 and -25 dB; at -20 dB and worse the
+  detector reports `active_fraction` 1.0 and a ~3 dB SNR, which the gate can refuse, rather than
+  inventing a single 14 s pause. Quiet speakers (gain 0.1) are unaffected.
+- Retrained as `synthetic-demo-v3` (still `trained: false`), fixtures regenerated, spec bumped to 3.
+  Sessions recorded under v2 will not enter a v3 baseline, which is correct: the measurement changed.
+
+**Open:** `isTooNoisy` in `app/src/features.ts` is a `TODO(human)` left for the owner, with the
+thresholds in `feature_spec.json` → `quality_gate` (`min_snr_db` 12, `min_active_fraction` 0.05,
+`max_active_fraction` 0.95) as suggested starting values. `app/src/__tests__/quality.test.ts`
+describes the required behaviour; 1 of its 5 cases fails until the policy is written. Until then
+every real recording is treated as `too_noisy`, which blocks scoring but never misleads.
+
 ## Completed implementation
 
 - **P0: pause measurement repaired.** Feature specification V2 measures PCM energy in 20 ms frames,
@@ -50,9 +80,9 @@ DementiaBank access and a real-data training/evaluation run remain outstanding.
 | Check | Latest result |
 |---|---|
 | `cd app && npm run typecheck` | Pass, zero errors |
-| `cd app && npm test -- --runInBand` | **15 suites, 320 tests pass** |
+| `cd app && npm test -- --runInBand` | **16 suites, 329 tests**: 328 pass, 1 fails on the open `isTooNoisy` TODO |
 | `cd app && npm run test:plugins` | **3 native configuration tests pass** |
-| `cd training && CADENCE_WHISPER_CPU=1 .venv/bin/python -m pytest -q` | **13 tests pass**, including local Whisper and fitted sklearn export |
+| `cd training && CADENCE_WHISPER_CPU=1 .venv/bin/python -m pytest -q` | **16 tests pass**, including local Whisper, fitted sklearn export, and noise robustness |
 | iOS Metro/Hermes export | Pass |
 | Android Metro/Hermes export | Pass |
 | Android native `app:assembleDebug` | **BUILD SUCCESSFUL**, including backup exclusions; final incremental build 20 s |

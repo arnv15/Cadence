@@ -164,6 +164,39 @@ export default function ResultScreen() {
     </View>
   );
 
+  // ---------------------------------------------------------------- too noisy to measure
+  if (session.quality === 'too_noisy') {
+    return (
+      <Screen testID="result-too-noisy">
+        {header}
+        <ResultDisclaimer />
+        <Card>
+          <View style={styles.friendly}>
+            <Glyph name="mic" color={colors.primary} size={40} />
+            <Heading>It was too noisy to measure</Heading>
+          </View>
+          <AppText>
+            Your words came through, but there was too much background sound to tell your pauses
+            apart from the room. A fan, a television, traffic or several people talking is usually
+            enough to hide them.
+          </AppText>
+          <AppText tone="secondary">
+            Cadence does not score a check it cannot measure, because background noise fills the
+            quiet moments and would make any voice look steady. Try again in a quieter room.
+          </AppText>
+        </Card>
+        <Button
+          label="Try another check"
+          onPress={() => router.push('/record')}
+          icon="mic"
+          size="large"
+        />
+        {transcriptSection}
+        {footerLinks}
+      </Screen>
+    );
+  }
+
   // ---------------------------------------------------------------- not enough speech
   if (session.quality === 'insufficient_speech') {
     return (

@@ -1,5 +1,5 @@
 {
-  "spec_version": 2,
+  "spec_version": 3,
   "audio": {
     "duration_s": 23.7920625,
     "speech_intervals": [
@@ -135,7 +135,13 @@
         "start": 23.3,
         "end": 23.6
       }
-    ]
+    ],
+    "quality": {
+      "threshold_rms": 0.01,
+      "noise_floor_rms": 0.0,
+      "active_fraction": 0.5411764705882353,
+      "snr_db": 99
+    }
   },
   "segments": [
     {

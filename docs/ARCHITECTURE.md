@@ -52,18 +52,52 @@ training features match app features.
 `types.ts`, `feature_spec.json`, and `lexicon.json` are contracts shared by the app and the Python
 pipeline. Change them deliberately, and follow the parity rules in `AGENTS.md`.
 
-## Feature definitions (spec_version 2) — TS and Python must match to 1e-9
+## Feature definitions (spec_version 3) — TS and Python must match to 1e-9
 
 ### Audio activity (audio/activity.ts and training/activity.py)
 Decode mono PCM16 WAV and use its sample count / sample rate as the real duration. Scan
 non-overlapping 20 ms frames (floor(rate * 20 / 1000) samples; include the final partial frame).
-For each frame, accumulate `(sample / 32768)^2` in order; active means RMS >= 0.01.
+For each frame, accumulate `(sample / 32768)^2` in order to get its RMS.
+
+**The threshold adapts to the recording (spec_version 3).** With a fixed 0.01 threshold, any room
+noise above that level made every frame active: the detector returned one continuous run and
+therefore zero pauses, which is indistinguishable from fluent speech. Measured on the bundled
+sample, a fan at roughly -30 dB erased all five pauses. The rule is now, in this order:
+
+1. Sort the frame RMS values ascending. Take `noise_floor` at `noise_floor_percentile` (10) and
+   `loud` at `loud_percentile` (90), both by nearest rank with **no interpolation**, so TS and
+   Python agree exactly: `index = min(n - 1, floor(n * pct / 100))`.
+2. `has_contrast = loud >= noise_floor * noise_margin` (3). Without contrast no threshold can
+   separate speech from the background, so do not try: use the fixed `rms_threshold`.
+3. `threshold = has_contrast ? max(rms_threshold, noise_floor * noise_margin) : rms_threshold`.
+
+Clean audio is unaffected, because its measured floor is silence and the threshold stays 0.01.
+Active means frame RMS >= threshold.
+
 Keep consecutive active runs lasting at least 60 ms. Their start/end sample indices divided by
 sample rate form ordered `speech_intervals`. Do not bridge quiet frames. Leading/trailing silence
 is not a pause. The owner's `pause_gap_s = 0.5` is unchanged.
 
-This is an energy heuristic, not validated voice activity detection: loud background noise can
-hide pauses, and quiet speech can be missed. A successful sample test is not clinical validation.
+`measureActivity` also returns `quality: AudioQuality` for real PCM: `threshold_rms`,
+`noise_floor_rms`, `active_fraction` (active frames / all frames), and `snr_db`
+(`20*log10(speech_rms / noise_floor)`, capped at 99 and reported as 99 when the floor is silent;
+`speech_rms` is the quadratic mean of active frame RMS values). The synthetic golden fixtures build
+intervals directly and therefore omit `quality`.
+
+This is an energy heuristic, not validated voice activity detection. Adaptation extends the usable
+range; it does not make noise safe. Measured on the sample: all five pauses are recovered down to
+about a 12 dB SNR, and by roughly 10 dB the speech is no longer separable, where the detector
+reports `active_fraction` 1.0 instead of inventing pauses. Quiet speakers are unaffected. A
+successful sample test is not clinical validation.
+
+### assessQuality (app only)
+`assessQuality({ stats, audioQuality })` decides the session's `SessionQuality`:
+`insufficient_speech` when `isScorable` fails, then `too_noisy` when `isTooNoisy(quality)` says the
+silences were unmeasurable, otherwise `ok`. A `too_noisy` session is stored but shows no tier.
+Scoring it anyway would most likely say "Typical", because noise hides pauses. The policy fails
+safe: if `isTooNoisy` throws, the session is treated as `too_noisy`, never as `ok`. Training keeps
+the simpler `is_scorable` filter, since corpus recordings are filtered by the researcher, not by a
+person holding a phone.
 Whisper timestamps are used only for transcript inspection, never for pause measurement.
 Production callers clamp word times to [0, actual audio duration], discard words starting at or
 beyond the end, and discard zero-duration words. This prevents Whisper padding from extending time.

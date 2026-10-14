@@ -27,7 +27,7 @@ out-of-fold sensitivity is still at least ``TARGET_SENSITIVITY``. The specificit
 is reported next to it.
 
 **Honesty gate.** ``trained`` is ``true`` only when every row is ``source == 'pitt'``. Any synthetic
-row anywhere in the CSV makes this a demo model: ``model_id`` ``synthetic-demo-v2``,
+row anywhere in the CSV makes this a demo model: ``model_id`` ``synthetic-demo-v3``,
 ``trained: false``, and notes that say so. The app is required to show that.
 """
 
@@ -59,7 +59,7 @@ RANDOM_STATE = 0
 C_GRID: Tuple[float, ...] = (0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0)
 L1_RATIO_GRID: Tuple[float, ...] = (0.0, 0.25, 0.5, 0.75, 1.0)
 
-SYNTHETIC_MODEL_ID = 'synthetic-demo-v2'
+SYNTHETIC_MODEL_ID = 'synthetic-demo-v3'
 PITT_MODEL_ID = 'pitt-cookie-v2'
 
 SYNTHETIC_TRAINED_ON = 'synthetic data (not clinical)'

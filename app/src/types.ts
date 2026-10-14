@@ -30,10 +30,30 @@ export interface Word {
   end: number;
 }
 
+/**
+ * How trustworthy the energy detection was for one recording. Measured per recording, because the
+ * activity threshold adapts to the recording's own noise floor.
+ */
+export interface AudioQuality {
+  /** The threshold actually used, max(spec floor, noise floor * margin). */
+  threshold_rms: number;
+  /** Low-percentile frame energy, the recording's own noise floor. */
+  noise_floor_rms: number;
+  /** Share of frames above the threshold, 0..1. Near 1 means no silence was distinguishable. */
+  active_fraction: number;
+  /** Rough speech-to-noise ratio in dB, capped at SNR_CEILING_DB when the floor is silent. */
+  snr_db: number;
+}
+
 export interface AudioTiming {
   duration_s: number;
   /** Ordered, non-overlapping audio-energy intervals in seconds. */
   speech_intervals: { start: number; end: number }[];
+  /**
+   * Present whenever the timing came from real PCM via measureActivity. Absent in the synthetic
+   * golden fixtures, which construct intervals directly and have no audio to measure.
+   */
+  quality?: AudioQuality;
 }
 
 export interface SpeechStats {
@@ -155,7 +175,11 @@ export interface FluencyResult {
   intrusions: number;
 }
 
-export type SessionQuality = 'ok' | 'insufficient_speech';
+/**
+ * 'too_noisy' means the recording was made but its silences could not be measured, so no tier is
+ * shown. Scoring it anyway would most likely report "Typical", because noise hides pauses.
+ */
+export type SessionQuality = 'ok' | 'insufficient_speech' | 'too_noisy';
 
 export interface SessionRecord {
   id: string;

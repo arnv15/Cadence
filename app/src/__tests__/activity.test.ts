@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { measureActivity } from '@/audio/activity';
+import { measureActivity, SNR_CEILING_DB } from '@/audio/activity';
 import { decodeWav, encodeWav } from '@/audio/wav';
 import { computeFeatures } from '@/features';
 import { segmentsToWords } from '@/words';
@@ -66,4 +66,62 @@ it('measures real sample pauses and matches Python from the identical PCM', () =
   for (const name of Object.keys(result.features) as (keyof typeof result.features)[]) {
     expect(Math.abs(result.features[name] - reference.features[name])).toBeLessThanOrEqual(1e-9);
   }
+});
+
+/**
+ * Deterministic uniform noise. The multiplier stays small enough that the product is exact in a
+ * double, so Python can reproduce the identical samples.
+ */
+function withNoise(samples: Int16Array, amplitude: number): Int16Array {
+  let state = 12345;
+  const out = new Int16Array(samples.length);
+  for (let i = 0; i < samples.length; i += 1) {
+    state = (state * 48271) % 2147483647;
+    const unit = (state / 2147483647) * 2 - 1;
+    out[i] = Math.max(-32768, Math.min(32767, Math.round(samples[i] + unit * amplitude)));
+  }
+  return out;
+}
+
+const SPEECH_WITH_GAP: [number, number][] = [[1, 0], [1, 4000], [1, 0], [1, 4000], [1, 0]];
+
+it('still finds pauses when the room is noisier than the fixed floor', () => {
+  // Noise at ~0.018 RMS sits above spec.rms_threshold (0.01). A fixed threshold would call every
+  // frame speech and report zero pauses, which is indistinguishable from fluent speech.
+  const audio = measureActivity(withNoise(signal(SPEECH_WITH_GAP), 1000), rate);
+  const quality = audio.quality!;
+
+  expect(quality.threshold_rms).toBeGreaterThan(0.01);
+  expect(audio.speech_intervals).toHaveLength(2);
+  expect(audio.speech_intervals[1].start - audio.speech_intervals[0].end).toBeCloseTo(1, 1);
+  expect(quality.active_fraction).toBeLessThan(0.75);
+  expect(quality.snr_db).toBeGreaterThan(12);
+});
+
+it('reports heavy noise as unmeasurable instead of inventing pauses', () => {
+  // Speech and noise are close in level, so no threshold separates them. The detector must not
+  // guess: it falls back to the fixed floor, marks everything active, and says the SNR is poor.
+  const audio = measureActivity(withNoise(signal(SPEECH_WITH_GAP), 6000), rate);
+  const quality = audio.quality!;
+
+  expect(quality.threshold_rms).toBe(0.01);
+  expect(quality.active_fraction).toBe(1);
+  expect(quality.snr_db).toBeLessThan(12);
+  expect(audio.speech_intervals).toHaveLength(1);
+});
+
+it('leaves clean audio exactly as the fixed threshold did', () => {
+  const audio = measureActivity(signal(SPEECH_WITH_GAP), rate);
+  const quality = audio.quality!;
+
+  expect(quality.threshold_rms).toBe(0.01);
+  expect(quality.noise_floor_rms).toBe(0);
+  expect(quality.snr_db).toBe(SNR_CEILING_DB);
+  expect(audio.speech_intervals).toEqual([{ start: 1, end: 2 }, { start: 3, end: 4 }]);
+});
+
+it('flags a steady hum, with no dynamic range, as fully active', () => {
+  const audio = measureActivity(new Int16Array(rate * 2).fill(4000), rate);
+  expect(audio.quality!.active_fraction).toBe(1);
+  expect(audio.quality!.snr_db).toBeLessThan(12);
 });

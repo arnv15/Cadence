@@ -453,6 +453,9 @@ function resultCell(session: SessionRecord): string {
   if (session.quality === 'insufficient_speech') {
     return 'Not enough speech to score';
   }
+  if (session.quality === 'too_noisy') {
+    return 'Too noisy to measure pauses';
+  }
   if (session.task === 'fluency') {
     const fluency = session.fluency;
     return fluency === null

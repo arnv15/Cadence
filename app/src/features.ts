@@ -1,6 +1,15 @@
 import lexicon from '@/shared/lexicon.json';
 import spec from '@/shared/feature_spec.json';
-import type { AudioTiming, FeatureName, FeatureResult, FeatureVector, SpeechStats, Word } from '@/types';
+import type {
+  AudioQuality,
+  AudioTiming,
+  FeatureName,
+  FeatureResult,
+  FeatureVector,
+  SessionQuality,
+  SpeechStats,
+  Word,
+} from '@/types';
 
 export const FEATURE_SPEC = spec;
 export const LEXICON = lexicon;
@@ -98,4 +107,44 @@ export function isScorable(stats: SpeechStats): boolean {
     stats.n_words >= spec.quality_gate.min_words &&
     stats.speaking_time_s >= spec.quality_gate.min_speaking_time_s
   );
+}
+
+/**
+ * Whether background noise made this recording's silences unmeasurable.
+ *
+ * The activity threshold adapts to the noise floor, which recovers pauses in an ordinary room, but
+ * adaptation runs out when speech and noise are close in level. Measured on the bundled sample with
+ * noise mixed in: at a 27 dB SNR all five pauses are found; at 18 dB all five are still found; by
+ * about 10 dB the detector loses the speech entirely and reports one 14 s "pause".
+ *
+ * Returning true means no tier is shown. That is the safe direction: noise fills the silences, so a
+ * recording we cannot measure looks exactly like fluent speech and would be reported as "Typical".
+ */
+export function isTooNoisy(quality: AudioQuality): boolean {
+  const gate = spec.quality_gate;
+  return (
+    // Speech and background too close in level to tell apart.
+    quality.snr_db < gate.min_snr_db ||
+    // Nothing read as quiet, so there were no measurable silences.
+    quality.active_fraction > gate.max_active_fraction ||
+    // Almost nothing read as speech, so there is nothing to measure gaps between.
+    quality.active_fraction < gate.min_active_fraction
+  );
+}
+
+/** The full gate: enough speech, and silences we can actually trust. */
+export function assessQuality(input: {
+  stats: SpeechStats;
+  audioQuality?: AudioQuality;
+}): SessionQuality {
+  if (!isScorable(input.stats)) return 'insufficient_speech';
+  // Synthetic golden fixtures build intervals directly and have no audio to judge.
+  if (!input.audioQuality) return 'ok';
+  try {
+    return isTooNoisy(input.audioQuality) ? 'too_noisy' : 'ok';
+  } catch {
+    // Fail safe rather than guess. A thrown policy (including the unimplemented stub above) must
+    // never fall through to 'ok', because that is the reassuring answer.
+    return 'too_noisy';
+  }
 }
