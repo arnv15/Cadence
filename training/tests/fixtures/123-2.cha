@@ -1,0 +1,16 @@
+@UTF8
+@Begin
+@Languages:	eng
+@Participants:	PAR Participant, INV Investigator
+@ID:	eng|Pitt|PAR|72;03|female|Control||Participant|29||
+@ID:	eng|Pitt|INV|||||Investigator|||
+@Media:	123-2, audio
+*INV:	please describe the picture .0_1000
+*PAR:	the boy is on a stool
+	and reaching up .1000_3000
+%mor:	det|the n|boy
+*PAR:	the water is running .4000_5500
+*INV:	anything else ?5500_6500
+*PAR:	the girl is watching .7000_9000
+*PAR:	that is all .
+@End

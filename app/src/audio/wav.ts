@@ -81,3 +81,41 @@ export function rmsLevel(chunk: ArrayBuffer): number {
   }
   return (db - METER_FLOOR_DB) / -METER_FLOOR_DB;
 }
+
+/** Read PCM16 mono WAV, including files with metadata chunks. Fail instead of scoring corrupt audio. */
+export function decodeWav(bytes: Uint8Array): { samples: Int16Array; sampleRate: number } {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const ascii = (offset: number, length: number): string =>
+    String.fromCharCode(...bytes.subarray(offset, offset + length));
+  if (bytes.length < 12 || ascii(0, 4) !== 'RIFF' || ascii(8, 4) !== 'WAVE') {
+    throw new Error('The recording is not a WAV file.');
+  }
+  const riffEnd = view.getUint32(4, true) + 8;
+  if (riffEnd > bytes.length) throw new Error('The recording is incomplete.');
+  let sampleRate = 0;
+  let data: Uint8Array | null = null;
+  for (let offset = 12; offset + 8 <= riffEnd;) {
+    const name = ascii(offset, 4);
+    const size = view.getUint32(offset + 4, true);
+    const start = offset + 8;
+    if (start + size > riffEnd) throw new Error('The recording is incomplete.');
+    if (name === 'fmt ') {
+      if (size < 16 || view.getUint16(start, true) !== 1 ||
+          view.getUint16(start + 2, true) !== 1 || view.getUint16(start + 14, true) !== 16 ||
+          view.getUint16(start + 12, true) !== 2) {
+        throw new Error('The recording must be mono PCM16 audio.');
+      }
+      sampleRate = view.getUint32(start + 4, true);
+    } else if (name === 'data') {
+      data = bytes.subarray(start, start + size);
+    }
+    offset = start + size + (size % 2);
+  }
+  if (!data || data.length % 2 !== 0 || sampleRate <= 0) {
+    throw new Error('The recording has invalid audio data.');
+  }
+  const pcm = new DataView(data.buffer, data.byteOffset, data.byteLength);
+  const samples = new Int16Array(data.byteLength / 2);
+  for (let i = 0; i < samples.length; i += 1) samples[i] = pcm.getInt16(i * 2, true);
+  return { samples, sampleRate };
+}

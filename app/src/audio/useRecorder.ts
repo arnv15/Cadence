@@ -72,9 +72,13 @@ export function useRecorder(options: RecorderOptions = {}): CadenceRecorder {
   const sampleRateRef = useRef(REQUESTED_SAMPLE_RATE);
   const channelsRef = useRef(REQUESTED_CHANNELS);
   const recordingRef = useRef(false);
+  const startPendingRef = useRef(false);
+  const generationRef = useRef(0);
   const audioModeAppliedRef = useRef(false);
   const autoStopFiredRef = useRef(false);
   const lastUiUpdateRef = useRef(0);
+  const lastBufferAtRef = useRef(0);
+  const wasStreamingRef = useRef(false);
   const onAutoStopRef = useRef(options.onAutoStop);
   const finishRef = useRef<(() => Promise<RecordingResult | null>) | null>(null);
 
@@ -88,14 +92,24 @@ export function useRecorder(options: RecorderOptions = {}): CadenceRecorder {
         return;
       }
 
+      lastBufferAtRef.current = Date.now();
       // The hardware may not honour the requested rate, so the WAV is written with what we got.
       const channels = Math.max(1, buffer.channels);
       const sampleRate = buffer.sampleRate > 0 ? buffer.sampleRate : REQUESTED_SAMPLE_RATE;
       sampleRateRef.current = sampleRate;
       channelsRef.current = channels;
 
-      chunksRef.current.push(buffer.data);
-      frameCountRef.current += buffer.data.byteLength / BYTES_PER_SAMPLE / channels;
+      if (channels !== REQUESTED_CHANNELS || sampleRate !== REQUESTED_SAMPLE_RATE) {
+        recordingRef.current = false;
+        chunksRef.current = [];
+        setError('This microphone did not provide the audio format Cadence needs. Please try another device.');
+        setState('error');
+        return;
+      }
+      const remainingBytes = Math.max(0, Math.floor(maxDurationS * sampleRate) - frameCountRef.current) * BYTES_PER_SAMPLE * channels;
+      const data = buffer.data.slice(0, remainingBytes);
+      chunksRef.current.push(data);
+      frameCountRef.current += data.byteLength / BYTES_PER_SAMPLE / channels;
       const elapsed = frameCountRef.current / sampleRate;
 
       const now = Date.now();
@@ -117,7 +131,7 @@ export function useRecorder(options: RecorderOptions = {}): CadenceRecorder {
     [maxDurationS],
   );
 
-  const { stream } = useAudioStream({
+  const { stream, isStreaming } = useAudioStream({
     sampleRate: REQUESTED_SAMPLE_RATE,
     channels: REQUESTED_CHANNELS,
     encoding: 'int16',
@@ -188,14 +202,15 @@ export function useRecorder(options: RecorderOptions = {}): CadenceRecorder {
   }, [finish]);
 
   const start = useCallback(async () => {
-    if (recordingRef.current) {
-      return;
-    }
+    if (recordingRef.current || startPendingRef.current) return;
+    startPendingRef.current = true;
+    const generation = ++generationRef.current;
     setError(null);
     setState('requesting');
 
     try {
       const permission = await requestRecordingPermissionsAsync();
+      if (generation !== generationRef.current) return;
       if (!permission.granted) {
         setPermissionDenied(true);
         setError('Cadence needs microphone access to record your voice check.');
@@ -206,6 +221,7 @@ export function useRecorder(options: RecorderOptions = {}): CadenceRecorder {
 
       await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
       audioModeAppliedRef.current = true;
+      if (generation !== generationRef.current) { await restoreAudioMode(); return; }
 
       chunksRef.current = [];
       frameCountRef.current = 0;
@@ -216,20 +232,57 @@ export function useRecorder(options: RecorderOptions = {}): CadenceRecorder {
       setElapsedS(0);
       setLevel(0);
 
+      wasStreamingRef.current = false;
+      lastBufferAtRef.current = Date.now();
       recordingRef.current = true;
       await stream.start();
+      if (generation !== generationRef.current) { stream.stop(); await restoreAudioMode(); return; }
       setState('recording');
     } catch (startError) {
       recordingRef.current = false;
       await restoreAudioMode();
       setError(`Could not start recording: ${errorMessage(startError)}`);
       setState('error');
+    } finally {
+      startPendingRef.current = false;
     }
   }, [restoreAudioMode, stream]);
+
+  useEffect(() => {
+    if (state !== 'error') return;
+    try { stream.stop(); } catch { /* Already stopped. */ }
+    void restoreAudioMode();
+  }, [state, stream, restoreAudioMode]);
+
+  const interrupt = useCallback(() => {
+    if (!recordingRef.current) return;
+    recordingRef.current = false;
+    chunksRef.current = [];
+    frameCountRef.current = 0;
+    try { stream.stop(); } catch { /* Already stopped. */ }
+    void restoreAudioMode();
+    setLevel(0);
+    setError('The microphone stopped sending audio. Please try recording again.');
+    setState('error');
+  }, [stream, restoreAudioMode]);
+
+  useEffect(() => {
+    if (isStreaming) wasStreamingRef.current = true;
+    else if (wasStreamingRef.current && recordingRef.current) interrupt();
+  }, [isStreaming, interrupt]);
+
+  useEffect(() => {
+    if (state !== 'recording') return;
+    const timer = setInterval(() => {
+      if (Date.now() - lastBufferAtRef.current >= 5000) interrupt();
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [state, interrupt]);
 
   const stop = useCallback(() => finish(), [finish]);
 
   const cancel = useCallback(() => {
+    generationRef.current += 1;
     chunksRef.current = [];
     frameCountRef.current = 0;
     if (recordingRef.current) {
@@ -268,6 +321,7 @@ export function useRecorder(options: RecorderOptions = {}): CadenceRecorder {
 
   useEffect(
     () => () => {
+      generationRef.current += 1;
       if (recordingRef.current) {
         recordingRef.current = false;
         try {

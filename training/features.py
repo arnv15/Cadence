@@ -11,6 +11,7 @@ from typing import Dict, Iterable, List, Sequence, Tuple, TypedDict
 
 import spec
 from words import Word
+from activity import AudioTiming
 
 
 class SpeechStats(TypedDict):
@@ -34,7 +35,7 @@ def _mattr(lexical: Sequence[str], window: int) -> float:
     return total / n_windows
 
 
-def compute_features(words: Iterable[Word]) -> Tuple[Dict[str, float], SpeechStats]:
+def compute_features(words: Iterable[Word], audio: AudioTiming) -> Tuple[Dict[str, float], SpeechStats]:
     """Returns (features in spec.FEATURE_NAMES order, stats)."""
     word_list: List[Word] = list(words)
     n_words = len(word_list)
@@ -42,20 +43,12 @@ def compute_features(words: Iterable[Word]) -> Tuple[Dict[str, float], SpeechSta
     lexical: List[str] = [w['text'] for w in word_list if w['text'] not in spec.FILLERS]
     n_lexical = len(lexical)
 
-    if n_words > 0:
-        speaking_time_s = word_list[-1]['end'] - word_list[0]['start']
-        if speaking_time_s < 0:
-            speaking_time_s = 0.0
-    else:
-        speaking_time_s = 0.0
-
-    # Gaps are taken over ALL words (fillers included).
+    intervals = audio['speech_intervals']
+    speaking_time_s = max(0.0, intervals[-1]['end'] - intervals[0]['start']) if intervals else 0.0
     n_long_pauses = 0
     long_sum = 0.0
-    for i in range(n_words - 1):
-        gap = word_list[i + 1]['start'] - word_list[i]['end']
-        if gap < 0:
-            gap = 0.0
+    for previous, following in zip(intervals, intervals[1:]):
+        gap = max(0.0, following['start'] - previous['end'])
         if gap >= spec.PAUSE_GAP_S - spec.PAUSE_EPSILON:
             n_long_pauses += 1
             long_sum += gap

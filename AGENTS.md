@@ -31,8 +31,8 @@ The exact feature definitions and data contracts are in [`docs/ARCHITECTURE.md`]
    - regenerate the golden fixtures (`training/export_fixtures.py`)
    - retrain `model.json`
 
-   `app/src/__tests__/parity.test.ts` must stay green. Parity is not validity, though: see HANDOFF.md
-   task P0.
+   `app/src/__tests__/parity.test.ts` must stay green. Parity is not validity: the audio-energy
+   heuristic still needs testing across microphones, background noise, and real speech.
 5. **Privacy.** Audio never leaves the device. There is no analytics and no network use except the
    one-time Whisper model download.
 6. **Audience is adults aged 50–85, some worried about their memory.** Copy should be calm, plain,
@@ -86,9 +86,15 @@ whisper.rn is a native module, so **Expo Go will not work**. You need a dev buil
   https://docs.expo.dev/versions/v57.0.0/, and check the installed sources in `app/node_modules`
   rather than relying on memory. `expo-audio` 57 provides raw PCM through `useAudioStream`. That is how
   Android gets WAV audio at all.
-- **whisper.rn's `package.json` `exports` map has no `"."` entry.** `tsconfig.json` maps the
-  `whisper.rn` types to `lib/typescript/index.d.ts` to work around this. Metro resolution of the bare
-  `'whisper.rn'` import has not been verified yet (see HANDOFF.md).
+- **Expo 57 prebuild recreates native folders by default.** For incremental config/artwork updates,
+  use `npx expo prebuild --no-clean`; otherwise Pods and native build outputs are removed and must
+  be regenerated. Native folders are generated and gitignored, not the source of truth.
+- **Xcode 27 builds need scene support on iOS 27.** Keep `expo-build-properties` with
+  `ios.enableSceneSupport: true` in `app.json` (supported by Expo 57.0.23+). Without it UIKit aborts
+  startup before the app opens. The generated AppDelegate uses `ExpoReactNativeFactoryProvider`;
+  the scene manifest references `EXExpoAppSceneDelegate`.
+- **whisper.rn's `package.json` `exports` map has no `"."` entry.** Use `'whisper.rn/index'`.
+  `tsconfig.json` maps that import to `lib/typescript/index.d.ts`; iOS and Android Metro exports pass.
 - **TypeScript 6 defaults `types` to `[]`.** Test files that need Node globals use
   `/// <reference types="node" />`. Do not add `node` to `tsconfig.json`, so RN code never sees Node
   APIs.
@@ -100,6 +106,8 @@ whisper.rn is a native module, so **Expo Go will not work**. You need a dev buil
   Gradle. Use `JAVA_HOME=/Users/gupta/Library/Java/JavaVirtualMachines/jbr-21.0.11/Contents/Home`.
 - `ffmpeg` is not installed. The training code decodes MP3 with `soundfile`, falling back to macOS
   `afconvert`.
+- If Python Whisper fails while initializing Metal, use `CADENCE_WHISPER_CPU=1`. This runs the
+  same transcription parameters on CPU and was used to regenerate the V2 reference fixture.
 
 ## Conventions
 

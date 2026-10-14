@@ -30,7 +30,8 @@ Path alias: `@/*` -> `app/src/*`, `@/assets/*` -> `app/assets/*`.
 ```
 record (expo-audio useAudioStream, int16 PCM @16 kHz) -> encodeWav -> documents/recordings/<id>.wav
   -> whisper.rn transcribe(tokenTimestamps, maxLen=1, initial prompt) -> WhisperSegment[] (centiseconds)
-  -> segmentsToWords -> Word[] (seconds) -> computeFeatures -> FeatureVector + SpeechStats
+  -> segmentsToWords (bounded by WAV duration) -> Word[] (seconds)
+  + WAV -> measureActivity -> AudioTiming -> computeFeatures(words, audio) -> FeatureVector + SpeechStats
   -> quality gate -> predict(model) -> computeDrift(history) -> decideTier -> SessionRecord -> SQLite
   -> result screen / trends / PDF report
 ```
@@ -51,11 +52,21 @@ training features match app features.
 `types.ts`, `feature_spec.json`, and `lexicon.json` are contracts shared by the app and the Python
 pipeline. Change them deliberately, and follow the parity rules in `AGENTS.md`.
 
-> **Known defect (see `HANDOFF.md` P0):** the pause rules below measure silence as the gap between
-> Whisper word timestamps. whisper.cpp token timestamps are contiguous without DTW, so those gaps are
-> always ~0. The definitions are implemented faithfully, but they do not yet measure real pauses.
+## Feature definitions (spec_version 2) — TS and Python must match to 1e-9
 
-## Feature definitions (spec_version 1) — TS and Python must match to 1e-9
+### Audio activity (audio/activity.ts and training/activity.py)
+Decode mono PCM16 WAV and use its sample count / sample rate as the real duration. Scan
+non-overlapping 20 ms frames (floor(rate * 20 / 1000) samples; include the final partial frame).
+For each frame, accumulate `(sample / 32768)^2` in order; active means RMS >= 0.01.
+Keep consecutive active runs lasting at least 60 ms. Their start/end sample indices divided by
+sample rate form ordered `speech_intervals`. Do not bridge quiet frames. Leading/trailing silence
+is not a pause. The owner's `pause_gap_s = 0.5` is unchanged.
+
+This is an energy heuristic, not validated voice activity detection: loud background noise can
+hide pauses, and quiet speech can be missed. A successful sample test is not clinical validation.
+Whisper timestamps are used only for transcript inspection, never for pause measurement.
+Production callers clamp word times to [0, actual audio duration], discard words starting at or
+beyond the end, and discard zero-duration words. This prevents Whisper padding from extending time.
 
 ### segmentsToWords(segments)
 1. Walk segments in order. Skip a segment whose `text` is `''`. Split `text` on runs of whitespace,
@@ -77,10 +88,11 @@ pipeline. Change them deliberately, and follow the parity rules in `AGENTS.md`.
 Lowercase. Replace `’ ‘ `` ` with `'`. Delete every character not in `[a-z0-9'-]`. Strip leading and
 trailing `'` and `-` characters (repeatedly).
 
-### computeFeatures(words) — `P = pause_gap_s`, `W = mattr_window`, `F/PR/FW` = fillers/pronouns/function_words
+### computeFeatures(words, audio) — `P = pause_gap_s`, `W = mattr_window`, `F/PR/FW` = fillers/pronouns/function_words
 - `n_words = len(words)`. `lexical` = words whose text is not in F. `n_lexical = len(lexical)`.
-- `speaking_time_s = max(0, words[-1].end - words[0].start)`, or 0 if there are no words.
-- Gaps over **all** words: `g_i = max(0, words[i+1].start - words[i].end)`. A gap is long if
+- `speaking_time_s = last activity end - first activity start`, or 0 if there is no activity.
+  This is elapsed speech-span time, including internal pauses, not the sum of voiced frames.
+- Gaps between audio activity intervals: `g_i = max(0, intervals[i+1].start - intervals[i].end)`. A gap is long if
   `g_i >= P - 1e-9`. This gives `n_long_pauses` and `long_sum`.
 - If `speaking_time_s > 0`: `words_per_minute = 60*n_words/T`, `pause_rate = 60*n_long_pauses/T`,
   `pause_time_ratio = long_sum/T`. Otherwise all three are 0.
@@ -111,9 +123,10 @@ descending. This must equal sklearn `Pipeline([StandardScaler, LogisticRegressio
    `max(sample std (n-1), std_floor_fraction*model.scaler.scale_i, 1e-6)`. The oriented z is
    `dir_i*(x_i-mean_i)/sd_i`, with `dir` taken from `concern_direction`. The composite is the mean
    oriented z over all features.
-4. Post-baseline sessions are the history items after the last baseline item.
-   `recentComposites` = the composites of the last `recent_window - 1` post-baseline sessions, followed
-   by the current composite.
+4. Post-baseline history is grouped by distinct local day, retaining the latest check per day and
+   excluding baseline dates and the current date. `recentComposites` contains the last
+   `recent_window - 1` such days followed by the current composite. A repeat on a baseline date
+   contributes no recent composite. Repeated checks on one day cannot establish sustained drift.
 
 ### decideTier(input)
 This is the screening decision. It combines `probability` against `threshold` with sustained drift.
@@ -128,8 +141,8 @@ It returns the reasons that drove the tier.
 
 `app/src/__tests__/fixtures/golden_features.json`
 ```json
-{ "spec_version": 1, "generated_by": "training/export_fixtures.py",
-  "cases": [ { "name": "...", "segments": [{"text": " The", "t0": 0, "t1": 32}],
+{ "spec_version": 2, "generated_by": "training/export_fixtures.py",
+  "cases": [ { "name": "...", "audio": {"duration_s": 1, "speech_intervals": []}, "segments": [{"text": " The", "t0": 0, "t1": 32}],
                "expected_words": [{"text": "the", "start": 0.0, "end": 0.32}],
                "expected_features": {"words_per_minute": 0.0, "...": 0.0},
                "expected_stats": {"n_words": 0, "n_lexical": 0, "speaking_time_s": 0.0, "n_long_pauses": 0} } ] }
@@ -146,7 +159,37 @@ The debug screen loads it and compares on-device whisper.rn results against it. 
 timestamps may differ slightly, so compare features with tolerances, not exact equality.
 
 ## Commands
-- App: `cd app && npm run typecheck && npm test`
+- App: `cd app && npm run typecheck && npm test && npm run test:plugins`
 - Training: `cd training && .venv/bin/python -m pytest -q`
 - Dev build: `cd app && npx expo run:ios` / `npx expo run:android`. whisper.rn needs a dev build;
   Expo Go cannot load it.
+
+## Feature upgrades and stored history
+
+The v2 demo model is `synthetic-demo-v2`, still `trained: false`. Baseline calculations accept only
+prior sessions with the current model ID; old v1 measurements must not become a v2 baseline.
+Corpus caches include the spec version and audio timing. The sample fixture carries the spec
+version, raw segments, clamped words, audio timing, features, stats, and Whisper provenance.
+
+## Native backup policy
+
+`app/plugins/with-local-data.js` preserves local-data exclusions across Expo prebuilds. Android
+disables backup and declares exclusions for private storage in both cloud-backup and device-transfer
+rules. iOS marks Documents and Application Support as excluded before React starts; a failure stops
+startup before audio collection. These roots survive the app's delete-all operation. Temporary
+recordings, retained WAVs, SQLite records, and downloaded models are covered by their parent roots.
+
+This uses platform-supported exclusions; it does not claim control over every system migration,
+user-created copy, or privileged backup tool. Physical-device backup verification remains in the
+device test plan. PDFs leave the app only through the user's explicit sharing action.
+
+References: [Android backup rules](https://developer.android.com/identity/data/autobackup) and
+[Apple directory exclusions](https://developer.apple.com/documentation/foundation/optimizing-your-app-s-data-for-icloud-backup).
+
+## iOS scene lifecycle
+
+For Xcode 27 / iOS 27, `expo-build-properties` enables `ios.enableSceneSupport` on Expo 57.0.23+.
+The generated scene manifest selects `EXExpoAppSceneDelegate`; AppDelegate prepares the React
+factory and backup exclusions, while Expo creates the window and starts React from its scene
+delegate. Keep this configuration when regenerating native projects. See
+[Expo's SDK 57 migration guidance](https://github.com/expo/fyi/blob/main/ios-scene-lifecycle.md).

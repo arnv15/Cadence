@@ -1,5 +1,7 @@
 /// <reference types="jest" />
 jest.mock('@/words', () => ({ segmentsToWords: jest.fn() }));
+jest.mock('@/audio/activity', () => ({ measureActivity: jest.fn(() => ({ duration_s: 58.5, speech_intervals: [] })) }));
+jest.mock('@/audio/wav', () => ({ decodeWav: jest.fn(() => ({ samples: new Int16Array(), sampleRate: 16000 })) }));
 jest.mock('@/features', () => ({ computeFeatures: jest.fn() }));
 jest.mock('@/scorer', () => ({ scoreSession: jest.fn() }));
 jest.mock('@/fluency', () => ({ scoreFluency: jest.fn() }));
@@ -28,6 +30,8 @@ jest.mock('expo-file-system', () => {
     get exists(): boolean {
       return present.has(this.uri);
     }
+
+    async bytes(): Promise<Uint8Array> { return new Uint8Array(); }
 
     delete(): void {
       present.delete(this.uri);
@@ -192,6 +196,7 @@ function build(overrides: Partial<Parameters<typeof buildSessionRecord>[0]> = {}
     history: [],
     model: MODEL,
     keepAudio: false,
+    audio: { duration_s: 58.5, speech_intervals: [] },
     ...overrides,
   });
 }
@@ -226,8 +231,8 @@ describe('buildSessionRecord: picture task', () => {
   it('turns segments into words, features and a score', () => {
     const session = build();
 
-    expect(segmentsToWordsMock).toHaveBeenCalledWith([{ text: ' The', t0: 0, t1: 30 }]);
-    expect(computeFeaturesMock).toHaveBeenCalledWith(WORDS);
+    expect(segmentsToWordsMock).toHaveBeenCalledWith([{ text: ' The', t0: 0, t1: 30 }], 58.5);
+    expect(computeFeaturesMock).toHaveBeenCalledWith(WORDS, { duration_s: 58.5, speech_intervals: [] });
     expect(session.words).toBe(WORDS);
     expect(session.features).toBe(FEATURES);
     expect(session.stats).toBe(STATS);
@@ -292,6 +297,7 @@ describe('buildSessionRecord: drift history', () => {
       stored({ id: 'fluency-task', task: 'fluency', fluency: null }),
       stored({ id: 'poor', quality: 'insufficient_speech' }),
       stored({ id: 'featureless', features: null }),
+      stored({ id: 'old-spec', modelId: 'synthetic-demo-v1' }),
     ];
 
     build({ history });

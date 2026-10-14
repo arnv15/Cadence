@@ -55,7 +55,7 @@ def _closes_tag(raw: str) -> bool:
     return raw.endswith(']') or raw.endswith(')')
 
 
-def segments_to_words(segments: Iterable[Dict[str, Any]]) -> List[Word]:
+def segments_to_words(segments: Iterable[Dict[str, Any]], duration_s: Optional[float] = None) -> List[Word]:
     """Merges whisper token segments into words.
 
     With `max_len=1` and `split_on_word=False`, whisper.cpp emits one BPE token per segment. A token
@@ -124,7 +124,12 @@ def segments_to_words(segments: Iterable[Dict[str, Any]]) -> List[Word]:
         text = normalize_word(raw_word['raw'])
         if text == '':
             continue
-        words.append({'text': text, 'start': raw_word['t0'] / 100, 'end': raw_word['t1'] / 100})
+        limit = float('inf') if duration_s is None else duration_s
+        start = min(limit, max(0.0, raw_word['t0'] / 100))
+        end = min(limit, max(start, raw_word['t1'] / 100))
+        if duration_s is not None and (start >= limit or end <= start):
+            continue
+        words.append({'text': text, 'start': start, 'end': end})
     return words
 
 

@@ -223,6 +223,6 @@ export const READING_GUIDE: string[] = [
 
 export const BASELINE_EXPLANATION =
   `Your first ${BASELINE_TARGET_DAYS} days of picture checks become your personal baseline — ` +
-  'the record of how you normally sound. Cadence does not compare you with anyone else, and it ' +
-  'does not judge those first checks. After the baseline is complete, each new check is measured ' +
+  'the record of how you normally sound. The personal comparison starts only when these days ' +
+  'are complete. After that, each new check is measured ' +
   'against it.';

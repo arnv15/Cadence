@@ -111,6 +111,7 @@ CSV_COLUMNS: Tuple[str, ...] = (
     'group',
     'mmse',
     'source',
+    'spec_version',
     'n_words',
     'speaking_time_s',
 ) + spec.FEATURE_NAMES
@@ -161,6 +162,7 @@ def generate(
                 'group': group,
                 'mmse': mmse,
                 'source': SOURCE,
+                'spec_version': spec.SPEC_VERSION,
             }
             speaking_time_s = float(
                 np.clip(rng.normal(SPEAKING_TIME_MEAN_S, SPEAKING_TIME_SD_S), 20.0, 60.0)

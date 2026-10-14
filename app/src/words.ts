@@ -64,7 +64,7 @@ function mergeSegments(segments: WhisperSegment[]): RawWord[] {
 }
 
 /** Merge whisper.cpp token segments (maxLen=1) into normalized words with second timestamps. */
-export function segmentsToWords(segments: WhisperSegment[]): Word[] {
+export function segmentsToWords(segments: WhisperSegment[], durationS?: number): Word[] {
   const words: Word[] = [];
   let inTag = false;
 
@@ -81,7 +81,11 @@ export function segmentsToWords(segments: WhisperSegment[]): Word[] {
 
     const text = normalizeWord(merged.raw);
     if (text === '') continue;
-    words.push({ text, start: merged.t0 / 100, end: merged.t1 / 100 });
+    const limit = durationS ?? Infinity;
+    const start = Math.min(limit, Math.max(0, merged.t0 / 100));
+    const end = Math.min(limit, Math.max(start, merged.t1 / 100));
+    if (durationS !== undefined && (start >= limit || end <= start)) continue;
+    words.push({ text, start, end });
   }
 
   return words;

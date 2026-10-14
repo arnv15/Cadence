@@ -455,3 +455,10 @@ describe('shareReport', () => {
     expect(printed?.html).toContain('No checks have been recorded yet.');
   });
 });
+
+
+it('excludes incompatible model measurements from a current report', () => {
+  const html = render([picture(0, { modelId: 'old-model', tier: 'doctor' }), picture(1)]);
+  expect(html).toContain('1 checks from an earlier model are excluded');
+  expect(html).toContain('1 checks recorded');
+});

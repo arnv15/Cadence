@@ -58,6 +58,8 @@ function RootNavigator() {
         }}>
         <Stack.Protected guard={consented}>
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="result/[id]" />
+          <Stack.Screen name="debug" />
           <Stack.Screen name="record" options={{ gestureEnabled: false }} />
           <Stack.Screen name="fluency" options={{ gestureEnabled: false }} />
           <Stack.Screen name="processing" options={{ gestureEnabled: false }} />

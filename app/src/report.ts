@@ -632,8 +632,10 @@ const STYLES = `
 
 /** Self-contained HTML for a clinician-shareable PDF trend summary. */
 export function buildReportHtml(args: ReportArgs): string {
-  const sessions = chronological(args.sessions);
   const { model } = args;
+  const sessions = chronological(args.sessions.filter(session =>
+    session.task === 'fluency' || session.modelId === model.model_id || session.quality !== 'ok'));
+  const excluded = args.sessions.length - sessions.length;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -650,6 +652,7 @@ export function buildReportHtml(args: ReportArgs): string {
 </header>
 <p class="disclaimer">${escapeHtml(REPORT_DISCLAIMER)}</p>
 ${modelSection(model)}
+${excluded > 0 ? `<p>${excluded} checks from an earlier model are excluded from this summary so incompatible measurements are not combined.</p>` : ''}
 ${baselineSection(sessions)}
 ${latestResultSection(sessions)}
 ${chartsSection(sessions)}

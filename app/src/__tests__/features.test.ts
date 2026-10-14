@@ -1,6 +1,12 @@
-import { computeFeatures, FEATURE_NAMES, isScorable } from '@/features';
+import { computeFeatures as compute, FEATURE_NAMES, isScorable } from '@/features';
 import spec from '@/shared/feature_spec.json';
 import type { Word } from '@/types';
+
+// These hand-annotated intervals intentionally align to the synthetic words.
+function computeFeatures(words: Word[]) {
+  return compute(words, { duration_s: Math.max(0, ...words.map(w => w.end)),
+    speech_intervals: words.map(({ start, end }) => ({ start, end })) });
+}
 
 /** Timestamps are chosen as exact binary fractions so hand-computed values are exact. */
 function w(text: string, start: number, end: number): Word {

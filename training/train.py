@@ -27,7 +27,7 @@ out-of-fold sensitivity is still at least ``TARGET_SENSITIVITY``. The specificit
 is reported next to it.
 
 **Honesty gate.** ``trained`` is ``true`` only when every row is ``source == 'pitt'``. Any synthetic
-row anywhere in the CSV makes this a demo model: ``model_id`` ``synthetic-demo-v1``,
+row anywhere in the CSV makes this a demo model: ``model_id`` ``synthetic-demo-v2``,
 ``trained: false``, and notes that say so. The app is required to show that.
 """
 
@@ -59,8 +59,8 @@ RANDOM_STATE = 0
 C_GRID: Tuple[float, ...] = (0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0)
 L1_RATIO_GRID: Tuple[float, ...] = (0.0, 0.25, 0.5, 0.75, 1.0)
 
-SYNTHETIC_MODEL_ID = 'synthetic-demo-v1'
-PITT_MODEL_ID = 'pitt-cookie-v1'
+SYNTHETIC_MODEL_ID = 'synthetic-demo-v2'
+PITT_MODEL_ID = 'pitt-cookie-v2'
 
 SYNTHETIC_TRAINED_ON = 'synthetic data (not clinical)'
 PITT_TRAINED_ON = 'DementiaBank Pitt corpus, Cookie Theft task, participant-only audio'
@@ -73,7 +73,7 @@ SYNTHETIC_NOTES = (
     'DementiaBank access is granted.'
 )
 
-REQUIRED_COLUMNS: Tuple[str, ...] = ('participant_id', 'label', 'source') + spec.FEATURE_NAMES
+REQUIRED_COLUMNS: Tuple[str, ...] = ('participant_id', 'label', 'source', 'spec_version') + spec.FEATURE_NAMES
 
 
 # --------------------------------------------------------------------------------------------- IO
@@ -85,6 +85,9 @@ def load_features(path: Path) -> pd.DataFrame:
     missing = [name for name in REQUIRED_COLUMNS if name not in frame.columns]
     if missing:
         raise ValueError(f'{path}: missing required columns {missing}')
+
+    if not (frame['spec_version'] == spec.SPEC_VERSION).all():
+        raise ValueError('Feature spec version mismatch: regenerate the feature CSV before training.')
 
     frame = frame.copy()
     frame['participant_id'] = frame['participant_id'].astype(str)
@@ -493,9 +496,9 @@ LIMITATIONS_COMMON = [
     'baseline for exactly that reason.',
     'whisper tiny.en drops most disfluencies and normalizes grammar, so filler and repetition '
     'features under-count what a person actually said.',
-    'With max_len=1 whisper.cpp reports contiguous segment timestamps, so silences land inside a '
-    'word span instead of between two words; the three pause features are therefore ~0 on both '
-    'the training and the app side. See docs and training/README.md.',
+    'Audio pauses use a fixed RMS threshold: background noise may hide pauses and quiet speech '
+    'may be missed. This heuristic needs validation on real phone recordings.',
+
 ]
 
 LIMITATIONS_SYNTHETIC = [

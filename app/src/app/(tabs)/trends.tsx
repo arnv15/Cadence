@@ -21,13 +21,18 @@ import {
 import { listSessions } from '@/db';
 import { useAsync } from '@/hooks/use-async';
 import { useTheme } from '@/hooks/use-theme';
+import { getModel } from '@/model';
 import { DRIFT_Z } from '@/scorer';
 import type { SessionRecord } from '@/types';
 
 export default function TrendsScreen() {
   const { colors } = useTheme();
   const { data, error, loading, reload } = useAsync<SessionRecord[]>(
-    () => listSessions({ order: 'asc' }),
+    async () => {
+      const model = getModel();
+      return (await listSessions({ order: 'asc' })).filter(session =>
+        session.task === 'fluency' || session.modelId === model.model_id);
+    },
     [],
   );
 
@@ -98,6 +103,7 @@ export default function TrendsScreen() {
         <Caption>{`${sessions.length} ${sessions.length === 1 ? 'check' : 'checks'} saved on this phone`}</Caption>
       </View>
 
+      {!getModel().trained && <Banner title="Demo model" body="This prototype’s model uses synthetic data. Charts show speech measurements, not a medical assessment." />}
       <ResultDisclaimer detail="These charts describe how you spoke. They do not measure your memory or your health." />
 
       <Card title="Your personal baseline" subtitle={baseline.ready ? 'Complete' : 'Still building'}>

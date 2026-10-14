@@ -1,161 +1,128 @@
-# Cadence — handoff (2026-09-20)
+# Cadence — handoff (2026-09-22)
 
-Hand-off from a Claude Code session to Codex. Project rules are in [`AGENTS.md`](AGENTS.md), and the
-exact algorithms are in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). This file is the **state
-snapshot and the to-do list**.
+Project rules: [AGENTS.md](AGENTS.md). Algorithms and contracts:
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). This is the current implementation and verification
+snapshot; build success does not imply that the device checklist has passed.
 
-Two parallel build runs were interrupted by usage limits. Most of the code landed anyway. Everything
-under "Verified" was re-checked by hand at the end of the session. Everything else is unverified.
+## Completed implementation
 
-## Verified (2026-09-20)
+- **P0: pause measurement repaired.** Feature specification V2 measures PCM energy in 20 ms frames,
+  keeps activity runs of at least 60 ms, and measures internal pauses between those runs. TypeScript
+  and Python share thresholds through `feature_spec.json`. Word timestamps are clamped to the real
+  audio duration. The bundled 23.792 s sample yields **five long pauses** and a **23.58 s speaking
+  span**, rather than zero pauses and a 30 s padded span. Golden fixtures were regenerated using
+  actual CPU Whisper inference and the synthetic demo model was retrained as `synthetic-demo-v2`.
+  The energy threshold is a deterministic heuristic, not a validated clinical voice detector.
+- **P1: missing screens implemented.** Today, three-step onboarding, picture recording, animal
+  naming, processing/retry, and debug sample parity. Recording includes permission recovery,
+  cancellation, minimum duration, 60 s cutoff, interruption detection, and a stalled-stream watchdog.
+  Processing validates input paths before reading or deleting files. Delete-all refreshes consent.
+- **Baseline compatibility and distinct days.** V1 sessions cannot enter the V2 baseline or PDF
+  summaries. Repeated checks on one date cannot simulate sustained drift across several days.
+  `decideTier` and the owner's `pause_gap_s` choice were left unchanged.
+- **P2: Python tests and training guide.** Tests cover hand-calculated features, real sample timing,
+  CHAT parsing, interviewer exclusion, synthetic training, spec-version rejection, and exported
+  sklearn probability parity. [training/README.md](training/README.md) covers data access, layout,
+  commands, CPU inference, and limitations.
+- **P3: bundling issues fixed.** Use `whisper.rn/index`, with its matching TypeScript alias. Added the
+  required `buffer` package. This app targets iOS and Android, not web. Native run scripts use
+  `expo run:ios` / `expo run:android` because Expo Go cannot load Whisper.
+- **Native backup defaults corrected.** The local-data config plugin disables Android backup and
+  excludes private data from cloud backup/device transfer. On iOS, Documents and Application Support
+  are marked excluded before React starts. Plugin regression checks pass; physical-device backup
+  behavior still needs validation.
+- **iOS 27 startup compatibility.** A headless test exposed UIKit's required scene lifecycle:
+  `Application failed to launch: UIScene life cycle is required for apps built with this SDK`.
+  Enabled the official Expo 57 `expo-build-properties` option `ios.enableSceneSupport`; the fix
+  generates the scene manifest and factory-provider conformance. Rebuilt, installed, and confirmed
+  onboarding renders on iPhone 18 Pro / iOS 27. Both local data roots have the MobileBackup exclusion
+  attribute after launch. The crash report was from the pre-fix test build.
+- **P5 preparation.** Five citations were checked against primary sources; copy separates published
+  results from Cadence's unknown accuracy. Original waveform artwork replaces the configured Expo
+  template icon and splash image. Regenerate it with `cd app && npm run artwork`.
 
-| Check | Result |
+The model is still **`trained: false`**, fitted only to synthetic feature vectors. Never remove the
+Demo model labels or imply clinical accuracy. A demo model cannot produce the doctor tier.
+DementiaBank access and a real-data training/evaluation run remain outstanding.
+
+## Verification
+
+| Check | Latest result |
 |---|---|
-| `cd app && npm run typecheck` | **0 errors** |
-| `cd app && npm test` | **12 suites, 294 tests passing**. This includes `parity.test.ts`: TS matches the Python golden fixtures to 1e-9 for words, stats, features, probability, and logit. |
-| Python CLIs (`synthetic.py`, `train.py`, `transcribe_pitt.py`, `export_fixtures.py`) | import cleanly and `--help` works |
-| `app/assets/model.json` | `synthetic-demo-v1`, `trained: false`. On **synthetic** data: out-of-fold AUC 0.821 (95% CI 0.745–0.889), threshold 0.3254, sensitivity 0.904, specificity 0.456. These numbers mean nothing clinically. They only show that the pipeline runs. |
-| Store name check | "Cadence" is crowded, and there is a medication-reminder app with that name on iOS. Consider "Cadence Voice Check" if the app is ever published. |
+| `cd app && npm run typecheck` | Pass, zero errors |
+| `cd app && npm test -- --runInBand` | **15 suites, 320 tests pass** |
+| `cd app && npm run test:plugins` | **3 native configuration tests pass** |
+| `cd training && CADENCE_WHISPER_CPU=1 .venv/bin/python -m pytest -q` | **13 tests pass**, including local Whisper and fitted sklearn export |
+| iOS Metro/Hermes export | Pass |
+| Android Metro/Hermes export | Pass |
+| Android native `app:assembleDebug` | **BUILD SUCCESSFUL**, including backup exclusions; final incremental build 20 s |
+| iOS native build | **BUILD SUCCEEDED**, including artwork, backup exclusions, and iOS 27 scene lifecycle; dependency warnings, no build errors |
+| Native startup / visual | Onboarding rendered on iOS 26.5, iOS 27 after compatibility fix, and Android API 36; remaining screens pending |
+| Native backup configuration | Android APK manifest/XML exclusions inspected; iOS Documents and Application Support exclusion attributes verified after launch |
+| Android install / launch | APK installation succeeded; first onboarding screen visually verified on API 36 |
+| In-app Whisper sample parity | **Pass** on iOS: owner supplied screenshot, five pauses / 23.58 s span / 23.79 s audio; all nine feature differences zero |
+| Microphone / PDF checks | Pending; see below |
 
-**Never run so far:** any native iOS/Android build, any Metro bundle, any screen render, and
-`pytest` (there are no Python tests yet).
+Mocked native tests and deterministic PCM fixtures do not establish real microphone, UI, or clinical
+performance. A design review identified clipped button labels and stalled microphone handling;
+both were corrected, but native appearance still needs visual verification.
 
-## What exists
+## Next work, in order
 
-- **Core logic (done, tested):** `words.ts`, `features.ts`, `scorer.ts` (predict, personal-baseline
-  drift, `decideTier`), `explain.ts` (plain-language copy), `fluency.ts` + `shared/animals.json`
-  (animal-naming task), `model.ts` (model.json validation).
-- **Services (written, unit-tested with mocks, never run on a device):**
-  - `audio/useRecorder.ts`: expo-audio `useAudioStream`, int16 PCM at 16 kHz, written to WAV
-  - `audio/wav.ts`
-  - `transcribe.ts`: one-time 78 MB model download with a size check, plus whisper.rn transcription
-  - `db.ts`: expo-sqlite with migrations
-  - `pipeline.ts`: record → transcribe → score → save
-  - `report.ts`: HTML → PDF → share sheet
-- **UI (partial):**
-  - done: component kit in `src/components/`, theme, hooks, the root layout with the consent gate
-    (`Stack.Protected`), the tabs layout, and `result/[id].tsx`, `(tabs)/trends.tsx`, `(tabs)/about.tsx`
-  - content: `src/content/` (consent steps, about copy, citations marked verified by an agent)
-  - four original SVG picture scenes in `src/prompts/`
-- **Training:**
-  - `spec.py`, `words.py`, `features.py`
-  - `chat.py` (CHAT transcript parser)
-  - `audio.py` (builds participant-only audio with interviewer speech cut out, to avoid label leakage)
-  - `whisper_runner.py` (pywhispercpp with the same params as the app)
-  - `transcribe_pitt.py`, `synthetic.py`, `train.py` (nested grouped CV, elastic-net LR,
-    sensitivity-first threshold), `export_fixtures.py`
+1. **Continue iOS native runtime testing.** Xcode license has been accepted and the iOS simulator
+   runtime installed. Cadence builds and opens to onboarding. UI automation could not connect to
+   Xcode's Device Hub (repeated timeout); a simulator CLI screenshot confirmed the first screen.
+   The owner completed onboarding and supplied a passing sample-parity screenshot. They mistook
+   the prerecorded sample transcript for their own speech; Debug now explicitly labels the sample,
+   has a separate latest-recording transcript, and links back to Today. The action is now named
+   **Check prerecorded sample** under About → Developer details. Actual microphone transcription
+   still needs verification. iOS 26.5 later refused a headless reboot with `Invalid argument`; iOS 27
+   works after the scene lifecycle fix. Run only one simulator at a time to limit contention.
+2. **Run the device checklist** in [docs/DEVICE_TEST_PLAN.md](docs/DEVICE_TEST_PLAN.md): onboarding,
+   speech-model download/retry, full 60 s recording, transcript/result persistence, built-in sample
+   parity, animal naming, permission denial, cancellation/interruption, PDF preview/share cancellation,
+   delete/reset, dark mode, largest font, and accessibility reading order. Record actual observations.
+   Do not infer a pass from tests or a successful bundle.
+3. **Continue Android runtime tests.** Installation and startup succeeded in a headless API 36
+   emulator with two cores and 2 GB memory. The earlier package-manager stall did not recur. Metro
+   initially listened only on IPv6, so adb reverse could not reach it; forcing IPv4 resolution fixed
+   startup (command below). Native artwork has been synced and the Android build passed with two workers.
+   Use `npx expo prebuild --no-clean` for future incremental config updates; Expo 57 otherwise
+   regenerates native directories. The owner may close the simulator while build-only work continues.
+4. **Human usability and submission work.** Ask a consenting family member to try the flow, record
+   confusion points, and iterate. The owner supplies participation, narration, and submission video.
+   [docs/SUBMISSION.md](docs/SUBMISSION.md) includes the verified national deadline, official rule
+   links, a video outline, and an honest AI-assistance record for the owner to complete. Confirm
+   California district 17 eligibility in the registration portal before submission.
+5. **Real-data research, when access is approved.** Obtain corpus access with the required sponsor,
+   use participant-only audio, train/evaluate with grouped splits, investigate recording/prompt/noise
+   domain shift, and report limitations. Never treat synthetic CV scores as evidence of accuracy.
 
-## To do, in priority order
+## Resume commands and environment
 
-### P0 — Pause measurement is invalid (validity bug, not a parity bug)
-Without DTW, whisper.cpp token timestamps are **contiguous**, so silences are absorbed into the
-preceding word instead of showing up as gaps. Evidence from
-`app/src/shared/parity/sample_pauses_python.json` (pywhispercpp on `assets/samples/sample-pauses.wav`,
-a 23.8 s clip with five deliberate silences of 1.5, 1.2, 2.0, 0.9, and 1.6 s):
+```bash
+# Development JS server; keep running during simulator tests.
+cd app
+NODE_OPTIONS=--dns-result-order=ipv4first npx expo start --localhost --port 8081
+```
 
-- every inter-word gap is exactly `0.0`, so `n_long_pauses: 0`
-- the silences show up as inflated word durations: "kitchen" 1.56 s, "floor" 2.64 s, "laughing" 1.76 s
-- the last word ("path") runs to `30.0` s, the Whisper padding window, so `speaking_time_s` is 29.98 s,
-  longer than the audio itself
+```bash
+# Verified iPhone 18 Pro simulator, iOS 27.
+cd app
+LANG=en_US.UTF-8 npx expo run:ios --device F000A4DE-E7AA-438B-A56E-DE0F21B4422E --no-bundler
+```
 
-As a result, `pause_rate`, `mean_pause_s`, and `pause_time_ratio` read ≈0 for everyone, and
-`words_per_minute` is skewed. These are the features the research relies on most.
+```bash
+# Android compile (JDK 26 on PATH is too new; explicitly use JBR 21).
+cd app/android
+JAVA_HOME=/Users/gupta/Library/Java/JavaVirtualMachines/jbr-21.0.11/Contents/Home \
+ANDROID_HOME=/Users/gupta/Library/Android/sdk ./gradlew app:assembleDebug --no-daemon
+```
 
-Suggested fix: measure silence from the **audio**, not from ASR timestamps.
-- An RMS-energy voice-activity pass over the 16 kHz PCM is deterministic and easy to keep identical
-  in TS and Python.
-- Alternatively, use Silero VAD, which is available in both whisper.rn (`initWhisperVad`) and
-  pywhispercpp.
-
-Keep Whisper for the words and the lexical features. Also clamp word times to the real audio
-duration.
-
-Acceptance:
-- `sample-pauses.wav` yields ≥ 4 long pauses and `speaking_time_s` ≤ 23.8 s in both TS and Python
-- `spec_version` bumped to 2
-- ARCHITECTURE.md updated, fixtures regenerated, the demo model retrained, and parity green
-
-### P1 — Missing screens
-The root layout already declares these routes, but the files do not exist:
-- `(tabs)/index.tsx` — the Today tab:
-  - today's status
-  - a "Start today's voice check" button that opens `/record`
-  - an optional "Animal naming" button that opens `/fluency`
-  - a latest-result card
-  - a "Baseline: n of 5 days" card
-  - the speech-model download card (`getWhisperModelStatus` / `ensureWhisperModel`)
-  - the demo-model banner
-- `onboarding.tsx` — three steps from `CONSENT_STEPS` (`src/content/consent.ts`). "I understand" calls
-  `setSetting('consent_version', CONSENT_VERSION)`. Check how `use-consent.tsx` expects this to be
-  refreshed.
-- `record.tsx` — picture from `pickPrompt(priorPictureCount)`; instructions; a 60 s `ProgressRing`
-  countdown; a level meter (`useRecorder`); Finish allowed after `min_duration_s`; auto-stop; a
-  permission-denied state with `Linking.openSettings`; and a cancel option.
-- `fluency.tsx` — the same flow with no picture: "Name as many different animals as you can."
-- `processing.tsx` — runs `processRecording` with stage labels and a progress bar, handles errors with
-  a retry, then `router.replace('/result/<id>')`.
-- `debug.tsx` — the About screen links here. It shows the model summary, the last session's words with
-  timestamps, and the features. A "Run parity check" button transcribes `sample-pauses.wav` on-device
-  and compares the result with `src/shared/parity/sample_pauses_python.json`.
-
-Build these with the existing component kit and theme so the design stays consistent.
-
-### P2 — Python tests and README
-`training/tests/` and `training/README.md` do not exist yet.
-
-Tests needed:
-- words/features cases computed by hand
-- the `chat.py` parser, run against a realistic `.cha` fixture
-- `audio.build_keep_intervals`, including INV removal
-- a smoke test of synthetic training
-- a check that the exported model reproduces sklearn `predict_proba` to 1e-12
-- a Whisper test on `sample-pauses.wav` (this will fail until P0 is fixed)
-
-The README should cover:
-- how to request DementiaBank access (TalkBank membership needs a faculty or mentor sponsor)
-- the expected data layout
-- the commands to run
-- synthetic versus real models
-- the limitations
-
-### P3 — Native builds (never done)
-1. `cd app && npx expo export --platform ios`. This bundles the JS and catches Metro resolution
-   problems quickly. The main suspect is the bare `'whisper.rn'` import, because its `exports` map has
-   no `"."` entry. If it fails, import `'whisper.rn/index'` or adjust the Metro resolver.
-2. **iOS:** CocoaPods 1.17 is installed. Run `export LANG=en_US.UTF-8`, then `npx expo run:ios`. An
-   iPhone 16 Pro simulator on iOS 18.3 is available, and the simulator can use the Mac's microphone.
-3. **Android:** set `JAVA_HOME` to JBR 21 (see AGENTS.md), then run `npx expo run:android`. The
-   emulator AVD `Medium_Phone_API_36` exists. No NDK is installed, so the first build downloads one
-   (several GB).
-
-### P4 — Verify on a device
-Check each of these:
-- the microphone permission prompt appears
-- a full 60-second recording completes
-- the model downloads (78 MB)
-- a transcript appears
-- the debug-screen parity check passes
-- the tier changes when you speak slowly on purpose, on several different days after the 5-day baseline
-- the PDF shares
-- "Delete all data" works
-- dark mode looks right
-- the app is usable with the largest system font
-
-### P5 — Before submission
-- Spot-check all five citations in `src/content/citations.ts` against their sources. An agent marked
-  them `verified: true`, but a person has not checked them.
-- Replace the Expo template icon and splash screen.
-- By design, `decideTier` can never return `doctor` with the demo model. To show that tier in the demo
-  video, either use a real trained model or explain the demo-model behavior.
-- Record a family usability test and the demo video.
-
-## Environment facts (this Mac)
-
-- Node 22.13
-- Xcode 26.6
-- CocoaPods 1.17.0
-- Python 3.14 (Homebrew)
-- Android SDK at `~/Library/Android/sdk` (no NDK installed)
-- JDKs: JBR 21 and Temurin 17; the `java` on PATH is 26
-- The Whisper model used by the training pipeline is at `training/models/ggml-tiny.en.bin`
-  (gitignored). The app downloads its own copy at runtime from `feature_spec.json → whisper.model_url`.
+- Node 22.13; currently selected Xcode **27.0 (27A266a)**; CocoaPods 1.17; Python 3.14.
+- Android SDK: `~/Library/Android/sdk`; NDK 27.1 was installed during the successful build.
+- APK: `app/android/app/build/outputs/apk/debug/app-debug.apk` (about 258 MB, development build).
+- Training Whisper model: `training/models/ggml-tiny.en.bin` (gitignored). The app downloads its own
+  copy. `CADENCE_WHISPER_CPU=1` avoids the observed Python Metal initialization failure.
+- Generated native projects, local model/data, caches, and build outputs remain gitignored.
+- Changes are local and uncommitted; the owner had pushed a checkpoint before this implementation.

@@ -127,11 +127,19 @@ export function computeDrift(
   }
   const composite = compositeOf(current.features);
 
-  // 4. Recent trend: the tail of the post-baseline sessions, then this one.
-  const postBaseline = history.slice(lastBaselineIndex + 1);
+  // 4. A repeated check on one day must not look like several unusual days.
+  // Keep the latest check per post-baseline day; today's current check replaces earlier ones.
+  const byDay = new Map<string, DriftHistoryItem>();
+  for (const session of history.slice(lastBaselineIndex + 1)) {
+    if (!baselineDays.has(session.localDay) && session.localDay !== current.localDay) {
+      byDay.set(session.localDay, session);
+    }
+  }
+  const postBaseline = [...byDay.values()];
   const tailLength = Math.max(0, BASELINE.recent_window - 1);
   const tail = postBaseline.slice(Math.max(0, postBaseline.length - tailLength));
-  const recentComposites = [...tail.map((item) => compositeOf(item.features)), composite];
+  const recentComposites = baselineDays.has(current.localDay) ? [] :
+    [...tail.map((session) => compositeOf(session.features)), composite];
 
   return {
     status: 'ready',

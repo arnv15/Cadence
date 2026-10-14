@@ -1,6 +1,8 @@
 import { randomUUID } from 'expo-crypto';
 import { File } from 'expo-file-system';
 
+import { measureActivity } from '@/audio/activity';
+import { decodeWav } from '@/audio/wav';
 import { getSetting, insertSession, listSessions, localDayKey } from '@/db';
 import { computeFeatures } from '@/features';
 import { scoreFluency } from '@/fluency';
@@ -8,6 +10,7 @@ import { getModel } from '@/model';
 import { scoreSession } from '@/scorer';
 import { ensureWhisperModel, transcribeWav, type TranscriptionResult } from '@/transcribe';
 import type {
+  AudioTiming,
   CadenceModel,
   DriftHistoryItem,
   FeatureVector,
@@ -34,6 +37,7 @@ export interface BuildSessionArgs {
   history: SessionRecord[];
   model: CadenceModel;
   keepAudio: boolean;
+  audio: AudioTiming;
 }
 
 function describe(error: unknown): string {
@@ -41,11 +45,11 @@ function describe(error: unknown): string {
 }
 
 /** Prior picture sessions that are good enough to sit in the personal baseline, oldest -> newest. */
-function driftHistory(history: SessionRecord[]): DriftHistoryItem[] {
+function driftHistory(history: SessionRecord[], modelId: string): DriftHistoryItem[] {
   return history
     .filter(
       (session): session is SessionRecord & { features: FeatureVector } =>
-        session.task === 'picture' && session.quality === 'ok' && session.features !== null,
+        session.modelId === modelId && session.task === 'picture' && session.quality === 'ok' && session.features !== null,
     )
     .slice()
     .sort((a, b) => (a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : 0))
@@ -56,7 +60,7 @@ function driftHistory(history: SessionRecord[]): DriftHistoryItem[] {
 export function buildSessionRecord(args: BuildSessionArgs): SessionRecord {
   const { id, now, input, transcription, history, model, keepAudio } = args;
 
-  const words = segmentsToWords(transcription.segments);
+  const words = segmentsToWords(transcription.segments, args.audio.duration_s);
   const joined = words.map((word) => word.text).join(' ');
   const transcript = joined.length > 0 ? joined : transcription.text.trim();
   const localDay = localDayKey(now);
@@ -67,7 +71,7 @@ export function buildSessionRecord(args: BuildSessionArgs): SessionRecord {
     localDay,
     task: input.task,
     promptId: input.promptId,
-    durationS: input.durationS,
+    durationS: args.audio.duration_s,
     transcript,
     words,
     audioUri: keepAudio ? input.wavUri : null,
@@ -88,13 +92,13 @@ export function buildSessionRecord(args: BuildSessionArgs): SessionRecord {
     };
   }
 
-  const { features, stats } = computeFeatures(words);
+  const { features, stats } = computeFeatures(words, args.audio);
   const current: DriftHistoryItem = { id, localDay, features };
   const score = scoreSession({
     features,
     stats,
     model,
-    history: driftHistory(history),
+    history: driftHistory(history, model.model_id),
     current,
   });
 
@@ -141,6 +145,10 @@ export async function processRecording(
   );
 
   report('analyzing', null);
+  const audio = await runStage('Could not read the recording', async () => {
+    const decoded = decodeWav(await new File(input.wavUri).bytes());
+    return measureActivity(decoded.samples, decoded.sampleRate);
+  });
   const [history, keepAudioSetting] = await runStage('Could not load your previous sessions', () =>
     Promise.all([listSessions({ order: 'asc' }), getSetting('keep_audio')]),
   );
@@ -163,6 +171,7 @@ export async function processRecording(
       history,
       model,
       keepAudio,
+      audio,
     });
   } catch (error) {
     throw new Error(`Could not analyze the recording: ${describe(error)}`);

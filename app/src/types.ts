@@ -30,14 +30,20 @@ export interface Word {
   end: number;
 }
 
+export interface AudioTiming {
+  duration_s: number;
+  /** Ordered, non-overlapping audio-energy intervals in seconds. */
+  speech_intervals: { start: number; end: number }[];
+}
+
 export interface SpeechStats {
   /** All normalized words, fillers included. */
   n_words: number;
   /** Words excluding fillers. */
   n_lexical: number;
-  /** last word end minus first word start, seconds. */
+  /** First detected activity to last detected activity, including internal pauses, seconds. */
   speaking_time_s: number;
-  /** Inter-word gaps >= pause_gap_s. */
+  /** Internal audio-inactivity gaps >= pause_gap_s. */
   n_long_pauses: number;
 }
 
@@ -106,7 +112,7 @@ export interface DriftSummary {
   perFeature: Partial<Record<FeatureName, number>>;
   /** Mean oriented z for the current session; null while building. */
   composite: number | null;
-  /** Composites of post-baseline sessions (oldest -> newest), ending with the current one; at most recent_window long. */
+  /** Composites of distinct post-baseline days (latest check per day), ending with today; at most recent_window long. */
   recentComposites: number[];
 }
 

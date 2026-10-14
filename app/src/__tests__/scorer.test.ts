@@ -304,6 +304,28 @@ describe('computeDrift once the baseline is ready', () => {
     });
   });
 
+  it('does not turn repeated checks on one bad day into sustained drift', () => {
+    const history = [...flatBaseline,
+      item('repeat1', '2026-01-06', uniform(3)),
+      item('repeat2', '2026-01-06', uniform(3))];
+    const current = item('repeat3', '2026-01-06', uniform(3));
+    const drift = computeDrift(history, current, model);
+    expect(drift.recentComposites).toHaveLength(1);
+    const scored = scoreSession({ features: current.features,
+      stats: { n_words: 40, n_lexical: 40, speaking_time_s: 30, n_long_pauses: 5 },
+      model: makeModel({ intercept: 10 }), history, current });
+    expect(scored.tier).not.toBe('doctor');
+    expect(scored.reasons).not.toContain('sustained_drift');
+  });
+
+  it('uses the latest check per prior day and excludes baseline-day repeats', () => {
+    const history = [...flatBaseline, item('baseline-repeat', '2026-01-05', uniform(100)),
+      item('first', '2026-01-06', uniform(9)), item('latest', '2026-01-06', uniform(0.3))];
+    const drift = computeDrift(history, item('today', '2026-01-07', uniform(0.75)), model);
+    expect(drift.recentComposites).toHaveLength(2);
+    expect(drift.recentComposites[0]).toBeCloseTo(uniformComposite(0.3), 12);
+  });
+
   it('grows recentComposites one session at a time', () => {
     const history = [...flatBaseline, item('p0', '2026-01-06', uniform(0.3))];
 

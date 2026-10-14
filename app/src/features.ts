@@ -1,6 +1,6 @@
 import lexicon from '@/shared/lexicon.json';
 import spec from '@/shared/feature_spec.json';
-import type { FeatureName, FeatureResult, FeatureVector, SpeechStats, Word } from '@/types';
+import type { AudioTiming, FeatureName, FeatureResult, FeatureVector, SpeechStats, Word } from '@/types';
 
 export const FEATURE_SPEC = spec;
 export const LEXICON = lexicon;
@@ -38,18 +38,20 @@ function movingAverageTypeTokenRatio(texts: string[]): number {
   return total / windows;
 }
 
-export function computeFeatures(words: Word[]): FeatureResult {
+export function computeFeatures(words: Word[], audio: AudioTiming): FeatureResult {
   const nWords = words.length;
   const lexicalTexts = words.map((word) => word.text).filter((text) => !FILLERS.has(text));
   const nLexical = lexicalTexts.length;
 
-  const speakingTime = nWords === 0 ? 0 : Math.max(0, words[nWords - 1].end - words[0].start);
+  const intervals = audio.speech_intervals;
+  const speakingTime = intervals.length === 0 ? 0 :
+    Math.max(0, intervals[intervals.length - 1].end - intervals[0].start);
 
-  // Gaps are taken over all words, fillers included.
+  // Silence comes from audio, independent of Whisper token timestamps.
   let nLongPauses = 0;
   let longSum = 0;
-  for (let i = 0; i + 1 < nWords; i += 1) {
-    const gap = Math.max(0, words[i + 1].start - words[i].end);
+  for (let i = 0; i + 1 < intervals.length; i += 1) {
+    const gap = Math.max(0, intervals[i + 1].start - intervals[i].end);
     if (gap >= spec.pause_gap_s - PAUSE_EPSILON) {
       nLongPauses += 1;
       longSum += gap;

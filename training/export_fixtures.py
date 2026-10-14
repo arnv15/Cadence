@@ -34,6 +34,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import features as features_mod
+from activity import measure_activity
+from audio import read_wav_int16, merge_spans
 import spec
 import words as words_mod
 
@@ -291,9 +293,8 @@ def golden_feature_cases() -> List[Dict[str, Any]]:
     assert len(many) > spec.MATTR_WINDOW
     cases.append(('mattr_multiple_windows', spoken(schedule(many, 30))))
 
-    # 18. The last word ends before the first one starts: speaking_time_s clamps to 0, which makes
-    #     the three time-normalized features 0 too.
-    cases.append(('reversed_times_zero_speaking_time', spoken([('later', 500, 520), ('earlier', 100, 120)])))
+    # 18. Out-of-order ASR times do not control timing; the independently supplied activity does.
+    cases.append(('out_of_order_transcript_times', spoken([('later', 500, 520), ('earlier', 100, 120)])))
 
     # 19. A realistic 60-second description with hesitation pauses.
     cases.append(
@@ -306,11 +307,15 @@ def golden_feature_cases() -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
     for name, segments in cases:
         word_list = words_mod.segments_to_words(segments)
-        feature_values, stats = features_mod.compute_features(word_list)
+        duration = max([w['end'] for w in word_list] + [0.0])
+        audio = {'duration_s': duration, 'speech_intervals': [
+            {'start': a, 'end': b} for a, b in merge_spans([(w['start'], w['end']) for w in word_list])]}
+        feature_values, stats = features_mod.compute_features(word_list, audio)
         out.append(
             {
                 'name': name,
                 'segments': segments,
+                'audio': audio,
                 'expected_words': word_list,
                 'expected_features': feature_values,
                 'expected_stats': stats,
@@ -456,9 +461,13 @@ def build_parity_payload(wav_path: Optional[Path] = None) -> Dict[str, Any]:
     source = Path(wav_path) if wav_path is not None else spec.SAMPLE_PAUSES_WAV
     model = whisper_runner.load_model(n_threads=whisper_runner.env_threads())
     segments = whisper_runner.transcribe(model, str(source))
-    word_list = words_mod.segments_to_words(segments)
-    feature_values, stats = features_mod.compute_features(word_list)
+    samples, sample_rate = read_wav_int16(source)
+    audio = measure_activity(samples, sample_rate)
+    word_list = words_mod.segments_to_words(segments, audio['duration_s'])
+    feature_values, stats = features_mod.compute_features(word_list, audio)
     return {
+        'spec_version': spec.SPEC_VERSION,
+        'audio': audio,
         'segments': segments,
         'words': word_list,
         'features': feature_values,

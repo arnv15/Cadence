@@ -27,6 +27,7 @@ import { CITATIONS, CITATIONS_VERIFIED_ON, unverifiedCitations } from '@/content
 import { deleteAllData, getSetting, setSetting } from '@/db';
 import { tierCopy } from '@/explain';
 import { useAsync } from '@/hooks/use-async';
+import { useConsent } from '@/hooks/use-consent';
 import { useTheme } from '@/hooks/use-theme';
 import { getModel } from '@/model';
 import type { CadenceModel, Tier } from '@/types';
@@ -53,6 +54,7 @@ async function loadAbout(): Promise<AboutData> {
 }
 
 export default function AboutScreen() {
+  const { refresh } = useConsent();
   const { colors } = useTheme();
   const { data, error, loading, reload } = useAsync<AboutData>(loadAbout, []);
 
@@ -84,10 +86,11 @@ export default function AboutScreen() {
         setDeleted(true);
         setKeepAudio(false);
         reload();
+        return refresh();
       })
       .catch((cause: unknown) => setSettingError(errorMessage(cause)))
       .then(() => setDeleting(false));
-  }, [reload]);
+  }, [reload, refresh]);
 
   const confirmDelete = useCallback(() => {
     Alert.alert(

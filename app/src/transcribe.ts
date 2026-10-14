@@ -1,5 +1,5 @@
 import { File, Paths } from 'expo-file-system';
-import { initWhisper, type WhisperContext } from 'whisper.rn';
+import { initWhisper, type WhisperContext } from 'whisper.rn/index';
 
 import { ensureDirectory, modelsDirectory } from '@/audio/paths';
 import spec from '@/shared/feature_spec.json';

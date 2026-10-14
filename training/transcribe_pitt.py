@@ -29,9 +29,8 @@ a direct proxy for the diagnosis — and it does not exist in the app, where the
 consecutive PAR spans only when no INV speech falls in it, and cuts every INV region out. Genuine
 participant hesitations survive; "waiting for the interviewer" does not.
 
-Known limitation (see docs and ``training/README.md``): with ``max_len=1`` whisper.cpp reports
-*contiguous* segment timestamps, so the three pause features come out as 0 for every recording.
-That is the same thing the app sees on device, so training and inference still agree.
+Pause measurements come from participant PCM activity, not Whisper timestamps. The deterministic
+energy detector is shared with the app; noise and quiet speech remain limitations.
 """
 
 from __future__ import annotations
@@ -45,6 +44,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 import audio as audio_mod
+from activity import measure_activity, AudioTiming
 import chat as chat_mod
 import features as features_mod
 import spec
@@ -62,6 +62,7 @@ CSV_COLUMNS: Tuple[str, ...] = (
     'group',
     'mmse',
     'source',
+    'spec_version',
     'n_words',
     'speaking_time_s',
 ) + spec.FEATURE_NAMES
@@ -196,9 +197,10 @@ def transcribe_recording(
     target = cache_path(cache_dir, cha_path) if cache_dir is not None else None
     if target is not None:
         cached = read_cache(target, key)
-    if cached is not None:
+    if cached is not None and "audio" in cached:
         return {
             'segments': cached['segments'],
+            'audio': cached['audio'],
             'intervals': [tuple(pair) for pair in cached.get('intervals', [])],
             'kept_s': float(cached.get('kept_s', 0.0)),
             'media': cached.get('media'),
@@ -227,6 +229,7 @@ def transcribe_recording(
         model = whisper_runner.load_model(n_threads=whisper_runner.env_threads())
         model_holder['model'] = model
     segments = whisper_runner.transcribe(model, audio_mod.int16_to_float32(participant))
+    audio = measure_activity(participant, spec.SAMPLE_RATE)
 
     if target is not None:
         write_cache(
@@ -238,11 +241,13 @@ def transcribe_recording(
                 'intervals': [[round(a, 3), round(b, 3)] for a, b in intervals],
                 'kept_s': round(kept_s, 3),
                 'segments': segments,
+                'audio': audio,
                 'whisper': whisper_runner.whisper_provenance(),
             },
         )
     return {
         'segments': segments,
+        'audio': audio,
         'intervals': intervals,
         'kept_s': kept_s,
         'media': str(media_path),
@@ -254,9 +259,10 @@ def row_for(
     transcript: chat_mod.ChatTranscript,
     label: int,
     segments: Iterable[Dict[str, Any]],
+    audio: AudioTiming,
 ) -> Dict[str, Any]:
-    word_list = words_mod.segments_to_words(segments)
-    feature_values, stats = features_mod.compute_features(word_list)
+    word_list = words_mod.segments_to_words(segments, audio["duration_s"])
+    feature_values, stats = features_mod.compute_features(word_list, audio)
     row: Dict[str, Any] = {
         'participant_id': transcript.participant_id,
         'visit': transcript.visit or '',
@@ -264,6 +270,7 @@ def row_for(
         'group': transcript.group or '',
         'mmse': '' if transcript.mmse is None else transcript.mmse,
         'source': 'pitt',
+        'spec_version': spec.SPEC_VERSION,
         'n_words': stats['n_words'],
         'speaking_time_s': stats['speaking_time_s'],
     }
@@ -336,7 +343,7 @@ def run(
             exclude(f'{type(error).__name__}: {error}', cha_path.name)
             continue
 
-        row = row_for(transcript, label, decoded['segments'])
+        row = row_for(transcript, label, decoded['segments'], decoded['audio'])
         stats: features_mod.SpeechStats = {
             'n_words': int(row['n_words']),
             'n_lexical': 0,

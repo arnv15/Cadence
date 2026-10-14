@@ -12,13 +12,13 @@ Congressional App Challenge 2026 · iOS and Android · Everything runs on the ph
 
 1. You describe a picture out loud for one minute.
 2. Whisper (`tiny.en`, running **on the phone** — no audio ever leaves it) transcribes what you said,
-   with a timestamp for every word.
+   with approximate word timestamps for inspection. Pause timing is measured directly from audio.
 3. Cadence measures nine things about your speech: speaking pace, how often and how long you pause,
    vocabulary variety, how often you say "it/that/this" instead of naming things, filler words,
    content-word density, and repeated words.
 4. Two scores are combined:
-   - **Population model** — a logistic regression trained offline on recordings of people with and
-     without dementia, so your speech can be compared to a reference group.
+   - **Demo model** — a logistic regression trained offline on synthetic feature vectors. It
+     demonstrates scoring; it has not learned from real clinical recordings.
    - **Personal baseline** — how today compares to *your own* first five days, which matters more,
      because everyone speaks differently.
 5. You get one of three tiers: **Typical**, **Worth watching**, or **Talk to a doctor**, always with a
@@ -32,8 +32,7 @@ transcript.
 Speech changes — longer pauses, slower pace, vaguer words — are among the earlier observable signs of
 cognitive decline, and a phone can measure them without a clinic visit. Published models on the
 DementiaBank Pitt corpus reach roughly 0.86 AUC on this kind of task, and speech screening for MCI
-sits near 80% sensitivity. That is good enough to say "worth a look", and nowhere near good enough to
-diagnose anyone. Cadence is built to say exactly that, and no more. Sources are listed in the app's
+sits near 80% sensitivity. These research results are not Cadence’s accuracy. Cadence has no established clinical accuracy. Sources are listed in the app's
 About screen.
 
 ## Repository
@@ -63,7 +62,7 @@ cd app && npx expo run:android
 Checks:
 
 ```bash
-cd app && npm run typecheck && npm test
+cd app && npm run typecheck && npm test && npm run test:plugins
 ```
 
 ```bash
@@ -76,3 +75,14 @@ DementiaBank access requires an institutional sponsor and has not been granted y
 `app/assets/model.json` is a **synthetic demo model** (`"trained": false`) that exists only so the
 pipeline runs end to end. The app says so wherever a result is shown. `training/README.md` explains how
 to request access and retrain once it is.
+
+## Implementation status
+
+See [HANDOFF.md](HANDOFF.md) for current verification and outstanding tasks. Feature specification
+v2 measures pauses from PCM energy rather than Whisper token gaps. Onboarding, Today, recording,
+animal naming, processing, and debug routes now exist. Build success is distinct from device testing.
+Use [docs/DEVICE_TEST_PLAN.md](docs/DEVICE_TEST_PLAN.md) to record the remaining runtime checks.
+Submission preparation and the AI-assistance record are in [docs/SUBMISSION.md](docs/SUBMISSION.md).
+
+App artwork is generated from `app/assets/images/cadence-mark.svg` with `cd app && npm run artwork`.
+This project targets native iOS and Android; the on-device Whisper flow is not a web app.

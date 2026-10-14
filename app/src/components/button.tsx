@@ -76,7 +76,7 @@ export function Button({
         <AppText
           variant={size === 'large' ? 'heading' : 'label'}
           style={[styles.label, { color: ink }]}
-          numberOfLines={2}>
+          >
           {label}
         </AppText>
       </View>

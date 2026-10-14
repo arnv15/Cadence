@@ -27,7 +27,7 @@ export interface Citation {
 }
 
 /** The day every entry below was last opened and checked. */
-export const CITATIONS_VERIFIED_ON = '2026-09-20';
+export const CITATIONS_VERIFIED_ON = '2026-09-21';
 
 export const CITATIONS: Citation[] = [
   {
@@ -39,12 +39,10 @@ export const CITATIONS: Citation[] = [
     url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC13405093/',
     identifier: 'PMID 42507664 · doi:10.1371/journal.pdig.0001552',
     relevance:
-      'This is the study Cadence is modelled on. The authors fit an ElasticNet logistic regression ' +
-      'to linguistic features taken from DementiaBank Pitt Cookie Theft picture descriptions, and ' +
-      'report an AUC of 0.858 with 90% sensitivity and 65% specificity at their chosen operating ' +
-      'point. That trade-off — catch most of the people who may have a problem, and accept that ' +
-      'many flagged people turn out to be fine — is the same one Cadence makes. It is also why a ' +
-      '"Worth watching" result is a reason to keep checking in, not a reason to be alarmed.',
+      'This study inspired Cadence’s picture-description task and interpretable model. It reports ' +
+      'AUC 0.858, sensitivity 90%, and specificity 65%. Its model includes semantic embeddings ' +
+      'and differs from Cadence’s nine features. Those results are not Cadence’s performance; ' +
+      'the authors also identify automated transcription and real-world audio as future work.',
     verified: true,
   },
   {
@@ -62,8 +60,8 @@ export const CITATIONS: Citation[] = [
       'them, pooled sensitivity was 80% (95% CI 71–90%), pooled specificity was 77% (95% CI ' +
       '65–89%), and the pooled area under the curve was 0.78 (95% CI 0.70–0.86). Read plainly: ' +
       'even the published research misses roughly one person in five who does have mild cognitive ' +
-      'impairment, and flags roughly one in four who does not. That is the ceiling for this whole ' +
-      'idea, and Cadence sits below it, not above it.',
+      'impairment, and flags roughly one in four who does not. These pooled results do not establish ' +
+      'an accuracy ceiling or measure Cadence’s accuracy, which is unknown.',
     verified: true,
   },
   {
@@ -79,14 +77,10 @@ export const CITATIONS: Citation[] = [
     url: 'https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software',
     identifier: 'Final guidance, issued January 2026',
     relevance:
-      'This final guidance explains which software functions fall outside the FDA’s definition ' +
-      'of a medical device. One of the statutory criteria from the 21st Century Cures Act is that ' +
-      'the software must not be intended to acquire, process or analyze a signal from a signal ' +
-      'acquisition system. Software that analyzes a voice recording in order to screen for or ' +
-      'diagnose a condition therefore does not qualify for that exclusion, and a product of that ' +
-      'kind is regulated as a medical device. Cadence has never been submitted to, reviewed by, ' +
-      'or cleared by the FDA. That is precisely why it is offered as a student research prototype ' +
-      'and why it must not be used to make any decision about anyone’s health.',
+      'This guidance describes criteria for software excluded from the FDA device definition ' +
+      'as non-device clinical decision support, including restrictions on signal analysis. ' +
+      'It does not review or clear Cadence. Calling software a prototype does not itself establish ' +
+      'a regulatory exemption. Cadence has no FDA clearance and must not guide health decisions.',
     verified: true,
   },
   {
@@ -102,7 +96,7 @@ export const CITATIONS: Citation[] = [
     identifier: 'The citation DementiaBank requires for the Pitt corpus',
     relevance:
       'The Pitt corpus, collected at the University of Pittsburgh and shared through ' +
-      'DementiaBank, is the recording set behind almost every published result in this field, ' +
+      'DementiaBank, is one recording set used in speech and dementia research, ' +
       'including the study above. Cadence has not been granted access to it. The model shipped ' +
       'with this app was therefore built on synthetic data and is flagged as untrained: it ' +
       'demonstrates how the app works and has learned nothing about real speech or real illness.',

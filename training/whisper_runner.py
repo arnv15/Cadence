@@ -40,6 +40,7 @@ def load_model(models_dir: Optional[Path] = None, n_threads: Optional[int] = Non
     return Model(
         spec.WHISPER_MODEL,
         models_dir=str(directory),
+        context_params={'use_gpu': False} if os.environ.get('CADENCE_WHISPER_CPU') == '1' else None,
         redirect_whispercpp_logs_to=None,
         **params,
     )

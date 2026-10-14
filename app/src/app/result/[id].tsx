@@ -138,8 +138,8 @@ export default function ResultScreen() {
         {spoken.length > 0 ? spoken : 'Cadence did not pick up any words in this recording.'}
       </AppText>
       <Caption>
-        This is the small on-device speech model&rsquo;s best guess. It mishears words, and every
-        number on this screen was calculated from exactly these words.
+        This is the small on-device speech model&rsquo;s best guess. It can mishear words, which
+        affects the word-based measurements. Pause timing is measured directly from the audio.
       </Caption>
     </Collapsible>
   );
@@ -169,6 +169,7 @@ export default function ResultScreen() {
     return (
       <Screen testID="result-insufficient">
         {header}
+        <ResultDisclaimer />
         <Card>
           <View style={styles.friendly}>
             <Glyph name="mic" color={colors.primary} size={40} />

@@ -17,6 +17,7 @@ import { segmentsToWords } from '@/words';
 
 interface GoldenFeatureCase {
   name: string;
+  audio: import('@/types').AudioTiming;
   segments: WhisperSegment[];
   expected_words: Word[];
   expected_features: Record<string, number>;
@@ -102,7 +103,7 @@ describe('golden fixtures', () => {
 for (const goldenCase of featureCases) {
   describe(`words and features match Python for ${goldenCase.name}`, () => {
     const words = segmentsToWords(goldenCase.segments);
-    const { features, stats } = computeFeatures(words);
+    const { features, stats } = computeFeatures(words, goldenCase.audio);
 
     it('produces the same words', () => {
       expect(words).toEqual(goldenCase.expected_words);

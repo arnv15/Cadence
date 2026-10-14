@@ -10,6 +10,7 @@ export interface ConsentState {
   consented: boolean;
   /** Records consent for the current version. */
   accept: () => Promise<void>;
+  refresh: () => Promise<void>;
 }
 
 const ConsentContext = createContext<ConsentState | null>(null);
@@ -43,9 +44,13 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
     setConsented(true);
   }, []);
 
+  const refresh = useCallback(async () => {
+    setConsented((await getSetting('consent_version')) === CONSENT_VERSION);
+  }, []);
+
   const value = useMemo<ConsentState>(
-    () => ({ loading, consented, accept }),
-    [loading, consented, accept],
+    () => ({ loading, consented, accept, refresh }),
+    [loading, consented, accept, refresh],
   );
 
   return <ConsentContext.Provider value={value}>{children}</ConsentContext.Provider>;
