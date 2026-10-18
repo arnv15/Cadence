@@ -8,6 +8,7 @@ import { Collapsible } from '@/components/collapsible';
 import { Glyph } from '@/components/glyph';
 import { ResultDisclaimer } from '@/components/result-disclaimer';
 import { ResultShareButton } from '@/components/result-share-button';
+import { SampleDataBanner } from '@/components/sample-data-banner';
 import { Screen } from '@/components/screen';
 import { StatRow } from '@/components/stat-row';
 import { AppText, Caption, Heading, Title } from '@/components/text';
@@ -121,12 +122,15 @@ export default function ResultScreen() {
   const spoken = session.transcript.trim();
 
   const header = (
-    <View style={styles.header}>
-      <Title>{session.task === 'fluency' ? 'Your naming check' : 'Your voice check'}</Title>
-      <Caption>
-        {`${formatTimestamp(session.createdAt)} · ${formatDuration(session.durationS)}`}
-      </Caption>
-    </View>
+    <>
+      <View style={styles.header}>
+        <Title>{session.task === 'fluency' ? 'Your naming check' : 'Your voice check'}</Title>
+        <Caption>
+          {`${formatTimestamp(session.createdAt)} · ${formatDuration(session.durationS)}`}
+        </Caption>
+      </View>
+      {session.isSample && <SampleDataBanner scope="session" />}
+    </>
   );
 
   const transcriptSection = (

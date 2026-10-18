@@ -22,6 +22,11 @@ export const DEMO_MODEL_NOTICE =
   'This summary was produced by a demo model trained on synthetic data. It has never seen a ' +
   'real clinical recording, and nothing in it says anything about anyone’s health.';
 
+/** Shown whenever any session in the summary was loaded from Debug as sample data. */
+export const SAMPLE_DATA_NOTICE =
+  'This summary includes sample data loaded for testing. Those checks are not recordings of ' +
+  'anyone speaking, and the trends they produce describe invented speech, not a person.';
+
 const REPORT_TITLE = 'Cadence voice check summary';
 /** Rows in the recent-sessions table, newest first. */
 const MAX_TABLE_ROWS = 12;
@@ -654,6 +659,7 @@ export function buildReportHtml(args: ReportArgs): string {
 <p class="generated">${escapeHtml(`Generated ${formatDateTime(args.generatedAt)} · ${sessions.length} checks recorded`)}</p>
 </header>
 <p class="disclaimer">${escapeHtml(REPORT_DISCLAIMER)}</p>
+${sessions.some((session) => session.isSample) ? `<p class="alert">${escapeHtml(SAMPLE_DATA_NOTICE)}</p>` : ''}
 ${modelSection(model)}
 ${excluded > 0 ? `<p>${excluded} checks from an earlier model are excluded from this summary so incompatible measurements are not combined.</p>` : ''}
 ${baselineSection(sessions)}

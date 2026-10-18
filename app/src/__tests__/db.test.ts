@@ -27,6 +27,7 @@ const PICTURE: SessionRecord = {
     { text: 'boy', start: 0.32, end: 0.61 },
   ],
   quality: 'ok',
+  isSample: false,
   features: FEATURES,
   stats: { n_words: 42, n_lexical: 39, speaking_time_s: 22.4, n_long_pauses: 3 },
   prediction: {
@@ -62,6 +63,7 @@ const FLUENCY: SessionRecord = {
   transcript: 'dog cat horse dog',
   words: [],
   quality: 'ok',
+  isSample: false,
   features: null,
   stats: null,
   prediction: null,

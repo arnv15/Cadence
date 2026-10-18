@@ -6,6 +6,7 @@ import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { ProgressBar } from '@/components/progress-bar';
 import { ResultDisclaimer } from '@/components/result-disclaimer';
+import { SampleDataBanner } from '@/components/sample-data-banner';
 import { Screen } from '@/components/screen';
 import { AppText, Caption, Title } from '@/components/text';
 import { TierBadge } from '@/components/tier-badge';
@@ -57,6 +58,7 @@ export default function TodayScreen() {
           <Button label="Download speech model" busy={downloading} onPress={() => void download()} />
           {downloadError && <Banner title="Download did not finish" body={downloadError} tone="caution" />}
         </Card>}
+        {data.sessions.some(session => session.isSample) && <SampleDataBanner scope="screen" />}
         {!data.model.trained && <Banner title="Demo model" body="This prototype uses synthetic training data. Its scores do not measure your chance of having a medical condition." />}
         <Card title={`Baseline: ${baselineCount} of ${spec.baseline.baseline_days} days`}>
           <AppText>{baselineCount < spec.baseline.baseline_days ? 'Your first five days help Cadence learn how you usually speak. Extra checks on the same day do not add baseline days.' : 'Your baseline is ready. Future checks can be compared with your first five days.'}</AppText>

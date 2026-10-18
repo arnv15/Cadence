@@ -8,6 +8,7 @@ import { listSessions } from '@/db';
 import { getModel } from '@/model';
 import {
   DEMO_MODEL_NOTICE,
+  SAMPLE_DATA_NOTICE,
   REPORT_DISCLAIMER,
   buildReportHtml,
   escapeHtml,
@@ -87,6 +88,7 @@ function picture(index: number, overrides: Partial<SessionRecord> = {}): Session
     createdAt: `${day}T18:04:11.000Z`,
     localDay: day,
     task: 'picture',
+    isSample: false,
     promptId: 'cookie-theft',
     durationS: 58,
     transcript: 'the boy is taking cookies out of the jar while his sister watches',
@@ -119,6 +121,7 @@ function fluency(index: number, overrides: Partial<SessionRecord> = {}): Session
     createdAt: `${day}T19:04:11.000Z`,
     localDay: day,
     task: 'fluency',
+    isSample: false,
     promptId: null,
     durationS: 60,
     transcript: 'dog cat horse zebra elephant',
@@ -461,4 +464,10 @@ it('excludes incompatible model measurements from a current report', () => {
   const html = render([picture(0, { modelId: 'old-model', tier: 'doctor' }), picture(1)]);
   expect(html).toContain('1 checks from an earlier model are excluded');
   expect(html).toContain('1 checks recorded');
+});
+
+
+it('says so when the summary includes sample data, and stays quiet when it does not', () => {
+  expect(render([picture(0)])).not.toContain(SAMPLE_DATA_NOTICE);
+  expect(render([picture(0), picture(1, { isSample: true })])).toContain(SAMPLE_DATA_NOTICE);
 });

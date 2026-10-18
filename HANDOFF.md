@@ -4,6 +4,21 @@ Project rules: [AGENTS.md](AGENTS.md). Algorithms and contracts:
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). This is the current implementation and verification
 snapshot; build success does not imply that the device checklist has passed.
 
+## 2026-10-18: sample history for testing trends
+
+`isTooNoisy` is implemented (SNR below `min_snr_db`, or `active_fraction` outside its bounds), so
+the noise gate is live and `quality.test.ts` is green.
+
+Trends, the baseline and the PDF needed five distinct days of data that nobody had, so Debug can now
+load sample history: `src/sample-history.ts` builds seven days of invented words and silences and
+runs them through the real `computeFeatures` / `scoreSession` path. The numbers on screen are
+genuinely computed; only the input is invented. Every row carries `isSample: true`, schema version 2
+adds the `is_sample` column, and Today, Trends, the result screen and the PDF all show a
+**Sample data** notice while any are present. `Remove sample history` deletes only those rows.
+
+Use it for testing and demonstration, label it in any video, and remove it before filming anything
+that is meant to show real use.
+
 ## 2026-10-13: noise robustness (feature spec v3)
 
 The v2 energy detector used a **fixed** 0.01 RMS threshold with no noise check. Mixing noise into
@@ -80,7 +95,7 @@ DementiaBank access and a real-data training/evaluation run remain outstanding.
 | Check | Latest result |
 |---|---|
 | `cd app && npm run typecheck` | Pass, zero errors |
-| `cd app && npm test -- --runInBand` | **16 suites, 329 tests**: 328 pass, 1 fails on the open `isTooNoisy` TODO |
+| `cd app && npm test -- --runInBand` | **17 suites, 336 tests pass** |
 | `cd app && npm run test:plugins` | **3 native configuration tests pass** |
 | `cd training && CADENCE_WHISPER_CPU=1 .venv/bin/python -m pytest -q` | **16 tests pass**, including local Whisper, fitted sklearn export, and noise robustness |
 | iOS Metro/Hermes export | Pass |

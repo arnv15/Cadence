@@ -69,6 +69,8 @@ export function buildSessionRecord(args: BuildSessionArgs): SessionRecord {
     id,
     createdAt: now.toISOString(),
     localDay,
+    // Real recordings are never sample data; only sample-history.ts sets this.
+    isSample: false,
     task: input.task,
     promptId: input.promptId,
     durationS: args.audio.duration_s,

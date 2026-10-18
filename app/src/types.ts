@@ -183,6 +183,11 @@ export type SessionQuality = 'ok' | 'insufficient_speech' | 'too_noisy';
 
 export interface SessionRecord {
   id: string;
+  /**
+   * True for demonstration rows loaded from Debug, never for a real recording. Anything that shows
+   * a session to a person -- result screen, trends, PDF -- must say so when this is set.
+   */
+  isSample: boolean;
   /** ISO timestamp. */
   createdAt: string;
   /** Local calendar day 'YYYY-MM-DD'. */

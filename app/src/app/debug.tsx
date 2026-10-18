@@ -17,12 +17,27 @@ import { useAsync } from '@/hooks/use-async';
 import { getModel } from '@/model';
 import reference from '@/shared/parity/sample_pauses_python.json';
 import { transcribeWav } from '@/transcribe';
+import { loadSampleHistory, removeSampleHistory, SAMPLE_DAYS } from '@/sample-history';
 import { segmentsToWords } from '@/words';
 
 export default function DebugScreen() {
-  const { data, error } = useAsync(async () => ({ model: getModel(), latest: (await listSessions({ limit: 1, order: 'desc' }))[0] }));
+  const { data, error, reload } = useAsync(async () => ({ model: getModel(), latest: (await listSessions({ limit: 1, order: 'desc' }))[0] }));
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState<string | null>(null);
+  const [sampleNote, setSampleNote] = useState<string | null>(null);
+  // Sample history exists so trends, the baseline and the PDF can be exercised before anyone has
+  // recorded on five separate days. Everything it writes is labelled as sample data.
+  const sample = async (load: boolean) => {
+    setBusy(true); setSampleNote(null);
+    try {
+      const count = load ? await loadSampleHistory() : await removeSampleHistory();
+      setSampleNote(load
+        ? `Loaded ${count} sample checks across ${SAMPLE_DAYS} days. Trends and the PDF will show a Sample data notice until you remove them.`
+        : `Removed ${count} sample checks. Your own recordings were not touched.`);
+      reload();
+    } catch (cause) { setSampleNote(errorMessage(cause)); }
+    finally { setBusy(false); }
+  };
   const run = async () => {
     setBusy(true); setReport(null);
     try {
@@ -62,6 +77,16 @@ export default function DebugScreen() {
       <Button label="Check prerecorded sample" busy={busy} onPress={() => void run()} />
       <AppText tone="secondary">The sample has five deliberate pauses. Its measurements are compared with the Python reference. The speech model may need its one-time download.</AppText>
       {report && <Mono selectable>{report}</Mono>}
+      <Card title="Sample history (testing only)">
+        <AppText>
+          Loads {SAMPLE_DAYS} days of invented checks so the trends, baseline and PDF screens can be
+          tested without waiting a week. These are not recordings of anyone speaking, and every
+          screen that shows them says so.
+        </AppText>
+        <Button label="Load sample history" variant="secondary" busy={busy} onPress={() => void sample(true)} />
+        <Button label="Remove sample history" variant="quiet" disabled={busy} onPress={() => void sample(false)} />
+        {sampleNote && <AppText tone="secondary">{sampleNote}</AppText>}
+      </Card>
       {data.latest ? <>
         <Card title="Your latest recording’s transcript">
           <AppText>{data.latest.transcript.trim() || 'No words were picked up in your latest recording.'}</AppText>

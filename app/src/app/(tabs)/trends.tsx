@@ -9,6 +9,7 @@ import { ChartTrend } from '@/components/chart-trend';
 import { Glyph } from '@/components/glyph';
 import { ResultDisclaimer } from '@/components/result-disclaimer';
 import { ResultShareButton } from '@/components/result-share-button';
+import { SampleDataBanner } from '@/components/sample-data-banner';
 import { Screen } from '@/components/screen';
 import { AppText, Caption, Title } from '@/components/text';
 import { Spacing } from '@/constants/theme';
@@ -103,6 +104,7 @@ export default function TrendsScreen() {
         <Caption>{`${sessions.length} ${sessions.length === 1 ? 'check' : 'checks'} saved on this phone`}</Caption>
       </View>
 
+      {sessions.some(session => session.isSample) && <SampleDataBanner scope="screen" />}
       {!getModel().trained && <Banner title="Demo model" body="This prototype’s model uses synthetic data. Charts show speech measurements, not a medical assessment." />}
       <ResultDisclaimer detail="These charts describe how you spoke. They do not measure your memory or your health." />
 

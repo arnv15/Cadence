@@ -18,7 +18,7 @@ import type {
 
 const DATABASE_NAME = 'cadence.db';
 /** Bump with every migration added to MIGRATIONS. */
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 const MIGRATIONS: Record<number, string> = {
   1: `
@@ -48,6 +48,8 @@ const MIGRATIONS: Record<number, string> = {
       value TEXT NOT NULL
     );
   `,
+  // Demonstration rows loaded from Debug, so they can be labelled and removed again.
+  2: `ALTER TABLE sessions ADD COLUMN is_sample INTEGER NOT NULL DEFAULT 0;`,
 };
 
 /** One row of the sessions table. JSON columns are stored as TEXT. */
@@ -70,6 +72,7 @@ export interface SessionRow {
   reasons: string;
   fluency: string | null;
   audio_uri: string | null;
+  is_sample: number;
 }
 
 function toJson(value: unknown): string | null {
@@ -104,6 +107,7 @@ export function sessionToRow(session: SessionRecord): SessionRow {
     reasons: JSON.stringify(session.reasons),
     fluency: toJson(session.fluency),
     audio_uri: session.audioUri,
+    is_sample: session.isSample ? 1 : 0,
   };
 }
 
@@ -128,6 +132,7 @@ export function rowToSession(row: SessionRow): SessionRecord {
     reasons: fromJson<TierReason[]>(row.reasons) ?? [],
     fluency: fromJson<FluencyResult>(row.fluency),
     audioUri: row.audio_uri,
+    isSample: row.is_sample === 1,
   };
 }
 
@@ -177,10 +182,11 @@ function getDatabase(): Promise<SQLiteDatabase> {
 const INSERT_SQL = `
   INSERT OR REPLACE INTO sessions (
     id, created_at, local_day, task, prompt_id, duration_s, transcript, words, quality,
-    features, stats, prediction, model_id, drift, tier, reasons, fluency, audio_uri
+    features, stats, prediction, model_id, drift, tier, reasons, fluency, audio_uri, is_sample
   ) VALUES (
     $id, $created_at, $local_day, $task, $prompt_id, $duration_s, $transcript, $words, $quality,
-    $features, $stats, $prediction, $model_id, $drift, $tier, $reasons, $fluency, $audio_uri
+    $features, $stats, $prediction, $model_id, $drift, $tier, $reasons, $fluency, $audio_uri,
+    $is_sample
   )
 `;
 
@@ -206,7 +212,15 @@ export async function insertSession(session: SessionRecord): Promise<void> {
     $reasons: row.reasons,
     $fluency: row.fluency,
     $audio_uri: row.audio_uri,
+    $is_sample: row.is_sample,
   });
+}
+
+/** Removes every demonstration row, leaving real recordings untouched. Returns how many went. */
+export async function deleteSampleSessions(): Promise<number> {
+  const db = await getDatabase();
+  const result = await db.runAsync('DELETE FROM sessions WHERE is_sample = 1');
+  return result.changes;
 }
 
 export async function getSession(id: string): Promise<SessionRecord | null> {

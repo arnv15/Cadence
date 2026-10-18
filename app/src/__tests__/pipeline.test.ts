@@ -169,6 +169,7 @@ function stored(overrides: Partial<SessionRecord>): SessionRecord {
     createdAt: '2026-09-01T10:00:00.000Z',
     localDay: '2026-09-01',
     task: 'picture',
+    isSample: false,
     promptId: 'cookie-theft',
     durationS: 60,
     transcript: 'previous',
