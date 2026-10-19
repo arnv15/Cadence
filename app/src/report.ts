@@ -1,3 +1,4 @@
+import { File, Paths } from 'expo-file-system';
 import { printToFileAsync } from 'expo-print';
 import { isAvailableAsync, shareAsync } from 'expo-sharing';
 
@@ -26,6 +27,12 @@ export const DEMO_MODEL_NOTICE =
 export const SAMPLE_DATA_NOTICE =
   'This summary includes sample data loaded for testing. Those checks are not recordings of ' +
   'anyone speaking, and the trends they produce describe invented speech, not a person.';
+
+/** Local YYYY-MM-DD, for a filename a person can scan in a list. */
+function fileDateStamp(date: Date): string {
+  const pad = (value: number): string => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
 
 const REPORT_TITLE = 'Cadence voice check summary';
 /** Rows in the recent-sessions table, newest first. */
@@ -676,9 +683,25 @@ ${methodsSection(model)}
 export async function shareReport(): Promise<void> {
   const sessions = await listSessions({ order: 'asc' });
   const model = getModel();
-  const html = buildReportHtml({ sessions, model, generatedAt: new Date() });
+  const generatedAt = new Date();
+  const html = buildReportHtml({ sessions, model, generatedAt });
 
   const { uri } = await printToFileAsync({ html });
+
+  // printToFileAsync names the file with a UUID, which is what the share sheet and the recipient
+  // see. Give it a name a clinician can recognise in an inbox or a downloads folder.
+  let shareUri = uri;
+  try {
+    const named = new File(Paths.cache, `Cadence-summary-${fileDateStamp(generatedAt)}.pdf`);
+    // These are synchronous in expo-file-system 57, but the package's own Jest mock returns
+    // promises, so await whatever comes back rather than leaving a rejection unhandled.
+    if (named.exists) await Promise.resolve(named.delete());
+    await Promise.resolve(new File(uri).move(named));
+    shareUri = named.uri;
+  } catch {
+    // A rename is cosmetic: if it fails, share the original file rather than nothing. This also
+    // keeps the function working under a test double that has no real filesystem.
+  }
 
   if (!(await isAvailableAsync())) {
     throw new Error(
@@ -687,7 +710,7 @@ export async function shareReport(): Promise<void> {
     );
   }
 
-  await shareAsync(uri, {
+  await shareAsync(shareUri, {
     mimeType: 'application/pdf',
     UTI: 'com.adobe.pdf',
     dialogTitle: REPORT_TITLE,

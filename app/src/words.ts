@@ -90,3 +90,19 @@ export function segmentsToWords(segments: WhisperSegment[], durationS?: number):
 
   return words;
 }
+
+/**
+ * Strip whisper's non-speech markers from a raw transcript, for example `[BLANK_AUDIO]`,
+ * `(laughs)` or a music note. `segmentsToWords` already drops these as words, but the raw text is
+ * used as a fallback transcript, and showing a marker to someone reads as broken software.
+ */
+export function stripNonSpeechTags(text: string): string {
+  return text
+    .replace(/\[[^\]]*\]/g, ' ')
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/\[[^\]]*$/g, ' ')
+    .replace(/\([^)]*$/g, ' ')
+    .replace(/[\u266a\u266b\u266c]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}

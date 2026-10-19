@@ -13,6 +13,9 @@ const Y_AXIS_LABEL_WIDTH = 56;
 const CHART_HEIGHT = 170;
 const MIN_POINT_SPACING = 28;
 const MAX_POINT_SPACING = 76;
+/** Room for a full date label like 'Oct 12' at the caption font size. */
+const X_LABEL_WIDTH = 64;
+
 /** Above this many points the x labels are thinned out so they stop colliding. */
 const MAX_X_LABELS = 6;
 
@@ -83,6 +86,18 @@ export function ChartTrend({ series, referenceValue, referenceLabel, testID }: C
     value: item.value,
     // Thin the labels, but never drop the newest one — that is the one people look for.
     label: index === lastIndex || index % stride === 0 ? item.label : '',
+    // The chart gives each label only `spacing` points of room and truncates past it, which turned
+    // "Oct 12" into "Oc...". Labels are already thinned, so a wider, centred box cannot collide.
+    labelTextStyle: {
+      color: colors.textSecondary,
+      fontSize: Type.caption.fontSize,
+      width: X_LABEL_WIDTH,
+      // Centre each label on its point, except the newest one: a centred box there would hang off
+      // the right edge of the card, so it ends at the point instead.
+      marginLeft:
+        index === lastIndex ? -X_LABEL_WIDTH + Spacing.lg : -X_LABEL_WIDTH / 2 + Spacing.sm,
+      textAlign: index === lastIndex ? ('right' as const) : ('center' as const),
+    },
     dataPointRadius: index === lastIndex ? 6 : 4,
     dataPointColor: index === lastIndex ? colors.primary : colors.chartLine,
   }));
@@ -142,7 +157,8 @@ export function ChartTrend({ series, referenceValue, referenceLabel, testID }: C
                 width={plotWidth}
                 height={CHART_HEIGHT}
                 spacing={spacing}
-                initialSpacing={Spacing.lg}
+                // Half a label box, so the first date is not clipped by the y-axis.
+                initialSpacing={Math.max(Spacing.lg, X_LABEL_WIDTH / 2)}
                 endSpacing={Spacing.lg}
                 maxValue={axis.maxValue}
                 mostNegativeValue={axis.mostNegativeValue}

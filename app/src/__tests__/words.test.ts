@@ -1,5 +1,5 @@
 import type { WhisperSegment } from '@/types';
-import { normalizeWord, segmentsToWords } from '@/words';
+import { normalizeWord, segmentsToWords, stripNonSpeechTags } from '@/words';
 
 /** whisper.cpp timestamps are centiseconds; `segmentsToWords` divides by 100. */
 function seg(text: string, t0: number, t1: number): WhisperSegment {
@@ -150,4 +150,12 @@ describe('segmentsToWords', () => {
 
     expect(words).toEqual([{ text: 'word', start: 0.07, end: 0.57 }]);
   });
+});
+
+it('strips whisper non-speech markers from a fallback transcript', () => {
+  expect(stripNonSpeechTags('[BLANK_AUDIO] [BLANK_AUDIO]')).toBe('');
+  expect(stripNonSpeechTags('  (birds chirping) the cat sat  ')).toBe('the cat sat');
+  expect(stripNonSpeechTags('the cat sat [BLANK_AUDIO')).toBe('the cat sat');
+  expect(stripNonSpeechTags('♪ music ♪ and words')).toBe('music and words');
+  expect(stripNonSpeechTags('a real sentence')).toBe('a real sentence');
 });

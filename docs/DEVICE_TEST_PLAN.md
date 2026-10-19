@@ -3,6 +3,29 @@
 Use a native development build. JavaScript bundles and mocked tests cannot verify microphone,
 Whisper native code, SQLite, PDF printing, or the system share sheet.
 
+## Observations (2026-10-18, iPhone 18 Pro / iOS 27 simulator)
+
+Driven screen by screen on a debug build. Xcode had updated to 27.1 and broke the build first; see
+AGENTS.md for the stale `ExpoModulesJSI` xcframework cache.
+
+| Check | Evidence and status |
+|---|---|
+| Onboarding | All three consent steps render and gate the app; "I understand" stores consent and lands on Today |
+| Speech model download | **Pass.** Downloaded to `Documents/models/ggml-tiny.en.bin`, byte-exact 77,704,715 bytes, matching `model_size_bytes`. Start buttons were correctly disabled until it existed |
+| Microphone permission | Prompt shows the app.json purpose string; Allow proceeds to recording |
+| Recording | **Pass.** 60 s countdown and ring advance; Finish enabled only after the 20 s minimum; WAV written as 1 ch / 16 kHz / Int16, 44.0 s, 1,407,992 bytes |
+| Transcription + scoring | **Pass end to end.** Simulator captured silence (no audio input route), so Whisper returned no words, the gate returned `insufficient_speech`, and the result screen showed the friendly "couldn't hear enough speech" state |
+| Audio deletion | **Pass.** `Documents/recordings/` was empty after processing, with keep-audio off |
+| Bundled sample parity | **Pass on device under spec v3.** 5 long pauses, 23.58 s span / 23.79 s audio, all nine feature differences 0.000000 |
+| Sample history | **Pass.** Loaded 9 checks across 7 days; baseline reported Complete; Sample data banner shown on Today and Trends |
+| Trends charts | **Pass.** Pace, pauses, drift and animal-count charts draw; sample drift visible in the last two days |
+| PDF summary | **Pass.** 52 KB PDF, native share sheet opened; rendered page carries the not-a-diagnosis line, the sample-data notice, the demo-model warning and the full model table |
+| Transcript display | **Bug found and fixed.** A silent recording stored `[BLANK_AUDIO] [BLANK_AUDIO]` and showed it as the transcript. Now stripped, so the empty state shows instead |
+| Chart date labels | **Bug found and fixed.** X-axis dates truncated to "Oc..."; labels now render in full and inside the card |
+| PDF filename | **Bug found and fixed.** The share sheet offered a UUID filename; now `Cadence-summary-YYYY-MM-DD.pdf` |
+| Real microphone transcription | **Still unverified.** The simulator records silence, so the owner must do one check in their own voice |
+| Dark mode, largest font, accessibility order, delete-all, Android runtime | Still pending |
+
 ## Observations (2026-09-21–22)
 
 | Check | Evidence and status |

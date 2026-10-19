@@ -1,5 +1,10 @@
 /// <reference types="jest" />
-jest.mock('@/words', () => ({ segmentsToWords: jest.fn() }));
+// segmentsToWords is stubbed per test, but the tag stripper is real: the fallback transcript must
+// never show a whisper marker like [BLANK_AUDIO] to a person.
+jest.mock('@/words', () => ({
+  segmentsToWords: jest.fn(),
+  stripNonSpeechTags: jest.requireActual('@/words').stripNonSpeechTags,
+}));
 jest.mock('@/audio/activity', () => ({ measureActivity: jest.fn(() => ({ duration_s: 58.5, speech_intervals: [] })) }));
 jest.mock('@/audio/wav', () => ({ decodeWav: jest.fn(() => ({ samples: new Int16Array(), sampleRate: 16000 })) }));
 jest.mock('@/features', () => ({ computeFeatures: jest.fn() }));
@@ -379,6 +384,12 @@ describe('buildSessionRecord: transcript and audio', () => {
   it('falls back to whisper’s own text when nothing survived normalization', () => {
     segmentsToWordsMock.mockReturnValue([]);
     expect(build().transcript).toBe('The boy, cookies.');
+  });
+
+  it('never falls back to a whisper non-speech marker', () => {
+    segmentsToWordsMock.mockReturnValue([]);
+    const silent = build({ transcription: { text: '[BLANK_AUDIO] [BLANK_AUDIO]', segments: [] } });
+    expect(silent.transcript).toBe('');
   });
 });
 

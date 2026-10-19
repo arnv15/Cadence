@@ -19,7 +19,7 @@ import type {
   SessionRecord,
   TaskKind,
 } from '@/types';
-import { segmentsToWords } from '@/words';
+import { segmentsToWords, stripNonSpeechTags } from '@/words';
 
 export interface ProcessInput {
   wavUri: string;
@@ -62,7 +62,9 @@ export function buildSessionRecord(args: BuildSessionArgs): SessionRecord {
 
   const words = segmentsToWords(transcription.segments, args.audio.duration_s);
   const joined = words.map((word) => word.text).join(' ');
-  const transcript = joined.length > 0 ? joined : transcription.text.trim();
+  // Whisper emits markers like [BLANK_AUDIO] when it hears nothing. They must never reach the
+  // transcript a person reads; the result screen has a friendly empty state for this.
+  const transcript = joined.length > 0 ? joined : stripNonSpeechTags(transcription.text);
   const localDay = localDayKey(now);
 
   const base = {

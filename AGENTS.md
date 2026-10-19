@@ -93,6 +93,13 @@ whisper.rn is a native module, so **Expo Go will not work**. You need a dev buil
   `ios.enableSceneSupport: true` in `app.json` (supported by Expo 57.0.23+). Without it UIKit aborts
   startup before the app opens. The generated AppDelegate uses `ExpoReactNativeFactoryProvider`;
   the scene manifest references `EXExpoAppSceneDelegate`.
+- **Xcode point updates break Expo's precompiled frameworks.** Xcode 27.1 (Swift 6.4) cannot import
+  the XCFrameworks shipped with Expo 57.0.23, which were built by an earlier Swift: the build fails
+  with `cannot find type '__ObjC::expo' in scope` and `failed to build module 'ExpoModulesJSI'`.
+  Nothing in this project is at fault. The fix is `expo-build-properties` -> `ios.usePrecompiledModules: false`
+  in `app.json`, which builds Expo modules from source against the local toolchain (slower first
+  build). Re-run `npx expo prebuild --no-clean -p ios` after changing it. Bumping Expo to a newer
+  57.0.x patch is the other option, but it churns dependencies.
 - **whisper.rn's `package.json` `exports` map has no `"."` entry.** Use `'whisper.rn/index'`.
   `tsconfig.json` maps that import to `lib/typescript/index.d.ts`; iOS and Android Metro exports pass.
 - **TypeScript 6 defaults `types` to `[]`.** Test files that need Node globals use
