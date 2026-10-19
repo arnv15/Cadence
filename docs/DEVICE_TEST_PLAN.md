@@ -23,6 +23,13 @@ AGENTS.md for the stale `ExpoModulesJSI` xcframework cache.
 | Transcript display | **Bug found and fixed.** A silent recording stored `[BLANK_AUDIO] [BLANK_AUDIO]` and showed it as the transcript. Now stripped, so the empty state shows instead |
 | Chart date labels | **Bug found and fixed.** X-axis dates truncated to "Oc..."; labels now render in full and inside the card |
 | PDF filename | **Bug found and fixed.** The share sheet offered a UUID filename; now `Cadence-summary-YYYY-MM-DD.pdf` |
+| Speaking-pace paragraph clips its tail | **Known cosmetic defect, unfixed.** The reading text under the first chart cuts off at "...taking your tir", losing "— not much more than that". Ruled out: the em dash (removing it changed nothing, and the drift paragraph has one and wraps), text length (the drift paragraph is longer), line clamping (no numberOfLines anywhere), and mid-scroll artefacts (it reproduces after a clean relaunch). The remaining suspect is a stale width measurement on the first chart card, whose onLayout sets state during the same frame. Meaning survives, so it is not blocking |
+| Dark mode | **Pass.** Every screen checked reads correctly on dark; the amber sample-data banner and the cyan chart lines hold contrast |
+| Largest accessibility text | **Pass.** At accessibility-extra-extra-extra-large, text reflows, buttons grow rather than truncate, and the record screen keeps Start/Cancel pinned in a reachable footer. Note: switching the system size while the app is running leaves stale gaps until relaunch, which is a simulator artefact |
+| Delete all my data | **Pass.** Confirmation alert states the consequence and offers "Keep my data". After confirming: sessions 10 -> 0, settings 1 -> 0, recordings directory empty, consent reset so the app returns to onboarding, and the 78 MB speech model is deliberately kept because it is not personal data |
+| App icon | Waveform artwork renders on the iOS home screen |
+| Microphone permission denied | Not completed. Revoking the grant terminates the app (expected iOS behaviour), and the retry needs a manual walk-through. The owner can test it by tapping "Don't Allow" on a fresh install |
+| Accessibility reading order (VoiceOver) | Not testable from this harness, which has no accessibility-tree inspection in this build. Use Xcode's Accessibility Inspector or VoiceOver on a device |
 | Real microphone transcription | **Still unverified.** The simulator records silence, so the owner must do one check in their own voice |
 | Dark mode, largest font, accessibility order, delete-all, Android runtime | Still pending |
 
