@@ -204,9 +204,11 @@ export default function YouScreen() {
               label={`Day ${baseline.count} of ${baseline.target}`}
               testID="you-baseline-progress"
             />
-            <AppText testID="you-baseline-count">
-              {`${baseline.count} of ${baseline.target} baseline days so far.`}
-            </AppText>
+            {baseline.count > 0 ? (
+              <AppText testID="you-baseline-count">
+                {`${baseline.count} of ${baseline.target} baseline days so far.`}
+              </AppText>
+            ) : null}
           </>
         ) : null}
 

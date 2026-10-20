@@ -96,26 +96,40 @@ export function dataSummary(sessions: SessionRecord[]): DataSummary {
 /**
  * The sentence under the baseline figures, or null to show none.
  *
- * This is the repo owner's judgment call, not a mechanical one: see the TODO below.
+ * The hard part is the building stage. No comparison is happening yet, and saying so plainly can
+ * read as "we know something and will not tell you" to someone who opened this app because they
+ * are worried about their memory. So each building line states the honest fact and then closes
+ * the door on that reading: there is no result waiting, only days still to collect.
+ *
+ * It deliberately counts days rather than checks, because extra checks on one day do not move the
+ * baseline, and someone doing three in an afternoon should not be left wondering why.
+ *
+ * A "you have not checked in a while" nudge was considered and left out. Today is the screen that
+ * asks for a check; this one is for looking at what is already saved. Telling a 50-to-85-year-old
+ * that an app noticed they stopped reads as being watched, and someone may have stopped for a
+ * reason that is none of the app's business.
  */
 export function baselineStatusLine(detail: BaselineDetail): string | null {
-  // TODO(human): decide what Cadence says about the baseline at each stage.
-  //
-  // `detail` gives you: count, target (5), ready, firstDay, completedDay, checksSince.
-  // Return one calm sentence, or null to show nothing extra.
-  //
-  // The tension to resolve: while the baseline is building, no comparison is happening at all,
-  // and the screen must be honest about that without making someone feel the app is sitting on
-  // bad news it will not tell them. "Cadence cannot compare your days yet" is accurate; it can
-  // also read as withholding. Decide where the line is at 1 of 5, at 3 of 5, and at 5 of 5.
-  //
-  // Also decide whether a long gap since the last check is worth pointing out here, and if so
-  // after how many days. A nudge is useful; a scolding is not, and this audience may have
-  // stopped checking for a reason that is none of the app's business.
-  //
-  // Constraints: no diagnosis language, nothing stated by colour alone, plain and hedged, and
-  // the word is "checks", not "sessions" (AGENTS.md #6).
-  return null;
+  const remaining = Math.max(0, detail.target - detail.count);
+
+  if (detail.ready) {
+    return detail.checksSince === 0
+      ? 'Your baseline is set. Nothing has been compared with it yet — that starts with your next picture check.'
+      : 'Your baseline is set, so each new picture check is compared with these days as well as scored on its own.';
+  }
+
+  if (detail.count === 0) {
+    return 'You have not recorded a picture check yet. Your first one starts your baseline.';
+  }
+
+  if (remaining === 1) {
+    return 'One more day of checks and Cadence will have enough of your own speech to compare against.';
+  }
+
+  return (
+    'Cadence is still learning how you usually sound, so it is not comparing your days yet. ' +
+    `There is no result waiting behind this — it simply needs ${remaining} more days of checks.`
+  );
 }
 
 /** Longest name the field accepts. Long enough for a full name, short enough for a PDF header. */

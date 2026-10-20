@@ -13,7 +13,7 @@ Challenge build (deadline **2026-10-26, 12:00 pm EDT**). Read [AGENTS.md](../../
 | Display name | `SettingKey` gained `display_name`; no schema migration, `SCHEMA_VERSION` untouched |
 | PDF header | `ReportArgs.displayName`, read by `shareReport` and escaped through `escapeHtml` |
 | Moved off About | Keep-audio switch, delete-everything flow and the app-version row; About now carries a "Go to the You tab" card |
-| Tests | `app/src/__tests__/profile.test.ts` (14) and `you-screen.test.tsx` (12), plus 4 report tests for the named header. Suite went 338 → 368, all green, `tsc` clean |
+| Tests | `app/src/__tests__/profile.test.ts` (20) and `you-screen.test.tsx` (12), plus 4 report tests for the named header. Suite went 338 → 374, all green, `tsc` clean |
 
 Decisions taken while building, which the spec did not settle:
 
@@ -23,8 +23,10 @@ Decisions taken while building, which the spec did not settle:
   changed where a control lives; `consent.ts` says to bump on a change of substance.
 - `SampleDataBanner` gained a third scope, `manage`, so the banner on the You tab says "remove
   them below" instead of sending someone to the tab they are already on.
-- `baselineStatusLine` returns `string | null` so the screen renders nothing while the owner's
-  copy is still a `TODO(human)`. The card is complete and honest without it.
+- `baselineStatusLine` returns `string | null`, so a stage may show no sentence at all. The owner
+  asked for the copy to be written rather than left as a `TODO(human)`; the reasoning behind each
+  stage line, and the decision to leave out a "you have not checked in a while" nudge, is in the
+  function's own comment.
 
 Not done, deliberately: the device-verified checks are on iOS only (see
 [DEVICE_TEST_PLAN.md](../DEVICE_TEST_PLAN.md)); Android still needs a pass on the new tab.
@@ -141,7 +143,7 @@ Audience is adults 50–85, some of them worried about their memory. Body text �
 hedged. Say "checks", not "sessions"; "your usual", not "baseline deviation". No diagnosis language
 anywhere, and the screening disclaimer stays wherever a result is implied.
 
-## Owner's piece (do not write this for them)
+## Owner's piece (written on request, 2026-10-20)
 
 Per AGENTS.md conventions, the repo owner writes the judgment calls. Leave a `TODO(human)` for
 **the baseline-status copy and thresholds** in `app/src/content/profile.ts` — what the screen says

@@ -19,13 +19,17 @@ in `src/content/profile.ts`.
 The optional name is stored under a new `display_name` setting (no migration; `settings` was
 already key/value) and heads a shared PDF, escaped through `escapeHtml` on the way.
 
-**One `TODO(human)` is outstanding**: `baselineStatusLine` in `src/content/profile.ts` — the
-sentence the baseline card shows at 1, 3 and 5 of 5 days, and whether a long gap since the last
-check gets mentioned. It returns `null` for now and the screen renders nothing extra, so the card
-is complete and honest without it. This is the owner's judgment call per the spec.
+`baselineStatusLine` in `src/content/profile.ts` carries the stage copy. The building lines state
+the honest fact — no comparison is happening yet — and then close the door on reading that as
+withheld bad news ("there is no result waiting behind this"), because this audience will reach for
+that interpretation. It counts **days** rather than checks, since extra checks on one day do not
+move the baseline. A "you have not checked in a while" nudge was considered and deliberately left
+out: Today is the screen that asks for a check, and telling someone the app noticed they stopped
+reads as being watched. The tests assert those properties rather than the exact wording, so the
+copy can be reworded without breaking them.
 
-Verified on the iOS simulator; the new tab has not been through an Android pass yet. 368 tests
-green, `tsc` clean.
+Verified on the iOS simulator at all four stages (0, building, last day, complete); the new tab has
+not been through an Android pass yet. 374 tests green, `tsc` clean.
 
 ## 2026-10-18: sample history for testing trends
 

@@ -2,10 +2,12 @@
 import {
   baselineDetail,
   baselineRange,
+  baselineStatusLine,
   dataSummary,
   DISPLAY_NAME_MAX,
   normalizeDisplayName,
   PROFILE_PRIVACY_POINTS,
+  type BaselineDetail,
 } from '@/content/profile';
 import { BASELINE_TARGET_DAYS } from '@/content/trends';
 import type { FeatureVector, SessionRecord } from '@/types';
@@ -146,6 +148,67 @@ it('collapses the range to one date when a baseline spans a single day', () => {
       checksSince: 0,
     }),
   ).toBe('Oct 13');
+});
+
+// ---------------------------------------------------------------- baseline copy
+
+/** The stage lines are copy, so these assert what must be true of them, not their exact wording. */
+function statusAt(count: number, extra: Partial<BaselineDetail> = {}): string {
+  const line = baselineStatusLine({
+    count,
+    target: BASELINE_TARGET_DAYS,
+    ready: count >= BASELINE_TARGET_DAYS,
+    firstDay: count > 0 ? '2026-10-13' : null,
+    completedDay: count >= BASELINE_TARGET_DAYS ? '2026-10-17' : null,
+    checksSince: 0,
+    ...extra,
+  });
+  expect(line).not.toBeNull();
+  return line as string;
+}
+
+it('says nothing is comparable yet without implying a result is being withheld', () => {
+  for (const count of [1, 2, 3]) {
+    const line = statusAt(count);
+    // The honest fact...
+    expect(line).toMatch(/not comparing your days yet/);
+    // ...and the sentence that stops it reading as withholding.
+    expect(line).toMatch(/no result waiting/);
+  }
+});
+
+it('counts the days still needed, not the checks', () => {
+  expect(statusAt(1)).toContain('4 more days of checks');
+  expect(statusAt(3)).toContain('2 more days of checks');
+});
+
+it('has a distinct line for the last day and does not say "1 more days"', () => {
+  const line = statusAt(BASELINE_TARGET_DAYS - 1);
+  expect(line).toContain('One more day of checks');
+  expect(line).not.toMatch(/1 more days/);
+});
+
+it('points a phone with no checks at the first one', () => {
+  expect(statusAt(0)).toContain('Your first one starts your baseline.');
+});
+
+it('distinguishes a finished baseline that has nothing compared with it yet', () => {
+  expect(statusAt(BASELINE_TARGET_DAYS, { checksSince: 0 })).toContain(
+    'Nothing has been compared with it yet',
+  );
+  expect(statusAt(BASELINE_TARGET_DAYS, { checksSince: 3 })).toContain(
+    'compared with these days',
+  );
+});
+
+it('never uses diagnosis language or calls a check a session', () => {
+  const lines = [0, 1, 3, 4, 5].map((count) => statusAt(count, { checksSince: count >= 5 ? 2 : 0 }));
+  for (const line of lines) {
+    expect(line).not.toMatch(/diagnos|dementia|alzheimer|risk|normal\b|abnormal/i);
+    expect(line).not.toMatch(/session/i);
+    // Plain and calm: no exclamation, no shouting.
+    expect(line).not.toContain('!');
+  }
 });
 
 // ---------------------------------------------------------------- data summary
