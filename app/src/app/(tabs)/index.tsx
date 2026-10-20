@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Banner } from '@/components/banner';
 import { Button } from '@/components/button';

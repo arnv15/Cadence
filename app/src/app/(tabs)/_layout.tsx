@@ -3,8 +3,9 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { useTheme } from '@/hooks/use-theme';
 
 /**
- * Three places, named in plain language: what to do now, how it has been going, and what this
- * app is. Native tabs keep the platform's own sizing and accessibility behaviour.
+ * Four places, named in plain language: what to do now, how it has been going, what Cadence has
+ * saved about you, and what this app is. Native tabs keep the platform's own sizing and
+ * accessibility behaviour.
  */
 export default function TabsLayout() {
   const { colors } = useTheme();
@@ -27,6 +28,13 @@ export default function TabsLayout() {
       <NativeTabs.Trigger name="trends">
         <NativeTabs.Trigger.Icon sf="chart.line.uptrend.xyaxis" md="insights" />
         <NativeTabs.Trigger.Label>Trends</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="you">
+        <NativeTabs.Trigger.Icon
+          sf={{ default: 'person.circle', selected: 'person.circle.fill' }}
+          md="person"
+        />
+        <NativeTabs.Trigger.Label>You</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="about">
         <NativeTabs.Trigger.Icon

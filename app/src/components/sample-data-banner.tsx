@@ -5,7 +5,7 @@ import { Banner } from '@/components/banner';
  * trends, baseline and PDF screens can be exercised before anyone has recorded on five separate
  * days, and it must never be mistaken for someone's own speech.
  */
-export function SampleDataBanner({ scope }: { scope: 'screen' | 'session' }) {
+export function SampleDataBanner({ scope }: { scope: 'screen' | 'session' | 'manage' }) {
   return (
     <Banner
       tone="caution"
@@ -15,7 +15,9 @@ export function SampleDataBanner({ scope }: { scope: 'screen' | 'session' }) {
       body={
         scope === 'session'
           ? 'This check was loaded as sample data for testing. It is not a recording of anyone speaking.'
-          : 'Some checks shown here were loaded as sample data for testing, not recorded by you. Remove them from About, Developer details.'
+          : scope === 'manage'
+            ? 'Some of the checks counted here were loaded as sample data for testing, not recorded by you. You can remove them below.'
+            : 'Some checks shown here were loaded as sample data for testing, not recorded by you. You can remove them on the You tab.'
       }
     />
   );

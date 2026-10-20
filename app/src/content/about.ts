@@ -116,9 +116,9 @@ export const LIMITATIONS: Section[] = [
 export const PRIVACY_POINTS: string[] = [
   'Your recordings, your transcripts and your results stay on this phone. There is no Cadence account and no Cadence server.',
   'Nothing is uploaded, and nothing is shared with anyone unless you export a summary yourself and send it.',
-  'Audio is deleted right after a check is analyzed, unless you turn on "Keep my recordings" below.',
+  'Audio is deleted right after a check is analyzed, unless you turn on "Keep my recordings" on the You tab.',
   'The one-time download is the speech model itself, about 78 MB, from the public whisper.cpp model repository. Nothing about you is sent with it.',
-  'Deleting your data below removes every check, every setting and every saved recording from this phone. It cannot be undone, because there is no copy anywhere else.',
+  'Deleting your data on the You tab removes every check, every setting and every saved recording from this phone. It cannot be undone, because there is no copy anywhere else.',
 ];
 
 /** The line that must appear on every result, every export and every chart. */

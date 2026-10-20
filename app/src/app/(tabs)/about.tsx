@@ -1,8 +1,7 @@
-import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { openBrowserAsync } from 'expo-web-browser';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { useCallback } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import { Banner } from '@/components/banner';
 import { Button } from '@/components/button';
@@ -15,7 +14,7 @@ import { StatRow } from '@/components/stat-row';
 import { AppText, Caption, Heading, Title } from '@/components/text';
 import { TierBadge } from '@/components/tier-badge';
 import { errorMessage, formatPercent } from '@/constants/format';
-import { Brand, MinTouch, Radius, Spacing } from '@/constants/theme';
+import { Brand, Spacing } from '@/constants/theme';
 import {
   HOW_IT_WORKS,
   LIMITATIONS,
@@ -24,10 +23,8 @@ import {
   TIER_GUIDE,
 } from '@/content/about';
 import { CITATIONS, CITATIONS_VERIFIED_ON, unverifiedCitations } from '@/content/citations';
-import { deleteAllData, getSetting, setSetting } from '@/db';
 import { tierCopy } from '@/explain';
 import { useAsync } from '@/hooks/use-async';
-import { useConsent } from '@/hooks/use-consent';
 import { useTheme } from '@/hooks/use-theme';
 import { getModel } from '@/model';
 import type { CadenceModel, Tier } from '@/types';
@@ -35,14 +32,12 @@ import type { CadenceModel, Tier } from '@/types';
 const TIER_ORDER: Tier[] = ['typical', 'watch', 'doctor'];
 
 interface AboutData {
-  keepAudio: boolean;
   /** Null when the bundled model file could not be read. */
   model: CadenceModel | null;
   modelError: string | null;
 }
 
 async function loadAbout(): Promise<AboutData> {
-  const keepAudioSetting = await getSetting('keep_audio');
   let model: CadenceModel | null = null;
   let modelError: string | null = null;
   try {
@@ -50,60 +45,12 @@ async function loadAbout(): Promise<AboutData> {
   } catch (cause: unknown) {
     modelError = errorMessage(cause);
   }
-  return { keepAudio: keepAudioSetting === '1', model, modelError };
+  return { model, modelError };
 }
 
 export default function AboutScreen() {
-  const { refresh } = useConsent();
   const { colors } = useTheme();
-  const { data, error, loading, reload } = useAsync<AboutData>(loadAbout, []);
-
-  const [keepAudio, setKeepAudio] = useState<boolean | null>(null);
-  const [settingError, setSettingError] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [deleted, setDeleted] = useState(false);
-
-  const effectiveKeepAudio = keepAudio ?? data?.keepAudio ?? false;
-
-  const toggleKeepAudio = useCallback((next: boolean) => {
-    setKeepAudio(next);
-    setSettingError(null);
-    Promise.resolve()
-      .then(() => setSetting('keep_audio', next ? '1' : '0'))
-      .catch((cause: unknown) => {
-        // Put the switch back where it was: it must never claim a setting that did not save.
-        setKeepAudio(!next);
-        setSettingError(errorMessage(cause));
-      });
-  }, []);
-
-  const runDelete = useCallback(() => {
-    setDeleting(true);
-    setSettingError(null);
-    Promise.resolve()
-      .then(() => deleteAllData())
-      .then(() => {
-        setDeleted(true);
-        setKeepAudio(false);
-        reload();
-        return refresh();
-      })
-      .catch((cause: unknown) => setSettingError(errorMessage(cause)))
-      .then(() => setDeleting(false));
-  }, [reload, refresh]);
-
-  const confirmDelete = useCallback(() => {
-    Alert.alert(
-      'Delete everything Cadence has saved?',
-      'This removes every check, every setting and every saved recording from this phone. ' +
-        'There is no copy anywhere else, so this cannot be undone.',
-      [
-        { text: 'Keep my data', style: 'cancel' },
-        { text: 'Delete everything', style: 'destructive', onPress: runDelete },
-      ],
-      { cancelable: true },
-    );
-  }, [runDelete]);
+  const { data, error } = useAsync<AboutData>(loadAbout, []);
 
   const openCitation = useCallback((url: string) => {
     Promise.resolve()
@@ -114,7 +61,6 @@ export default function AboutScreen() {
   }, []);
 
   const unverified = unverifiedCitations();
-  const appVersion = Constants.expoConfig?.version ?? 'unknown';
   const model = data?.model ?? null;
 
   return (
@@ -233,77 +179,23 @@ export default function AboutScreen() {
             </View>
           ))}
         </View>
-
-        {loading ? (
-          <View style={styles.inlineLoading}>
-            <ActivityIndicator color={colors.primary} />
-            <AppText tone="secondary">Reading your settings&hellip;</AppText>
-          </View>
-        ) : (
-          <Pressable
-            onPress={() => toggleKeepAudio(!effectiveKeepAudio)}
-            accessibilityRole="switch"
-            accessibilityState={{ checked: effectiveKeepAudio }}
-            accessibilityLabel="Keep my recordings"
-            accessibilityHint="When off, each recording is deleted as soon as it has been analyzed"
-            testID="keep-audio-toggle"
-            style={({ pressed }) => [
-              styles.toggleRow,
-              { borderColor: colors.border, backgroundColor: colors.surfaceAlt },
-              pressed && styles.pressed,
-            ]}>
-            <View style={styles.toggleText}>
-              <AppText variant="label">Keep my recordings</AppText>
-              <Caption>
-                {effectiveKeepAudio
-                  ? 'Audio files are kept on this phone after a check is analyzed.'
-                  : 'Audio is deleted as soon as a check has been analyzed. Recommended.'}
-              </Caption>
-            </View>
-            <Switch
-              value={effectiveKeepAudio}
-              onValueChange={toggleKeepAudio}
-              trackColor={{ true: colors.primary, false: colors.borderStrong }}
-              thumbColor={colors.surface}
-              ios_backgroundColor={colors.borderStrong}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-            />
-          </Pressable>
-        )}
-
-        {settingError ? (
-          <AppText variant="caption" style={{ color: colors.destructive }}>
-            {settingError}
-          </AppText>
-        ) : null}
-
-        {deleted ? (
-          <Banner
-            tone="info"
-            title="Everything was deleted"
-            body="Your checks, settings and recordings are gone from this phone."
-            icon="check-circle"
-            testID="delete-confirmation"
-          />
-        ) : null}
-
+        <AppText tone="secondary">
+          Your settings and the controls for your own data live on the You tab: whether recordings
+          are kept, sharing a summary, and deleting everything Cadence has saved.
+        </AppText>
         <Button
-          label="Delete all my data"
-          onPress={confirmDelete}
-          variant="destructive"
-          icon="trash"
-          busy={deleting}
-          hint="Asks you to confirm first. This cannot be undone."
-          testID="delete-all-data"
+          label="Go to the You tab"
+          onPress={() => router.push('/you')}
+          variant="secondary"
+          icon="chevron-right"
+          hint="Your baseline, your saved checks, and the delete control"
+          testID="about-to-you"
         />
       </Card>
 
       {/* ------------------------------------------------------------------ model + version */}
       <Card title="The model in this build">
-        {error ? (
-          <Banner tone="caution" title="Could not read your settings" body={error} />
-        ) : null}
+        {error ? <Banner tone="caution" title="Could not read this build" body={error} /> : null}
         {data?.modelError ? (
           <Banner
             tone="caution"
@@ -327,7 +219,7 @@ export default function AboutScreen() {
             ) : null}
             <StatRow label="Model" value={model.model_id} emphasis />
             <StatRow
-              label="Trained on real recordings"
+              label="Trained on real data"
               value={model.trained ? 'Yes' : 'No — synthetic demo data'}
             />
             {model.trained_on ? <StatRow label="Data" value={model.trained_on} /> : null}
@@ -365,7 +257,6 @@ export default function AboutScreen() {
             {model.notes ? <Caption>{model.notes}</Caption> : null}
           </>
         ) : null}
-        <StatRow label="App version" value={appVersion} />
       </Card>
 
       <Button
@@ -388,21 +279,4 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   bulletText: { flex: 1 },
-  toggleRow: {
-    alignItems: 'center',
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    flexDirection: 'row',
-    gap: Spacing.lg,
-    minHeight: MinTouch,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-  },
-  toggleText: { flex: 1, gap: 2 },
-  pressed: { opacity: 0.85 },
-  inlineLoading: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: Spacing.md,
-  },
 });

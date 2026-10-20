@@ -1,10 +1,10 @@
 /// <reference types="jest" />
 jest.mock('expo-print', () => ({ printToFileAsync: jest.fn() }));
 jest.mock('expo-sharing', () => ({ isAvailableAsync: jest.fn(), shareAsync: jest.fn() }));
-jest.mock('@/db', () => ({ listSessions: jest.fn() }));
+jest.mock('@/db', () => ({ listSessions: jest.fn(), getSetting: jest.fn() }));
 jest.mock('@/model', () => ({ getModel: jest.fn() }));
 
-import { listSessions } from '@/db';
+import { getSetting, listSessions } from '@/db';
 import { getModel } from '@/model';
 import {
   DEMO_MODEL_NOTICE,
@@ -19,6 +19,7 @@ import { printToFileAsync } from 'expo-print';
 import { isAvailableAsync, shareAsync } from 'expo-sharing';
 
 const listSessionsMock = jest.mocked(listSessions);
+const getSettingMock = jest.mocked(getSetting);
 const getModelMock = jest.mocked(getModel);
 const printToFileAsyncMock = jest.mocked(printToFileAsync);
 const isAvailableAsyncMock = jest.mocked(isAvailableAsync);
@@ -410,6 +411,7 @@ describe('shareReport', () => {
     printToFileAsyncMock.mockResolvedValue({ uri: 'file:///cache/report.pdf', numberOfPages: 2 });
     isAvailableAsyncMock.mockResolvedValue(true);
     shareAsyncMock.mockResolvedValue(undefined);
+    getSettingMock.mockResolvedValue(null);
   });
 
   it('renders the stored sessions to a PDF and opens the share sheet', async () => {
@@ -448,6 +450,43 @@ describe('shareReport', () => {
 
     await expect(shareReport()).rejects.toThrow(/Sharing is not available/);
     expect(shareAsyncMock).not.toHaveBeenCalled();
+  });
+
+  it('heads the summary with the name set on the You tab', async () => {
+    getSettingMock.mockResolvedValue('Arnav Gupta');
+
+    await shareReport();
+
+    expect(getSettingMock).toHaveBeenCalledWith('display_name');
+    expect(printToFileAsyncMock.mock.calls[0][0]?.html).toContain(
+      'Checks recorded by Arnav Gupta',
+    );
+  });
+
+  it('escapes a name before it reaches the report', async () => {
+    getSettingMock.mockResolvedValue('<script>alert(1)</script>');
+
+    await shareReport();
+
+    const html = printToFileAsyncMock.mock.calls[0][0]?.html ?? '';
+    expect(html).not.toContain('<script>');
+    expect(html).toContain('&lt;script&gt;');
+  });
+
+  it('shares the summary anyway when the name cannot be read', async () => {
+    getSettingMock.mockRejectedValue(new Error('database is locked'));
+
+    await shareReport();
+
+    // The name is a nicety. Losing it must never cost someone their summary.
+    expect(shareAsyncMock).toHaveBeenCalled();
+    expect(printToFileAsyncMock.mock.calls[0][0]?.html).not.toContain('Checks recorded by');
+  });
+
+  it('leaves the header unnamed when no name is set', async () => {
+    await shareReport();
+
+    expect(printToFileAsyncMock.mock.calls[0][0]?.html).not.toContain('Checks recorded by');
   });
 
   it('still works with no sessions at all', async () => {

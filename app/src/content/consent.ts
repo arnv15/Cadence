@@ -38,9 +38,9 @@ export const CONSENT_STEPS: ConsentStep[] = [
     title: 'Your recordings stay on this phone',
     body: [
       'Everything happens on this device. Your voice is transcribed here, the analysis runs here, and your results are stored here. Nothing is uploaded, and there is no Cadence account or server.',
-      'By default the audio file is deleted as soon as the check has been analyzed, and only the text and the numbers are kept. You can choose to keep your recordings in the About tab, and you can turn that back off at any time.',
+      'By default the audio file is deleted as soon as the check has been analyzed, and only the text and the numbers are kept. You can choose to keep your recordings on the You tab, and you can turn that back off at any time.',
       'The first check downloads a speech-recognition model of about 78 MB, one time. After that, Cadence works without an internet connection.',
-      'You can delete everything Cadence has stored — every check, every setting, and every saved recording — from the About tab, at any time, without asking anyone.',
+      'You can delete everything Cadence has stored — every check, every setting, and every saved recording — from the You tab, at any time, without asking anyone.',
       'Nothing is shared with anyone else unless you choose to share it. If you want your doctor to see a summary, you export a PDF yourself and send it however you like.',
     ],
   },

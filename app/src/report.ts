@@ -2,7 +2,7 @@ import { File, Paths } from 'expo-file-system';
 import { printToFileAsync } from 'expo-print';
 import { isAvailableAsync, shareAsync } from 'expo-sharing';
 
-import { listSessions } from '@/db';
+import { getSetting, listSessions } from '@/db';
 import { reasonCopy, tierCopy } from '@/explain';
 import { getModel } from '@/model';
 import { DRIFT_Z } from '@/scorer';
@@ -12,6 +12,8 @@ export interface ReportArgs {
   sessions: SessionRecord[];
   model: CadenceModel;
   generatedAt: Date;
+  /** Optional name the person set on the You tab, for the header. Never required. */
+  displayName?: string | null;
 }
 
 /** The one line that must appear on every page Cadence produces. */
@@ -663,6 +665,7 @@ export function buildReportHtml(args: ReportArgs): string {
 <body>
 <header>
 <h1>${escapeHtml(REPORT_TITLE)}</h1>
+${args.displayName ? `<p class="generated">${escapeHtml(`Checks recorded by ${args.displayName}`)}</p>` : ''}
 <p class="generated">${escapeHtml(`Generated ${formatDateTime(args.generatedAt)} · ${sessions.length} checks recorded`)}</p>
 </header>
 <p class="disclaimer">${escapeHtml(REPORT_DISCLAIMER)}</p>
@@ -684,7 +687,14 @@ export async function shareReport(): Promise<void> {
   const sessions = await listSessions({ order: 'asc' });
   const model = getModel();
   const generatedAt = new Date();
-  const html = buildReportHtml({ sessions, model, generatedAt });
+  // The name is optional and local. A failure to read it must not cost someone their summary.
+  let displayName: string | null = null;
+  try {
+    displayName = await getSetting('display_name');
+  } catch {
+    displayName = null;
+  }
+  const html = buildReportHtml({ sessions, model, generatedAt, displayName });
 
   const { uri } = await printToFileAsync({ html });
 

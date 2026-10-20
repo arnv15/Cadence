@@ -1,8 +1,33 @@
 # Spec — "You" screen (profile) for Cadence
 
-Status: proposed, not implemented. Target: Congressional App Challenge build (deadline
-**2026-10-26, 12:00 pm EDT**). Read [AGENTS.md](../../AGENTS.md) and
+Status: **implemented 2026-10-20**, except the owner's piece below. Target: Congressional App
+Challenge build (deadline **2026-10-26, 12:00 pm EDT**). Read [AGENTS.md](../../AGENTS.md) and
 [HANDOFF.md](../../HANDOFF.md) before starting.
+
+## What was built
+
+| Spec section | Where it landed |
+|---|---|
+| Route and tab | `app/src/app/(tabs)/you.tsx`, registered in `_layout.tsx` between Trends and About |
+| Baseline, data and name helpers | `app/src/content/profile.ts` — `baselineDetail`, `baselineRange`, `dataSummary`, `normalizeDisplayName`, `PROFILE_PRIVACY_POINTS` |
+| Display name | `SettingKey` gained `display_name`; no schema migration, `SCHEMA_VERSION` untouched |
+| PDF header | `ReportArgs.displayName`, read by `shareReport` and escaped through `escapeHtml` |
+| Moved off About | Keep-audio switch, delete-everything flow and the app-version row; About now carries a "Go to the You tab" card |
+| Tests | `app/src/__tests__/profile.test.ts` (14) and `you-screen.test.tsx` (12), plus 4 report tests for the named header. Suite went 338 → 368, all green, `tsc` clean |
+
+Decisions taken while building, which the spec did not settle:
+
+- The display name **was** built. The spec said to cut it first under deadline pressure; it is six
+  days out, the rules were fully specified, and the spec's own test list assumed it.
+- `CONSENT_VERSION` was **not** bumped, although two onboarding sentences changed. They only
+  changed where a control lives; `consent.ts` says to bump on a change of substance.
+- `SampleDataBanner` gained a third scope, `manage`, so the banner on the You tab says "remove
+  them below" instead of sending someone to the tab they are already on.
+- `baselineStatusLine` returns `string | null` so the screen renders nothing while the owner's
+  copy is still a `TODO(human)`. The card is complete and honest without it.
+
+Not done, deliberately: the device-verified checks are on iOS only (see
+[DEVICE_TEST_PLAN.md](../DEVICE_TEST_PLAN.md)); Android still needs a pass on the new tab.
 
 ## Why
 

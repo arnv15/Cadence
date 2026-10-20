@@ -4,6 +4,29 @@ Project rules: [AGENTS.md](AGENTS.md). Algorithms and contracts:
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). This is the current implementation and verification
 snapshot; build success does not imply that the device checklist has passed.
 
+## 2026-10-20: the You tab
+
+`docs/specs/profile-screen.md` is built. There is now a fourth tab, **You**, which owns the
+person's own data: the personal baseline in detail (days, the range it was built from, and how many
+checks have been compared against it since), what is saved on the phone, an optional local-only
+name, the keep-recordings switch, PDF export, sample removal and delete-everything. About went back
+to being only "what this app is and what the research says" and points at You for the controls.
+
+The baseline is read from `baselineProgress` in `@/content/trends`, never recomputed, so the You
+tab and the Trends tab cannot disagree about whether a baseline is complete. New pure helpers live
+in `src/content/profile.ts`.
+
+The optional name is stored under a new `display_name` setting (no migration; `settings` was
+already key/value) and heads a shared PDF, escaped through `escapeHtml` on the way.
+
+**One `TODO(human)` is outstanding**: `baselineStatusLine` in `src/content/profile.ts` — the
+sentence the baseline card shows at 1, 3 and 5 of 5 days, and whether a long gap since the last
+check gets mentioned. It returns `null` for now and the screen renders nothing extra, so the card
+is complete and honest without it. This is the owner's judgment call per the spec.
+
+Verified on the iOS simulator; the new tab has not been through an Android pass yet. 368 tests
+green, `tsc` clean.
+
 ## 2026-10-18: sample history for testing trends
 
 `isTooNoisy` is implemented (SNR below `min_snr_db`, or `active_fraction` outside its bounds), so
