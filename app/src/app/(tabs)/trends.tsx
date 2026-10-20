@@ -1,5 +1,4 @@
-import { router, useFocusEffect } from 'expo-router';
-import { useCallback } from 'react';
+import { router } from 'expo-router';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { Banner } from '@/components/banner';
@@ -21,6 +20,8 @@ import {
 } from '@/content/trends';
 import { listSessions } from '@/db';
 import { useAsync } from '@/hooks/use-async';
+import { useReloadOnReturn } from '@/hooks/use-reload-on-return';
+import { useSlowLoad } from '@/hooks/use-slow-load';
 import { useTheme } from '@/hooks/use-theme';
 import { getModel } from '@/model';
 import { DRIFT_Z } from '@/scorer';
@@ -38,11 +39,8 @@ export default function TrendsScreen() {
   );
 
   // A check finished on another tab should be on the charts by the time this one is looked at.
-  useFocusEffect(
-    useCallback(() => {
-      reload();
-    }, [reload]),
-  );
+  useReloadOnReturn(reload);
+  const slowLoad = useSlowLoad(loading);
 
   if (loading) {
     return (
@@ -53,6 +51,14 @@ export default function TrendsScreen() {
           <AppText tone="secondary" center>
             Gathering your checks&hellip;
           </AppText>
+          {slowLoad && (
+            <>
+              <AppText tone="secondary" center>
+                This is taking longer than it should.
+              </AppText>
+              <Button label="Try again" variant="secondary" onPress={reload} />
+            </>
+          )}
         </View>
       </Screen>
     );

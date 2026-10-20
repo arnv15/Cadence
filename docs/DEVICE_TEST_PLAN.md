@@ -20,7 +20,14 @@ Debug build driven through adb on the booted emulator.
 | Audio deletion | **Pass.** `files/recordings/` empty after processing |
 | Bundled sample parity | **Pass.** 5 long pauses, 23.58 s span / 23.79 s audio, all nine feature differences 0.000000 — identical to iOS and to the Python reference, which is three-way agreement across separately compiled whisper builds |
 | Transcription speed | The 23.8 s sample took roughly a minute on the emulator, versus near-instant on the iOS simulator. Real Android hardware will differ, but slow mid-range devices remain a risk worth measuring |
-| Android dark mode, largest font, PDF share, delete-all | Still pending |
+| Android dark mode | **Pass.** Every screen checked reads correctly on dark, including the dark splash, the amber sample-data banner and the cyan chart lines |
+| Android largest font | **Pass at font_scale 2.0.** Text reflows and buttons grow. Note: changing the system font size at runtime triggers a configuration change, which is how the Trends stall below was found |
+| Android PDF share | **Pass.** Share sheet opened with the file named `Cadence-summary-2026-10-19.pdf`, offering Quick Share, Print, Drive, Messages and Bluetooth. PDF generation took roughly 30 s on the emulator |
+| Android sample history | **Pass.** 9 checks across 7 days, baseline Complete, Sample data banner on Today and Trends |
+| Android delete all my data | **Pass.** Confirmation states the consequence and offers "Keep my data". After confirming: sessions 0, settings 0, recordings directory empty, speech model kept, and the app returned to onboarding |
+| Speaking-pace paragraph | **Renders in full on Android**, so the clipped tail is iOS-only. That narrows the open defect to iOS text measurement rather than anything in the shared component |
+| **Trends can stall on its loading state after a configuration change** | **Open defect, partly mitigated.** Switching dark mode or the system font size while Trends is open leaves "Gathering your checks..." on screen. Instrumentation proved the loader completes (`listSessions returned 10`) while the screen stays on `loading`, so a state update is being dropped, most likely by a duplicate or stale screen instance after the Android configuration change. It recovers by switching tabs or on the next remount. Mitigated by a "Try again" button that appears after 6 s (`useSlowLoad`), and by `useReloadOnReturn`, which stops the initial load and the focus reload from fighting. Root cause still unidentified |
+| Android cold-start deep link to /trends | Same stall as above. Not on a user path: people tap the tab |
 
 ## Observations (2026-10-18, iPhone 18 Pro / iOS 27 simulator)
 

@@ -1,4 +1,4 @@
-import { router, useFocusEffect } from 'expo-router';
+import { router } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { Banner } from '@/components/banner';
@@ -14,6 +14,7 @@ import { errorMessage } from '@/constants/format';
 import { listSessions, localDayKey } from '@/db';
 import { tierCopy } from '@/explain';
 import { useAsync } from '@/hooks/use-async';
+import { useReloadOnReturn } from '@/hooks/use-reload-on-return';
 import { getModel } from '@/model';
 import spec from '@/shared/feature_spec.json';
 import { ensureWhisperModel, getWhisperModelStatus } from '@/transcribe';
@@ -28,7 +29,7 @@ export default function TodayScreen() {
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
-  useFocusEffect(useCallback(() => { reload(); }, [reload]));
+  useReloadOnReturn(reload);
   const pictures = data?.sessions.filter(session => session.task === 'picture') ?? [];
   const latest = pictures[0];
   const today = localDayKey(new Date());

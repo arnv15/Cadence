@@ -92,11 +92,16 @@ export function ChartTrend({ series, referenceValue, referenceLabel, testID }: C
       color: colors.textSecondary,
       fontSize: Type.caption.fontSize,
       width: X_LABEL_WIDTH,
-      // Centre each label on its point, except the newest one: a centred box there would hang off
-      // the right edge of the card, so it ends at the point instead.
+      // Centre each label on its point, except the outermost two. A centred box at either end hangs
+      // off the card, so the first label starts at its point and the last one ends at its point.
       marginLeft:
-        index === lastIndex ? -X_LABEL_WIDTH + Spacing.lg : -X_LABEL_WIDTH / 2 + Spacing.sm,
-      textAlign: index === lastIndex ? ('right' as const) : ('center' as const),
+        index === lastIndex
+          ? -X_LABEL_WIDTH + Spacing.lg
+          : index === 0
+            ? Spacing.sm
+            : -X_LABEL_WIDTH / 2 + Spacing.sm,
+      textAlign:
+        index === lastIndex ? ('right' as const) : index === 0 ? ('left' as const) : ('center' as const),
     },
     dataPointRadius: index === lastIndex ? 6 : 4,
     dataPointColor: index === lastIndex ? colors.primary : colors.chartLine,
