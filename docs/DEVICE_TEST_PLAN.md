@@ -3,6 +3,25 @@
 Use a native development build. JavaScript bundles and mocked tests cannot verify microphone,
 Whisper native code, SQLite, PDF printing, or the system share sheet.
 
+## Observations (2026-10-19, Android emulator, Medium_Phone_API_36 / API 36)
+
+Debug build driven through adb on the booted emulator.
+
+| Check | Evidence and status |
+|---|---|
+| Gradle build and install | **BUILD SUCCESSFUL** (31 s incremental) with JDK 21; APK installed |
+| Metro connection | Metro bound to `[::1]` only, so `adb reverse` over IPv4 could not reach it and the app showed "Unable to load script". Restarting with `NODE_OPTIONS=--dns-result-order=ipv4first` fixed it. Android bundle: 8.5 s, 1731 modules |
+| Onboarding | All three consent steps render and gate the app, identical copy to iOS |
+| Speech model download | **Pass.** `files/models/ggml-tiny.en.bin`, byte-exact 77,704,715 bytes, same as iOS |
+| Microphone permission | Android prompt appears ("While using the app" / "Only this time" / "Don't allow"); granting proceeds and `RECORD_AUDIO: granted=true` |
+| Recording | **Pass.** Ring and countdown advance, level meter and "Recording on this phone" show, Finish stays disabled until the 20 s minimum |
+| Transcription and scoring | **Pass end to end.** Native whisper.rn ran on Android; emulator captured silence, so the gate returned `insufficient_speech` and the result screen showed the friendly state. Session row: 36.0 s, stats all zero |
+| Transcript marker fix | **Verified on device.** The stored transcript is empty, where iOS stored `[BLANK_AUDIO]` before the fix, so the friendly empty state shows |
+| Audio deletion | **Pass.** `files/recordings/` empty after processing |
+| Bundled sample parity | **Pass.** 5 long pauses, 23.58 s span / 23.79 s audio, all nine feature differences 0.000000 — identical to iOS and to the Python reference, which is three-way agreement across separately compiled whisper builds |
+| Transcription speed | The 23.8 s sample took roughly a minute on the emulator, versus near-instant on the iOS simulator. Real Android hardware will differ, but slow mid-range devices remain a risk worth measuring |
+| Android dark mode, largest font, PDF share, delete-all | Still pending |
+
 ## Observations (2026-10-18, iPhone 18 Pro / iOS 27 simulator)
 
 Driven screen by screen on a debug build. Xcode had updated to 27.1 and broke the build first; see
