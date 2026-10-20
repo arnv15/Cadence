@@ -29,6 +29,42 @@ Debug build driven through adb on the booted emulator.
 | **Trends can stall on its loading state after a configuration change** | **Open defect, partly mitigated.** Switching dark mode or the system font size while Trends is open leaves "Gathering your checks..." on screen. Instrumentation proved the loader completes (`listSessions returned 10`) while the screen stays on `loading`, so a state update is being dropped, most likely by a duplicate or stale screen instance after the Android configuration change. It recovers by switching tabs or on the next remount. Mitigated by a "Try again" button that appears after 6 s (`useSlowLoad`), and by `useReloadOnReturn`, which stops the initial load and the focus reload from fighting. Root cause still unidentified |
 | Android cold-start deep link to /trends | Same stall as above. Not on a user path: people tap the tab |
 
+## You tab on Android (2026-10-20, Medium_Phone_API_36 / API 36)
+
+Driven through adb on the booted emulator. The You tab is pure JavaScript, so the existing debug
+APK served it from Metro with no rebuild.
+
+| Check | Evidence and status |
+|---|---|
+| Four tabs | **Pass.** Today / Trends / You / About. Android shows only the active tab's label, which is the platform's own Material 3 behaviour, not a layout fault |
+| Baseline card | **Pass, identical to iOS.** Complete, "Days in your baseline 5 of 5", "Built from Oct 14 to Oct 18", "Checks since it was complete 2". The range moved with the date, since sample history is generated relative to now |
+| Baseline stage copy | **Pass.** The complete-state line renders; the zero-state line ("You have not recorded a picture check yet") was seen before the sample data loaded |
+| Your data card | **Pass.** 9 checks, Oct 14 to Oct 20, and a "Remove 9 sample checks" button present only while sample rows exist |
+| Keep my recordings | **Pass.** Toggling on saved, the caption flipped, and the summary row above it updated to "Yes / None saved yet". Toggled back off afterwards |
+| Optional name | **Pass end to end.** Typed with surrounding spaces, stored trimmed as "Arnav", and the greeting re-read it from SQLite |
+| Sample-data banner scope | **Pass.** On the You tab it reads "You can remove them below" rather than pointing at the tab the reader is already on |
+| Onboarding copy | **Pass.** Step 3 reads "keep your recordings on the You tab" and "from the You tab, at any time", so the repointed consent copy is correct on Android too |
+| Dark mode | **Pass.** Amber sample banner, readable body text and cyan tab accent. The night-mode configuration change did not stall this screen |
+| Largest font (`font_scale 2.0`) | **Bug found and fixed** — see below. Everything else reflowed correctly |
+| Privacy and build cards | **Pass.** Three privacy lines, model id, demo-model disclosure, app version and consent version |
+
+### StatRow starved its label when the value was long
+
+At `font_scale 2.0` the model row rendered its label as **"M / od / el"** — one letter per line.
+`StatRow` gave the value `flexShrink: 0`, so a long unbreakable value (`synthetic-demo-v3`, or a
+whole sentence at 2x) took the width it wanted and the label column was squeezed below the width
+of its own longest word, at which point the platform broke the word mid-character.
+
+This is the same defect as the iOS "Trained on real recording / s" break seen on 2026-10-19, which
+had been worked around there by shortening the label. The real fix is in the component: the value
+now has `flexShrink: 1` and `maxWidth: '55%'`, so the label always keeps a readable share and a
+long value wraps instead. Verified at `font_scale 2.0` (label intact, value wraps to two lines), at
+1.0 on Android, and on the iOS simulator at the default size — no regression on either platform.
+
+Two rows were also changed to put their detail in `StatRow`'s `hint` rather than in a long value,
+which reads better at every size: "Trained on real data / This build uses a synthetic demo model"
+and "Recordings kept on this phone / None saved yet".
+
 ## Observations (2026-10-18, iPhone 18 Pro / iOS 27 simulator)
 
 Driven screen by screen on a debug build. Xcode had updated to 27.1 and broke the build first; see

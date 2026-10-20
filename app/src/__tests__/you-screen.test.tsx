@@ -189,7 +189,10 @@ it('shows an empty state on a phone with nothing saved', async () => {
 it('never hides that the model is a demonstration one', async () => {
   await mount([picture(DAYS[0])]);
 
-  expect(screenText()).toContain('No — synthetic demo data');
+  const text = screenText();
+  expect(text).toContain('Trained on real data');
+  expect(text).toContain('No');
+  expect(text).toContain('synthetic demo model');
 });
 
 // ---------------------------------------------------------------- keep audio

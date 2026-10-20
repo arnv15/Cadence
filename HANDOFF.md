@@ -28,8 +28,11 @@ out: Today is the screen that asks for a check, and telling someone the app noti
 reads as being watched. The tests assert those properties rather than the exact wording, so the
 copy can be reworded without breaking them.
 
-Verified on the iOS simulator at all four stages (0, building, last day, complete); the new tab has
-not been through an Android pass yet. 374 tests green, `tsc` clean.
+Verified on both platforms, including dark mode and `font_scale 2.0` on Android. That pass found a
+real defect in `StatRow`: the value had `flexShrink: 0`, so a long unbreakable value starved the
+label column until the platform broke the label mid-word — "M / od / el" at 2x on Android, and the
+"recording / s" break seen on iOS the day before. The value now shrinks and is capped at 55%, so
+the label always keeps a readable share. 374 tests green, `tsc` clean.
 
 ## 2026-10-18: sample history for testing trends
 

@@ -295,12 +295,13 @@ export default function YouScreen() {
             ) : null}
             <StatRow
               label="Recordings kept on this phone"
-              value={
+              value={effectiveKeepAudio ? 'Yes' : 'No'}
+              hint={
                 effectiveKeepAudio
                   ? summary.keptRecordings > 0
-                    ? `Yes — ${summary.keptRecordings} saved`
-                    : 'Yes — none saved yet'
-                  : 'No'
+                    ? `${summary.keptRecordings} saved on this phone`
+                    : 'None saved yet'
+                  : undefined
               }
               testID="you-kept-recordings"
             />
@@ -409,9 +410,13 @@ export default function YouScreen() {
         {model !== null ? (
           <>
             <StatRow label="Model" value={model.model_id} />
+            {/* A long value squeezes the label column until the label itself wraps badly, so the
+                demo disclosure (AGENTS.md #2) goes in the hint, which gets the full label column
+                rather than fighting the value for it. */}
             <StatRow
               label="Trained on real data"
-              value={model.trained ? 'Yes' : 'No — synthetic demo data'}
+              value={model.trained ? 'Yes' : 'No'}
+              hint={model.trained ? undefined : 'This build uses a synthetic demo model'}
               testID="you-model-trained"
             />
           </>

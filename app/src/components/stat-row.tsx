@@ -51,7 +51,11 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   value: {
-    flexShrink: 0,
+    // A long unbreakable value (a model id, or a sentence at 2x font scale) would otherwise take
+    // the whole row and squeeze the label until the platform breaks it mid-word: 'M / od / el'.
+    // Capping the value and letting it shrink leaves the label a readable share at any font size.
+    flexShrink: 1,
+    maxWidth: '55%',
     textAlign: 'right',
   },
 });

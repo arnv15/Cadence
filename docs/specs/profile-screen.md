@@ -28,8 +28,9 @@ Decisions taken while building, which the spec did not settle:
   stage line, and the decision to leave out a "you have not checked in a while" nudge, is in the
   function's own comment.
 
-Not done, deliberately: the device-verified checks are on iOS only (see
-[DEVICE_TEST_PLAN.md](../DEVICE_TEST_PLAN.md)); Android still needs a pass on the new tab.
+Verified on both platforms (see [DEVICE_TEST_PLAN.md](../DEVICE_TEST_PLAN.md)): iOS on
+2026-10-20 and Android on the same day, including dark mode and `font_scale 2.0`, which is where
+the `StatRow` label-starvation bug was found and fixed.
 
 ## Why
 
