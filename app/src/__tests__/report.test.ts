@@ -228,6 +228,34 @@ describe('model block', () => {
     const html = render([], DEMO_MODEL);
     expect(html).toContain('None — this model has no measured performance.');
   });
+
+  it('never prints accuracy figures for an untrained model that happens to carry them', () => {
+    // The shipped demo model is exactly this shape: trained false, but with metrics measured on
+    // synthetic data. A clinician reading "382 recordings from 150 people" in a shared PDF would
+    // take that for a real cohort, so the numbers must not appear at all.
+    const untrainedWithMetrics: CadenceModel = {
+      ...DEMO_MODEL,
+      metrics: {
+        cv_auc: 0.820555,
+        cv_auc_ci: [0.744682, 0.88856],
+        sensitivity: 0.904494,
+        specificity: 0.455882,
+        n_participants: 150,
+        n_samples: 382,
+        cv_folds: 5,
+      },
+    };
+    const html = render([picture(0)], untrainedWithMetrics);
+
+    expect(html).toContain('None — this model has no measured performance.');
+    expect(html).not.toContain('Cross-validated AUC');
+    expect(html).not.toContain('Sensitivity / specificity');
+    expect(html).not.toContain('recordings from');
+    expect(html).not.toContain('0.904');
+    expect(html).not.toContain('150');
+    // The demo warning still has to be there.
+    expect(html).toContain(DEMO_MODEL_NOTICE);
+  });
 });
 
 describe('escaping of user-derived text', () => {

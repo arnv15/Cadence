@@ -4,6 +4,17 @@ Project rules: [AGENTS.md](AGENTS.md). Algorithms and contracts:
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). This is the current implementation and verification
 snapshot; build success does not imply that the device checklist has passed.
 
+## 2026-10-20: the exported PDF was printing synthetic accuracy figures
+
+Found while checking the claims in `docs/SUBMISSION.md`. `modelSection` in `src/report.ts` gated its
+metrics rows on `model.metrics` existing, not on `model.trained`. The shipped demo model carries
+metrics measured on synthetic data (AUC 0.821, sensitivity 0.904, "382 recordings from 150 people"),
+so the one document that leaves the phone and reaches a clinician was printing them beside the
+demo-model warning. About had always gated on `trained`; the PDF had not.
+
+The existing test missed it because its fixture was an untrained model with `metrics: null` — a shape
+the real model does not have. The guard now matches About, and a test covers untrained *with* metrics.
+
 ## 2026-10-20: the You tab
 
 `docs/specs/profile-screen.md` is built. There is now a fourth tab, **You**, which owns the

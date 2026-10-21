@@ -299,7 +299,11 @@ function modelSection(model: CadenceModel): string {
   rows.push(row('Feature spec version', String(model.spec_version)));
   rows.push(row('Decision threshold', formatNumber(model.threshold, 3)));
 
-  const metrics = model.metrics;
+  // Only a model fitted on real recordings has performance worth printing. The synthetic demo
+  // model carries metrics from synthetic data, and a clinician reading "382 recordings from 150
+  // people" in a PDF would reasonably take that for a real cohort. About already gates on
+  // `trained`; this is the document that leaves the phone, so it must too.
+  const metrics = model.trained ? model.metrics : null;
   if (metrics) {
     const interval = metrics.cv_auc_ci
       ? ` (95% CI ${formatNumber(metrics.cv_auc_ci[0], 3)}–${formatNumber(metrics.cv_auc_ci[1], 3)})`
