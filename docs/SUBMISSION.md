@@ -240,6 +240,27 @@ screen on each platform.
 If you describe one bug in the video, this group is a stronger choice than a layout fix: it is the
 difference between a disclosure being written down and a disclosure actually holding.
 
+### The training pipeline, swept too
+
+The Python side was already the most careful part of the project. `train.py` sets `trained: true`
+only when **every** row is `source == 'pitt'`, so a synthetic run cannot claim otherwise. Its
+`LIMITATIONS_SYNTHETIC` text says the figures "describe the synthetic generator, not clinical
+performance" and "should never be quoted as evidence the app works". `synthetic.py` states plainly
+that nothing it writes is clinical evidence, and it deliberately tunes the effect size *down* so the
+demo model lands near AUC 0.8 rather than ~1.0, on the stated grounds that a demo that looked perfect
+would be a lie about how hard the problem is. That is the right instinct, written into the generator.
+
+One gap, the same shape as the two in the PDF: the figures sat in one place and the caveat in
+another. The generated `report.md` bolded "Out-of-fold AUC: 0.821" inside its Cross-validation
+section while the demo warning lived at the top of the document, and the console printed the AUC and
+sensitivity four lines **before** the "NOTE: demo model" line. Either a screenshot of that section or
+a truncated terminal paste would carry the number without the qualifier. The warning is now inside
+the Cross-validation section, the console prints it first, and tests pin both.
+
+Running the pipeline also confirmed a claim made above: a fresh synthetic run reproduces the shipped
+model's figures exactly — AUC 0.821, sensitivity 0.904, specificity 0.456 — which is the evidence
+that those numbers come from `synthetic.py` and not from any real cohort.
+
 ### The rest of the sweep came back clean
 
 Checked, and correct as written: the in-app result screens (tier, written reasons and feature

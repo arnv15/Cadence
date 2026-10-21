@@ -18,6 +18,25 @@ def test_synthetic_training_and_export(tmp_path, monkeypatch):
     assert model['trained'] is False
     assert model['spec_version'] == spec.SPEC_VERSION
     assert (tmp_path / 'report/report.md').exists()
+
+    # A reader who only sees the cross-validation section, or only the first lines of the run,
+    # must not come away with an unqualified AUC for a model fitted on invented numbers.
+    md = (tmp_path / 'report/report.md').read_text()
+    cv_section = md.split('## Cross-validation')[1].split('## Final model')[0]
+    assert 'measure the synthetic generator, not speech' in cv_section
+    assert 'never be quoted' in cv_section
+    # Every line of the warning must be a blockquote line. A stray '>' mid-sentence means the
+    # continuation markers were concatenated into one line instead of emitted per line.
+    warning = [line for line in cv_section.splitlines() if line.startswith('>')]
+    assert len(warning) >= 3
+    for line in warning:
+        assert '>' not in line[1:], line
+
+    console = io.StringIO()
+    train.run(csv, tmp_path / 'm2.json', tmp_path / 'r2', outer_folds=2, inner_folds=2,
+              bootstrap_samples=100, log=console)
+    printed = console.getvalue()
+    assert printed.index('demo model') < printed.index('OOF AUC')
     x, y, _ = train.design_matrix(train.load_features(csv))
     fitted = train.make_pipeline().fit(x, y)
     exported = train.build_model_json(fitted, trained=False, threshold=.5, metrics=None, notes='test', model_id='test', trained_on='synthetic')

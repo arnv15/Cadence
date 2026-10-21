@@ -413,6 +413,14 @@ def _markdown_report(report: Dict[str, Any]) -> str:
 
     lines.append('## Cross-validation')
     lines.append('')
+    if not model['trained']:
+        # The warning at the top of the document does not travel with a screenshot of this
+        # section, and a bolded AUC is exactly the line somebody lifts into a slide.
+        lines.append('> **These figures measure the synthetic generator, not speech.** They say')
+        lines.append('> how separable the invented numbers from `training/synthetic.py` are, and')
+        lines.append('> nothing about how well Cadence works on anyone. They must never be quoted')
+        lines.append('> as evidence of accuracy.')
+        lines.append('')
     lines.append(
         f"Nested CV: outer {report['cv']['outer_folds']}-fold StratifiedGroupKFold grouped by "
         f"`participant_id`, inner grid search over C x l1_ratio."
@@ -611,6 +619,14 @@ def run(
     md_path, json_path = write_reports(report, Path(report_dir))
 
     ci_text = 'n/a' if ci is None else f'[{ci[0]:.3f}, {ci[1]:.3f}]'
+    # Say what the numbers are before printing them. Truncated terminal output, and anyone
+    # copying the first lines of a run, must not come away with an unqualified AUC.
+    if not trained:
+        print(
+            'NOTE: demo model — not fitted on clinical data. The figures below measure the '
+            'synthetic generator, not speech, and are not evidence of accuracy.',
+            file=log,
+        )
     print(f'OOF AUC {oof_auc:.3f} 95% CI {ci_text}', file=log)
     print(
         f'threshold {threshold:.4f} -> sensitivity {sensitivity:.3f}, specificity {specificity:.3f}',
@@ -618,8 +634,6 @@ def run(
     )
     print(f'wrote {written}  (trained={trained}, model_id={model_id})', file=log)
     print(f'wrote {md_path} and {json_path}', file=log)
-    if not trained:
-        print('NOTE: demo model — not fitted on clinical data.', file=log)
     return report
 
 

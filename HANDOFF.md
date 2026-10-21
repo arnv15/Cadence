@@ -25,6 +25,14 @@ probability — so both leaks were in the PDF alone.
 Verified on real rendered PDFs before and after (`pdftotext`, not the naive stream extraction, which
 reports false absences).
 
+The training pipeline was swept too. Its honesty gate (`trained` only when every row is
+`source == 'pitt'`), its synthetic limitations text and `synthetic.py`'s own warnings were already
+correct. One gap, the same shape as the PDF's: the generated `report.md` bolded the out-of-fold AUC
+inside its Cross-validation section while the demo warning sat at the top of the document, and the
+console printed the figures before the "NOTE: demo model" line. Both now carry the qualifier where
+the number is, with tests for each — including one that catches the blockquote continuation markers
+being concatenated into one line, which is how the first attempt rendered.
+
 A full sweep of the app's copy then found a third, smaller instance: two places described the features
 as compared against "the reference data" — the PDF's methods list and the result screen's "What stood
 out in this check" card. There is no reference data behind the demo model. Both now say so when
