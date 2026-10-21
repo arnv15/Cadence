@@ -67,7 +67,10 @@ screen. Four tabs: Today, Trends, You, About.
 - **Charts:** `react-native-gifted-charts`. **Graphics:** `react-native-svg` (all picture scenes are
   hand-written SVG, no stock imagery).
 - **Training pipeline:** numpy, pandas, scipy, scikit-learn, `pywhispercpp`, soundfile.
-- **Tests:** Jest with `jest-expo` (379 tests, 19 suites) and pytest (16 tests). `tsc --noEmit` clean.
+- **Tests:** Jest with `jest-expo` (379 tests, 19 suites) and pytest (29 tests). `tsc --noEmit` clean.
+- **CI:** GitHub Actions runs the typecheck, both test suites and the config-plugin tests on every
+  push and pull request. It cannot test anything native or the microphone, which is why the device
+  verification in [DEVICE_TEST_PLAN.md](DEVICE_TEST_PLAN.md) is done by hand.
 - **AI assistance:** disclosed in full below.
 
 ### Privacy claims, and why they hold

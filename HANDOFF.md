@@ -4,6 +4,23 @@ Project rules: [AGENTS.md](AGENTS.md). Algorithms and contracts:
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). This is the current implementation and verification
 snapshot; build success does not imply that the device checklist has passed.
 
+## 2026-10-21: CI
+
+`.github/workflows/ci.yml` runs on push to main, on pull requests and on demand: typecheck, the 379
+Jest tests (parity among them), the Expo config-plugin tests, and the 29 pytest tests. Every command
+was run locally first.
+
+`training/requirements-ci.txt` is `requirements.txt` without `pywhispercpp`. `whisper_runner` imports
+it inside its functions rather than at module scope and the tests stub transcription, so building
+whisper.cpp on a runner would cost minutes and verify nothing. `tests/test_requirements.py` fails if
+the two files drift — checked by mutating a pin and dropping a package.
+
+The workflow header says what CI cannot cover: everything native, and the microphone. A green badge
+is not a verified app; `docs/DEVICE_TEST_PLAN.md` is where that lives.
+
+**Unverified:** whether `actions/setup-python` offers 3.14 on `ubuntu-latest`. The project requires
+3.14, so that is the honest pin; if the runner cannot provide it the first run will say so.
+
 ## 2026-10-21: the Pitt corpus walk is tested end to end
 
 `transcribe_pitt.run` was the riskiest untested code in the repo: ~130 lines that execute exactly

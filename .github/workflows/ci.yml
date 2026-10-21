@@ -1,0 +1,73 @@
+# Automated checks for Cadence.
+#
+# What this can verify: the pure logic, the TypeScript/Python feature parity, the Expo config
+# plugin, and the training pipeline's orchestration.
+#
+# What it cannot: anything native. whisper.rn, expo-audio recording, expo-sqlite, PDF printing and
+# the share sheet need a real device build, and the microphone needs a real voice. Those are
+# recorded by hand in docs/DEVICE_TEST_PLAN.md. A green badge here is not a verified app.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  app:
+    name: App — typecheck, tests, config plugin
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Includes parity.test.ts, which checks the shipped TypeScript still reproduces the golden
+      # fixtures from training/export_fixtures.py to 1e-9. That is the check that stops the app
+      # and the trainer computing different features from the same audio.
+      - name: Jest (379 tests, including TypeScript/Python feature parity)
+        run: npm test -- --ci
+
+      - name: Config plugin tests
+        run: npm run test:plugins
+
+  training:
+    name: Training pipeline — pytest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: training
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: pip
+          cache-dependency-path: training/requirements-ci.txt
+
+      - name: Install dependencies
+        # requirements-ci.txt omits pywhispercpp only; see the header in that file, and
+        # tests/test_requirements.py, which fails if the two files drift apart.
+        run: pip install -r requirements-ci.txt
+
+      - name: Pytest
+        run: python -m pytest tests/ -q

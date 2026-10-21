@@ -1,0 +1,21 @@
+# Dependencies for automated checks only. Identical to requirements.txt except that
+# pywhispercpp is omitted.
+#
+# Why: whisper_runner imports pywhispercpp inside its functions, not at module scope, and the
+# tests stub transcription — the orchestration is what they exercise, not whisper.cpp. Building
+# whisper.cpp on a CI runner would add minutes and a native toolchain dependency and verify
+# nothing the tests check. Anything that really runs Whisper (transcribe_pitt against the real
+# corpus, export_fixtures) needs the full requirements.txt.
+#
+# tests/test_requirements.py asserts this file stays in step with requirements.txt.
+
+numpy==2.5.3
+pandas==3.0.5
+scipy==1.18.1
+scikit-learn==1.9.1
+joblib==1.6.0
+
+# Audio decoding (mp3/wav -> 16 kHz mono int16) without ffmpeg.
+soundfile==0.14.0
+
+pytest==9.1.1
