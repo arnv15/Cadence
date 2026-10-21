@@ -205,9 +205,27 @@ PDF did not, and the existing test missed it because its fixture used an untrain
 `metrics: null` — a combination the shipped model does not have.
 
 The PDF now prints "Validation: None — this model has no measured performance." for any untrained
-model, and a test covers the real shape: untrained *with* metrics present. If you describe one bug in
-the video, this is a stronger choice than a layout fix: it is the difference between a disclosure
-being written down and a disclosure actually holding.
+model, and a test covers the real shape: untrained *with* metrics present.
+
+A sweep for the same mistake elsewhere then found a second one in the same document. The "Most
+recent result" section printed a bare `Model probability 0.296`. That is a different kind of claim
+from the metrics — it is a genuine output of that session rather than a false statement about
+validation — but a bare decimal beside a tier, in a section a clinician may read on its own, invites
+being read as a likelihood of illness, and an untrained model's inference carries no information at
+all. The distinction that matters: **a feature value is a measurement of real speech and means
+something on its own; a probability is an inference, and a synthetic model's inference means
+nothing.** The PDF now prints "Demo-model output 0.296 … This number comes from a model fitted to
+synthetic data. It is not a probability of any medical condition and carries no clinical meaning."
+
+The in-app result screen was already correct: it shows the tier, the written reasons and the feature
+measurements, and never the raw probability. About was already correct too. Both leaks were in the
+PDF alone — the one artifact that leaves the phone.
+
+Both fixes were verified on a real rendered PDF from the simulator, not only in tests: the figures
+are gone, and the demo-model warning and not-a-diagnosis line are still present.
+
+If you describe one bug in the video, this pair is a stronger choice than a layout fix: it is the
+difference between a disclosure being written down and a disclosure actually holding.
 
 ---
 

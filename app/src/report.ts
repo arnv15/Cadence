@@ -365,7 +365,7 @@ function baselineSection(sessions: SessionRecord[]): string {
   return ['<section>', '<h2>Personal baseline</h2>', `<p>${escapeHtml(body)}</p>`, '</section>'].join('\n');
 }
 
-function latestResultSection(sessions: SessionRecord[]): string {
+function latestResultSection(sessions: SessionRecord[], model: CadenceModel): string {
   const latest = lastWhere(sessions, (session) => session.task === 'picture' && session.tier !== null);
 
   if (!latest || latest.tier === null) {
@@ -381,10 +381,19 @@ function latestResultSection(sessions: SessionRecord[]): string {
   const reasons = latest.reasons
     .map((reason) => `<li>${escapeHtml(reasonCopy(reason))}</li>`)
     .join('\n');
+  // A feature value is a measurement of real speech and means something on its own. A probability
+  // is an inference, and an untrained model's inference carries no information at all — so the bare
+  // number never appears without saying so in the same breath. A reader who skims only this section
+  // must not be able to mistake it for a likelihood of illness.
   const probability = latest.prediction
     ? `<p class="note">${escapeHtml(
-        `Model probability ${formatNumber(latest.prediction.probability, 3)} on ` +
-          `${formatIsoDateTime(latest.createdAt)}.`,
+        model.trained
+          ? `Model probability ${formatNumber(latest.prediction.probability, 3)} on ` +
+              `${formatIsoDateTime(latest.createdAt)}.`
+          : `Demo-model output ${formatNumber(latest.prediction.probability, 3)} on ` +
+              `${formatIsoDateTime(latest.createdAt)}. This number comes from a model fitted to ` +
+              `synthetic data. It is not a probability of any medical condition and carries no ` +
+              `clinical meaning.`,
       )}</p>`
     : '';
 
@@ -677,7 +686,7 @@ ${sessions.some((session) => session.isSample) ? `<p class="alert">${escapeHtml(
 ${modelSection(model)}
 ${excluded > 0 ? `<p>${excluded} checks from an earlier model are excluded from this summary so incompatible measurements are not combined.</p>` : ''}
 ${baselineSection(sessions)}
-${latestResultSection(sessions)}
+${latestResultSection(sessions, model)}
 ${chartsSection(sessions)}
 ${sessionsSection(sessions)}
 ${methodsSection(model)}

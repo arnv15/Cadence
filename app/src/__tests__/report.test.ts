@@ -229,6 +229,24 @@ describe('model block', () => {
     expect(html).toContain('None — this model has no measured performance.');
   });
 
+  it('never prints a bare probability for an untrained model', () => {
+    const html = render([picture(0)], DEMO_MODEL);
+
+    // The number may appear, but never without saying what it is worth.
+    expect(html).not.toContain('Model probability');
+    expect(html).toContain('Demo-model output');
+    expect(html).toContain('not a probability of any medical condition');
+  });
+
+  it('prints a plain model probability once the model is trained on real data', () => {
+    // The report only includes sessions scored by the model it is reporting on.
+    const html = render([picture(0, { modelId: TRAINED_MODEL.model_id })], TRAINED_MODEL);
+
+    expect(html).toContain('Model probability');
+    expect(html).not.toContain('Demo-model output');
+    expect(html).not.toContain('carries no clinical meaning');
+  });
+
   it('never prints accuracy figures for an untrained model that happens to carry them', () => {
     // The shipped demo model is exactly this shape: trained false, but with metrics measured on
     // synthetic data. A clinician reading "382 recordings from 150 people" in a shared PDF would
@@ -364,7 +382,8 @@ describe('latest result and baseline', () => {
 
     expect(html).toContain('<p class="tier">Worth watching</p>');
     expect(countOf(html, '<li>')).toBeGreaterThanOrEqual(2);
-    expect(html).toContain('Model probability 0.37 on');
+    // This render uses the demo model, so the number carries its qualifier.
+    expect(html).toContain('Demo-model output 0.37 on');
   });
 
   it('says so plainly when there are no checks yet', () => {

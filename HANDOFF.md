@@ -15,6 +15,16 @@ demo-model warning. About had always gated on `trained`; the PDF had not.
 The existing test missed it because its fixture was an untrained model with `metrics: null` — a shape
 the real model does not have. The guard now matches About, and a test covers untrained *with* metrics.
 
+Sweeping for the same mistake found a second leak in the same document: the "Most recent result"
+section printed a bare `Model probability 0.296`. A feature value is a measurement and means
+something on its own; a probability is an inference, and a synthetic model's inference means nothing,
+so the number now carries an explicit qualifier when `trained` is false. The in-app result screen was
+already correct — it shows the tier, the reasons and the feature measurements, never the raw
+probability — so both leaks were in the PDF alone.
+
+Verified on real rendered PDFs before and after (`pdftotext`, not the naive stream extraction, which
+reports false absences).
+
 ## 2026-10-20: the You tab
 
 `docs/specs/profile-screen.md` is built. There is now a fourth tab, **You**, which owns the
