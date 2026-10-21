@@ -29,6 +29,26 @@ Debug build driven through adb on the booted emulator.
 | **Trends can stall on its loading state after a configuration change** | **Open defect, partly mitigated.** Switching dark mode or the system font size while Trends is open leaves "Gathering your checks..." on screen. Instrumentation proved the loader completes (`listSessions returned 10`) while the screen stays on `loading`, so a state update is being dropped, most likely by a duplicate or stale screen instance after the Android configuration change. It recovers by switching tabs or on the next remount. Mitigated by a "Try again" button that appears after 6 s (`useSlowLoad`), and by `useReloadOnReturn`, which stops the initial load and the focus reload from fighting. Root cause still unidentified |
 | Android cold-start deep link to /trends | Same stall as above. Not on a user path: people tap the tab |
 
+## Overclaim fixes re-verified on Android (2026-10-20, Medium_Phone_API_36 / API 36)
+
+Second Android pass, after the three overclaim fixes. The exported PDF was pulled off the emulator
+with `run-as` and read with `pdftotext`, so this is the document a recipient would actually open, not
+a rendering of the HTML builder.
+
+| Check | Evidence and status |
+|---|---|
+| PDF accuracy figures | **Clean.** No "Cross-validated AUC", no "Sensitivity / specificity", no "382 recordings from 150 people". Prints "None — this model has no measured performance." |
+| PDF probability | **Clean.** "Demo-model output 0.296 on 2026-10-20 09:05. This number comes from a model fitted to synthetic data. It is not a probability of any medical condition and carries no clinical meaning." |
+| PDF reference-data claim | **Clean.** "A logistic regression scores the features against the synthetic data it was fitted to; there is no real comparison group behind this build." |
+| Required disclosures retained | **Pass.** Demo-model warning and "not a diagnosis" both still present |
+| Result screen standouts caption | **Pass.** Renders the demo wording: "These compare you with the demonstration model's invented data, not with yourself and not with any real group of people." |
+| You tab after the fixes | **Pass.** Four tabs, baseline and data cards correct, and the `StatRow` label fix still holds ("Trained on real data / This build uses a synthetic demo model" on one label line) |
+
+Two process notes worth keeping. The app must be launched **after** `adb reverse` is established or it
+shows "Unable to load script" — relaunching is enough, no rebuild. And an exact-string probe reported
+"no real comparison group behind this build" as missing when the phrase was simply line-wrapped in the
+PDF text; printing the sentence verbatim showed it was there. Grep for a fragment, or print the line.
+
 ## You tab on Android (2026-10-20, Medium_Phone_API_36 / API 36)
 
 Driven through adb on the booted emulator. The You tab is pure JavaScript, so the existing debug
