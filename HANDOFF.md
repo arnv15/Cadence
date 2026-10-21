@@ -4,6 +4,26 @@ Project rules: [AGENTS.md](AGENTS.md). Algorithms and contracts:
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). This is the current implementation and verification
 snapshot; build success does not imply that the device checklist has passed.
 
+## 2026-10-21: the Pitt corpus walk is tested end to end
+
+`transcribe_pitt.run` was the riskiest untested code in the repo: ~130 lines that execute exactly
+once, under deadline pressure, on a corpus this project has not been granted access to. The existing
+`test_corpus.py` covered the parsing pieces in isolation; the directory walk, the label decision,
+media resolution, the quality gate, the cache and the CSV/summary were untested.
+
+`tests/test_corpus_run.py` now builds a fabricated Pitt tree — real WAV audio so `measure_activity`
+does genuine work, Whisper stubbed — and exercises `run()` through it. Twelve tests: the labelled CSV
+and its columns, MCI/Vascular excluded rather than relabelled, `@ID` winning over a disagreeing
+cohort folder, task filtering, missing media, media found via a separate root, `--limit`, the
+quality gate, short participant audio, cache reuse, and a bad `--pitt-root`.
+
+Writing the fixture found the first thing: CHAT wraps its millisecond time marker in NAK bytes
+(`\x15`), and without them the parser finds no time-aligned utterances at all. The first version of
+the fabricated transcripts omitted them and every recording was skipped.
+
+The tests were mutation-checked rather than assumed: making unknown groups fall through to control
+fails the test written for exactly that, and inverting the labels fails three tests.
+
 ## 2026-10-20: the exported PDF was printing synthetic accuracy figures
 
 Found while checking the claims in `docs/SUBMISSION.md`. `modelSection` in `src/report.ts` gated its
