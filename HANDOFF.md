@@ -25,6 +25,11 @@ probability — so both leaks were in the PDF alone.
 Verified on real rendered PDFs before and after (`pdftotext`, not the naive stream extraction, which
 reports false absences).
 
+A full sweep of the app's copy then found a third, smaller instance: two places described the features
+as compared against "the reference data" — the PDF's methods list and the result screen's "What stood
+out in this check" card. There is no reference data behind the demo model. Both now say so when
+`trained` is false. Everything else came back clean; `docs/SUBMISSION.md` lists what was checked.
+
 ## 2026-10-20: the You tab
 
 `docs/specs/profile-screen.md` is built. There is now a fourth tab, **You**, which owns the

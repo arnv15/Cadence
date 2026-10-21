@@ -571,9 +571,15 @@ function methodsSection(model: CadenceModel): string {
     'Nine features are computed from those words: speaking pace, pause rate, mean pause length, ' +
       'share of time spent pausing, word variety (moving-average type-token ratio), pronoun use, ' +
       'filler use, describing-word use and immediate repetition.',
-    'A logistic regression scores the features against its reference data. Separately, the same ' +
-      'features are compared with the personal baseline. A tier is only raised when both the ' +
-      'model and a sustained personal difference agree; one unusual check on its own never is.',
+    // "Reference data" implies a real comparison group. For the demo model there is not one, and
+    // this sentence is the only place in the document that would suggest otherwise.
+    (model.trained
+      ? 'A logistic regression scores the features against its reference data.'
+      : 'A logistic regression scores the features against the synthetic data it was fitted to; ' +
+        'there is no real comparison group behind this build.') +
+      ' Separately, the same features are compared with the personal baseline. A tier is only ' +
+      'raised when both the model and a sustained personal difference agree; one unusual check ' +
+      'on its own never is.',
     'Audio never leaves the device, and recordings are deleted after they are transcribed unless ' +
       'the user turns on keeping them.',
   ];

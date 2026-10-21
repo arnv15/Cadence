@@ -229,6 +229,21 @@ describe('model block', () => {
     expect(html).toContain('None — this model has no measured performance.');
   });
 
+  it('does not claim a real comparison group for an untrained model', () => {
+    const html = render([picture(0)], DEMO_MODEL);
+
+    // "its reference data" implies a real cohort. There is not one behind the demo model.
+    expect(html).not.toContain('against its reference data');
+    expect(html).toContain('no real comparison group behind this build');
+  });
+
+  it('calls it reference data once the model is trained on real data', () => {
+    const html = render([picture(0, { modelId: TRAINED_MODEL.model_id })], TRAINED_MODEL);
+
+    expect(html).toContain('against its reference data');
+    expect(html).not.toContain('no real comparison group');
+  });
+
   it('never prints a bare probability for an untrained model', () => {
     const html = render([picture(0)], DEMO_MODEL);
 

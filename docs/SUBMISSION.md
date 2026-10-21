@@ -224,8 +224,28 @@ PDF alone — the one artifact that leaves the phone.
 Both fixes were verified on a real rendered PDF from the simulator, not only in tests: the figures
 are gone, and the demo-model warning and not-a-diagnosis line are still present.
 
-If you describe one bug in the video, this pair is a stronger choice than a layout fix: it is the
+A third, smaller one turned up in a full sweep of the app's copy. Two places said the features were
+compared against "the reference data" — the PDF's methods list and the "What stood out in this check"
+card on the result screen. For the demo model there is no reference data; it is invented. Both now say
+so plainly when `trained` is false.
+
+If you describe one bug in the video, this group is a stronger choice than a layout fix: it is the
 difference between a disclosure being written down and a disclosure actually holding.
+
+### The rest of the sweep came back clean
+
+Checked, and correct as written: the in-app result screens (tier, written reasons and feature
+measurements, never a raw probability); the feature comparisons, which say "than **this model**
+expects" rather than implying a norm; the animal-naming screen, which publishes no norm and states
+that naming checks are not scored into a tier; the three tier texts, each carrying "screening
+estimate, not a diagnosis"; the onboarding disclosures; About's metrics, already gated on `trained`;
+and the citations and README, which quote published figures but say in the same breath that those are
+not Cadence's accuracy.
+
+One judgement call left alone: About's decision-threshold row reads "Set low on purpose, to miss fewer
+people at the cost of more false alarms". That describes how the app is configured rather than how well
+it performs, it is true, and it sits directly under the demonstration-model banner. Hedging every
+sentence would bury the warnings that matter in noise, which for this audience is its own harm.
 
 ---
 

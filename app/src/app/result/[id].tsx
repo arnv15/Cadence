@@ -347,8 +347,12 @@ export default function ResultScreen() {
             ))}
           </View>
           <Caption>
-            These compare you with the reference data, not with yourself. Your own baseline,
-            below, is the more meaningful comparison.
+            {demoModel
+              ? 'These compare you with the demonstration model’s invented data, not with yourself ' +
+                'and not with any real group of people. Your own baseline, below, is the only ' +
+                'comparison here that means anything.'
+              : 'These compare you with the reference data, not with yourself. Your own baseline, ' +
+                'below, is the more meaningful comparison.'}
           </Caption>
         </Card>
       ) : null}
