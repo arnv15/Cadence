@@ -29,6 +29,35 @@ Debug build driven through adb on the booted emulator.
 | **Trends can stall on its loading state after a configuration change** | **Open defect, partly mitigated.** Switching dark mode or the system font size while Trends is open leaves "Gathering your checks..." on screen. Instrumentation proved the loader completes (`listSessions returned 10`) while the screen stays on `loading`, so a state update is being dropped, most likely by a duplicate or stale screen instance after the Android configuration change. It recovers by switching tabs or on the next remount. Mitigated by a "Try again" button that appears after 6 s (`useSlowLoad`), and by `useReloadOnReturn`, which stops the initial load and the focus reload from fighting. Root cause still unidentified |
 | Android cold-start deep link to /trends | Same stall as above. Not on a user path: people tap the tab |
 
+## Release-mode bundle check (2026-10-21)
+
+`npx expo export --platform ios --platform android` from `app/`. Metro's dev server resolves things a
+production bundle does not, so this checks what actually ships.
+
+| Check | Result |
+|---|---|
+| Export | **Pass.** iOS 1,410 modules / 3.6 MB Hermes bytecode, Android 1,573 / 3.9 MB, 35 assets, no warnings |
+| Module count versus dev | 1,410 / 1,573 release against 1,598 / 1,735 under Metro — dev-only modules correctly dropped |
+| Data files compiled in | **Pass.** `model.json` (`synthetic-demo-v3`), `feature_spec.json` (`words_per_minute`, `noise_floor_percentile`), `lexicon.json` (`function_words`, `umm`, `myself`) and `animals.json` (`squirrel`) are all in both bundles. JSON imports are inlined rather than emitted as assets, which is why they do not appear in the asset list |
+| Bundled parity sample | **Pass.** `sample-pauses.wav` (765 KB) is a real asset in both platform manifests |
+| Disclosures that must ship | **Pass in both bundles:** the standing disclaimer, the PDF demo-model notice, "no measured performance", "no real comparison group behind this build", the result screen's invented-data caption, the delete-everything confirmation, and the "Talk to a doctor" tier text |
+| Test-only strings | **Absent, as required.** Neither `cookie-theft` (a fixture-only prompt id) nor `jest-expo` ships |
+
+Three false alarms, all mine, all worth remembering:
+
+- **Hermes stores any string containing a non-ASCII character as UTF-16.** `Screening estimate — not a
+  diagnosis.` has an em dash, so an ASCII `grep` cannot find it and reports the app's most important
+  line as missing. Probe for both encodings.
+- `cookie-theft` is not a real prompt id — the shipping ones are `kitchen`, `park`, `beach`,
+  `birthday`. It exists only in test fixtures, so its absence was the correct result.
+- `carries no clinical meaning` is assembled from two adjacent template literals, so the phrase never
+  exists as one string in the bundle even though the rendered PDF contains it. Probe the literals the
+  source actually contains, not the sentence a reader sees.
+
+Not added to CI. The export takes about 30 s and would catch release-only breakage on every push,
+which is worth considering after the deadline; it was not added now because CI had just gone green and
+the deadline is five days out.
+
 ## Overclaim fixes re-verified on Android (2026-10-20, Medium_Phone_API_36 / API 36)
 
 Second Android pass, after the three overclaim fixes. The exported PDF was pulled off the emulator
