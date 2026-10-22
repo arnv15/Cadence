@@ -27,7 +27,7 @@ export interface Citation {
 }
 
 /** The day every entry below was last opened and checked. */
-export const CITATIONS_VERIFIED_ON = '2026-09-21';
+export const CITATIONS_VERIFIED_ON = '2026-10-21';
 
 export const CITATIONS: Citation[] = [
   {
@@ -50,11 +50,16 @@ export const CITATIONS: Citation[] = [
     title:
       'Diagnostic utility of speech-based biomarkers in mild cognitive impairment: a systematic ' +
       'review and meta-analysis',
-    authors: 'Zahra Jafari, Melissa K. Andrew, Kenneth Rockwood',
+    authors: 'Zahra Jafari, Melissa K. Andrew, Kenneth J. Rockwood',
     venue: 'Age and Ageing',
     year: 2025,
     url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12560767/',
     identifier: 'PMID 41148189 · doi:10.1093/ageing/afaf316',
+    // The figures below are the abstract's, which the Results section agrees with. Note for
+    // anyone challenged on them: this paper is internally inconsistent. Its Discussion gives the
+    // pooled AUC as 76.0% with the same interval, and its Results section labels the 77.0%
+    // specificity estimate "sensitivity". Quoting the abstract is defensible; pretending the
+    // source is tidy would not be.
     relevance:
       'A review that pools many speech-screening studies for mild cognitive impairment. Across ' +
       'them, pooled sensitivity was 80% (95% CI 71–90%), pooled specificity was 77% (95% CI ' +
@@ -94,6 +99,9 @@ export const CITATIONS: Citation[] = [
     year: 1994,
     url: 'https://talkbank.org/dementia/access/English/Pitt.html',
     identifier: 'The citation DementiaBank requires for the Pitt corpus',
+    // TalkBank also requires acknowledging NIA grants AG03705 and AG05133 for any use of the
+    // data. Cadence has no access, so nothing here uses it and no acknowledgement is owed yet.
+    // If access is granted, that acknowledgement has to appear wherever results are reported.
     relevance:
       'The Pitt corpus, collected at the University of Pittsburgh and shared through ' +
       'DementiaBank, is one recording set used in speech and dementia research, ' +

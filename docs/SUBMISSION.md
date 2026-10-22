@@ -296,5 +296,29 @@ Use only test data in the video, and leave the **Sample data** notice visible ra
 out — it is the honest signal that those days were not recorded by a person. Do not fabricate several
 days of personal history, and do not claim that paper results are Cadence's accuracy.
 
-The owner must record narration, complete the student section above, review the disclosures,
-spot-check the five citations in About, register, upload the video, and submit.
+### Citations — all five checked against their sources on 2026-10-21
+
+Each URL was opened and the recorded title, authors, venue, year, identifier and every quoted number
+compared with what the source prints.
+
+| Source | Result |
+|---|---|
+| Mekulu et al. 2026, *PLOS Digital Health* | **Exact.** Title, three authors, journal, year, DOI and PMID all match. AUC 0.858, sensitivity 90% and specificity 65% at threshold 0.37 are the paper's own figures. The claims that its model uses semantic embeddings (all-MiniLM-L6-v2) and that the authors name automated transcription and real-world acoustic conditions as future work are both accurate |
+| Jafari, Andrew & Rockwood 2025, *Age and Ageing* | **Figures match the abstract**: pooled sensitivity 80.0% (95% CI 71.0–90.0), specificity 77.0% (65.0–89.0), AUC 78.0% (70.0–86.0). Journal, year, DOI and PMID match. Two corrections: the middle initial was missing from Rockwood's name, now fixed; and **the paper itself is internally inconsistent** — see below |
+| FDA, *Clinical Decision Support Software* | **Exact.** Title, the three issuing centers, "Final", and "January 2026" all as printed |
+| Becker et al. 1994, *Archives of Neurology* | **Exact.** Authors, title, 51(6), 585–594, 1994 — and talkbank.org does ask for precisely this citation for the Pitt corpus |
+| Radford et al. 2022, Whisper | **Exact.** Title, six authors, arXiv:2212.04356, 2022. The "later published at ICML 2023" claim is not on the arXiv page, so it was checked separately against PMLR v202 — Proceedings of the 40th International Conference on Machine Learning, pages 28492–28518 |
+
+**Know this before you are asked about it.** The Jafari meta-analysis contradicts itself: its Discussion
+gives the pooled AUC as 76.0% with the same confidence interval the abstract reports for 78.0%, and its
+Results section labels the 77.0% specificity estimate "sensitivity". Cadence quotes the abstract, which
+the Results agree with, and that is defensible — but if a judge checks the paper and finds 76%, the
+right answer is that the source disagrees with itself, not that the app is wrong. It is noted in a
+comment beside the figures in `citations.ts`.
+
+**One obligation that is not yet owed.** TalkBank requires any use of the Pitt data to acknowledge NIA
+grants AG03705 and AG05133. Cadence has no access and uses none of the data, so nothing is owed today.
+If access is granted, that acknowledgement must appear wherever results are reported.
+
+The owner must record narration, complete the student section above, review the disclosures, register,
+upload the video, and submit.
