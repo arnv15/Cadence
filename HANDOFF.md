@@ -4,6 +4,38 @@ Project rules: [AGENTS.md](AGENTS.md). Algorithms and contracts:
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). This is the current implementation and verification
 snapshot; build success does not imply that the device checklist has passed.
 
+## 2026-10-23: the generator's timing scale was wrong too
+
+Fixing the detector made a second problem visible. With correct measurements, an ordinary speaker
+still scored "Worth watching", and the contributions said why: `pause_rate` was **+3.18 SD** and
+`pause_time_ratio` **+3.68 SD** against the synthetic reference. The features were right; the
+yardstick was imaginary.
+
+`synthetic.py` took its timing centres from the literature, which reports pause rates for
+human-annotated silences. This pipeline measures them with its own energy detector, and the two do
+not agree: real speech gave 17.8-19.7 pauses a minute against a generator centred on 6.0. Any real
+speaker therefore landed in the tail.
+
+Recalibrated the three measurement-derived centres — `words_per_minute` 126 -> 140, `pause_rate`
+6.0 -> 18.0, `pause_time_ratio` 0.105 -> 0.270 — and left `mean_pause_s` alone, since 0.90 already
+matched. Spreads keep roughly their original coefficients of variation rather than the observed
+(n=3) spread, so the generator does not pretend to know how much people differ. `EFFECT_SCALE` needed
+no change: effects are in SD units, so rescaling natural units leaves separability alone, and the
+grouped OOF AUC stayed at 0.802.
+
+All three real recordings now score **Typical** (probabilities 0.19, 0.12, 0.21 against a 0.326
+threshold), and the newest check's z-scores sit where a healthy speaker should: `pause_rate` -0.45,
+`pause_time_ratio` +0.21, `words_per_minute` +0.75.
+
+**Calibrated against three recordings from one speaker.** That fixes the scale, not the validity, and
+the comment in `synthetic.py` says so. It is still a demo model with `trained: false`.
+
+**Known dead feature:** `filler_ratio` is structurally 0.000 on every real recording, because Whisper
+`tiny.en` does not transcribe "um" or "uh" at all. The generator centres it at 0.05, so it
+contributes a constant -2 SD for every real speaker. It is not wrong, it is inert — and worth saying
+out loud rather than leaving for someone to discover. Removing it is a feature-spec question, too
+large to take on two days from the deadline.
+
 ## 2026-10-23: feature spec v4 — the threshold was above real speech
 
 The first real voice check found what no fixture could. `rms_threshold: 0.01` sat **above the 90th

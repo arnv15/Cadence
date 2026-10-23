@@ -4,7 +4,7 @@
     "model_id": "synthetic-demo-v4",
     "trained": false,
     "trained_on": "synthetic data (not clinical)",
-    "created_at": "2026-10-23T07:34:53Z",
+    "created_at": "2026-10-23T07:48:13Z",
     "spec_version": 4,
     "feature_names": [
       "words_per_minute",
@@ -19,10 +19,10 @@
     ],
     "scaler": {
       "mean": [
-        111.74700651196505,
-        7.779305808000292,
+        123.80282153608593,
+        21.769897793999117,
         1.0386717597059323,
-        0.13964541066300304,
+        0.3322533444146424,
         0.7568641892830993,
         0.1521603583108769,
         0.0621521358538038,
@@ -30,10 +30,10 @@
         0.026480683563143904
       ],
       "scale": [
-        26.511515131702442,
-        3.3630395758001352,
+        30.128670637672446,
+        7.319200478000938,
         0.3175325325783437,
-        0.058471912357524025,
+        0.1055285324544854,
         0.06732642509759333,
         0.060003421423139684,
         0.03067381173767695,
@@ -42,23 +42,23 @@
       ]
     },
     "coef": [
-      -0.16291405172784265,
-      0.19917599610655803,
-      0.16802811392147585,
-      0.15341534326607975,
-      -0.25468667302577774,
-      0.26143510317956065,
-      0.03074493909723899,
-      -0.12426252173595768,
-      0.17521447680739935
+      -0.16282361540421755,
+      0.1994748990813396,
+      0.1679253158860155,
+      0.1536561659261059,
+      -0.2547543325045376,
+      0.2617276884259412,
+      0.03063914472085885,
+      -0.12412697179722937,
+      0.1753280074896736
     ],
-    "intercept": -0.15152820176583015,
-    "threshold": 0.3254382940179105,
+    "intercept": -0.15215969811794974,
+    "threshold": 0.32565376684698844,
     "metrics": {
-      "cv_auc": 0.820555,
+      "cv_auc": 0.820638,
       "cv_auc_ci": [
-        0.744682,
-        0.88856
+        0.744965,
+        0.888529
       ],
       "sensitivity": 0.904494,
       "specificity": 0.455882,
@@ -82,24 +82,24 @@
         "content_word_ratio": 0.0,
         "repetition_rate": 0.0
       },
-      "probability": 0.8567636623368724,
-      "logit": 1.7886661303624292
+      "probability": 0.8205396087155666,
+      "logit": 1.5200076610304036
     },
     {
       "name": "scaler_mean",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.46219026701890265,
-      "logit": -0.15152820176583015
+      "probability": 0.46203329945592897,
+      "logit": -0.15215969811794974
     },
     {
       "name": "typical_control",
@@ -114,8 +114,8 @@
         "content_word_ratio": 0.47,
         "repetition_rate": 0.01
       },
-      "probability": 0.15534811629932566,
-      "logit": -1.6932560602833624
+      "probability": 0.11267825083581075,
+      "logit": -2.0636712355663085
     },
     {
       "name": "typical_concern",
@@ -130,8 +130,8 @@
         "content_word_ratio": 0.34,
         "repetition_rate": 0.07
       },
-      "probability": 0.8650234777243223,
-      "logit": 1.857655794195935
+      "probability": 0.7330229255550171,
+      "logit": 1.0100141865227203
     },
     {
       "name": "all_high_extreme",
@@ -146,14 +146,14 @@
         "content_word_ratio": 1.0,
         "repetition_rate": 1.0
       },
-      "probability": 0.9999999999999725,
-      "logit": 31.22151994176859
+      "probability": 0.9999999999994122,
+      "logit": 28.162543825232472
     },
     {
       "name": "all_ratios_one",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
         "pause_time_ratio": 1.0,
         "mattr": 1.0,
@@ -162,8 +162,8 @@
         "content_word_ratio": 1.0,
         "repetition_rate": 1.0
       },
-      "probability": 0.9999995319355793,
-      "logit": 14.574659431645433
+      "probability": 0.9999983208850666,
+      "logit": 13.297242049645293
     },
     {
       "name": "silent_sample",
@@ -178,8 +178,8 @@
         "content_word_ratio": 0.2,
         "repetition_rate": 0.3
       },
-      "probability": 0.9999707778435927,
-      "logit": 10.440554132761783
+      "probability": 0.9997336590131227,
+      "logit": 8.230466788106908
     },
     {
       "name": "rapid_fluent",
@@ -194,8 +194,8 @@
         "content_word_ratio": 0.62,
         "repetition_rate": 0.0
       },
-      "probability": 0.0177259344366807,
-      "logit": -4.014841568984513
+      "probability": 0.015868780485423735,
+      "logit": -4.127405553759734
     },
     {
       "name": "no_pauses_detected",
@@ -210,78 +210,78 @@
         "content_word_ratio": 0.47,
         "repetition_rate": 0.01
       },
-      "probability": 0.07724177773785207,
-      "logit": -2.4804267794143375
+      "probability": 0.06621938275142833,
+      "logit": -2.646268314570991
     },
     {
       "name": "huge_words_per_minute",
       "features": {
         "words_per_minute": 1000.0,
-        "pause_rate": 7.779305808000292,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.0036481896619977652,
-      "logit": -5.609869356907057
+      "probability": 0.00748478516263581,
+      "logit": -4.887370027181786
     },
     {
       "name": "words_per_minute_high",
       "features": {
         "words_per_minute": 400.0,
-        "pause_rate": 7.779305808000292,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.1275439299136108,
-      "logit": -1.9228514497404408
+      "probability": 0.16181228518722487,
+      "logit": -1.6448051487840263
     },
     {
       "name": "pause_rate_high",
       "features": {
-        "words_per_minute": 111.74700651196505,
+        "words_per_minute": 123.80282153608593,
         "pause_rate": 60.0,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.9498479276092947,
-      "logit": 2.941242058183566
+      "probability": 0.7088385735417787,
+      "logit": 0.8897499752585837
     },
     {
       "name": "mean_pause_s_high",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 30.0,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.9999997429218089,
-      "logit": 15.173885296382545
+      "probability": 0.9999997403361985,
+      "logit": 15.163877854758772
     },
     {
       "name": "pause_time_ratio_high",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
         "pause_time_ratio": 1.0,
         "mattr": 0.7568641892830993,
@@ -290,142 +290,142 @@
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.8914677789077369,
-      "logit": 2.1058221966036546
+      "probability": 0.6942620962556518,
+      "logit": 0.8201213383067629
     },
     {
       "name": "mattr_high",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 1.0,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.2551601627286185,
-      "logit": -1.0712777746141027
+      "probability": 0.2549937429746262,
+      "logit": -1.0721536095330944
     },
     {
       "name": "pronoun_ratio_high",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 1.0,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.9718734570165054,
-      "logit": 3.5425118870754817
+      "probability": 0.9719690465204729,
+      "logit": 3.5460145778175525
     },
     {
       "name": "filler_ratio_high",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 1.0,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.6875079517250025,
-      "logit": 0.7884943722865915
+      "probability": 0.6866767444455749,
+      "logit": 0.7846282264303504
     },
     {
       "name": "content_word_ratio_high",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 1.0,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.21817867363560556,
-      "logit": -1.2763119005988022
+      "probability": 0.21828026185448346,
+      "logit": -1.2757164432457382
     },
     {
       "name": "repetition_rate_high",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 1.0
       },
-      "probability": 0.9999403990619414,
-      "logit": 9.727779642063458
+      "probability": 0.9999407419385572,
+      "logit": 9.73354946927971
     },
     {
       "name": "words_per_minute_zero",
       "features": {
         "words_per_minute": 0.0,
-        "pause_rate": 7.779305808000292,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.6306859075778676,
-      "logit": 0.5351604883706357
+      "probability": 0.6264237136781945,
+      "logit": 0.5169047701478139
     },
     {
       "name": "pause_rate_zero",
       "features": {
-        "words_per_minute": 111.74700651196505,
+        "words_per_minute": 123.80282153608593,
         "pause_rate": 0.0,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.35154439568843887,
-      "logit": -0.612257535573133
+      "probability": 0.32180943006537344,
+      "logit": -0.7454687867979627
     },
     {
       "name": "mean_pause_s_zero",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 0.0,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.33155503533550645,
-      "logit": -0.7011602515899784
+      "probability": 0.3314896064003324,
+      "logit": -0.7014554881720552
     },
     {
       "name": "pause_time_ratio_zero",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
         "pause_time_ratio": 0.0,
         "mattr": 0.7568641892830993,
@@ -434,88 +434,88 @@
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.373338257610416,
-      "logit": -0.5179220436741072
+      "probability": 0.3461645625360686,
+      "logit": -0.6359414188663078
     },
     {
       "name": "mattr_zero",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.0,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.9377068368168465,
-      "logit": 2.7115856799150144
+      "probability": 0.9377143781703158,
+      "logit": 2.711714791845076
     },
     {
       "name": "pronoun_ratio_zero",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.0,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.30693423653697016,
-      "logit": -0.814491380053898
+      "probability": 0.30664214562506426,
+      "logit": -0.8158648320290443
     },
     {
       "name": "filler_ratio_zero",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.4467466304159235,
-      "logit": -0.21382445786631957
+      "probability": 0.44664353245708316,
+      "logit": -0.21424159069200235
     },
     {
       "name": "content_word_ratio_zero",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.0,
         "repetition_rate": 0.026480683563143904
       },
-      "probability": 0.6478507182638624,
-      "logit": 0.6096051152265592
+      "probability": 0.6475171583765471,
+      "logit": 0.6081433478237553
     },
     {
       "name": "repetition_rate_zero",
       "features": {
-        "words_per_minute": 111.74700651196505,
-        "pause_rate": 7.779305808000292,
+        "words_per_minute": 123.80282153608593,
+        "pause_rate": 21.769897793999117,
         "mean_pause_s": 1.0386717597059323,
-        "pause_time_ratio": 0.13964541066300304,
+        "pause_time_ratio": 0.3322533444146424,
         "mattr": 0.7568641892830993,
         "pronoun_ratio": 0.1521603583108769,
         "filler_ratio": 0.0621521358538038,
         "content_word_ratio": 0.40358791537775246,
         "repetition_rate": 0.0
       },
-      "probability": 0.39645570891193466,
-      "logit": -0.42025509851898496
+      "probability": 0.39626295771387515,
+      "logit": -0.4210607171724676
     }
   ]
 }

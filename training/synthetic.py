@@ -64,11 +64,25 @@ SHARED_LOADING: Dict[str, float] = {
 VISIT_NOISE = 0.55
 
 #: (population mean, between-participant SD, hard lower bound, hard upper bound) in natural units.
+#:
+#: The three timing centres were recalibrated on 2026-10-23 against the first real recordings this
+#: project ever measured. The original values came from the literature, which reports pause rates
+#: for human-annotated silences; this pipeline measures them with its own energy detector, and the
+#: two do not agree. Real speech through this detector gave pause rates of 17.8-19.7 per minute
+#: against a generator centred on 6.0, which put an ordinary speaker 3.2 SD into the tail and made
+#: the demo model flag them. The generator's numbers are invented either way, so matching the scale
+#: this pipeline actually produces is strictly more defensible than keeping values no real
+#: recording can reach.
+#:
+#: Calibrated against **three recordings from one speaker**, which is far too small a sample to call
+#: a population estimate. It fixes the scale, not the validity. The spreads keep roughly their
+#: original coefficients of variation rather than the (tiny) observed spread, so the generator does
+#: not pretend to know how much people differ.
 DISTRIBUTIONS: Dict[str, Tuple[float, float, float, float]] = {
-    'words_per_minute': (126.0, 22.0, 25.0, 220.0),
-    'pause_rate': (6.0, 2.8, 0.0, 40.0),
+    'words_per_minute': (140.0, 25.0, 25.0, 260.0),
+    'pause_rate': (18.0, 6.0, 0.0, 60.0),
     'mean_pause_s': (0.90, 0.28, 0.50, 6.0),
-    'pause_time_ratio': (0.105, 0.050, 0.0, 0.80),
+    'pause_time_ratio': (0.270, 0.090, 0.0, 0.90),
     'mattr': (0.780, 0.055, 0.30, 1.0),
     'pronoun_ratio': (0.130, 0.045, 0.0, 0.60),
     'filler_ratio': (0.050, 0.028, 0.0, 0.50),
