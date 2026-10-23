@@ -1,5 +1,5 @@
 {
-  "spec_version": 3,
+  "spec_version": 4,
   "description": "Single source of truth for Cadence speech features. Read by app/src/features.ts AND training/features.py. Change both implementations and regenerate golden fixtures whenever this file changes.",
   "feature_names": [
     "words_per_minute",
@@ -56,7 +56,8 @@
   },
   "audio_activity": {
     "frame_ms": 20,
-    "rms_threshold": 0.01,
+    "rms_threshold": 0.004,
+    "loud_fraction": 0.1,
     "min_active_ms": 60,
     "noise_floor_percentile": 10,
     "noise_margin": 3,

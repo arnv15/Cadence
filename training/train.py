@@ -59,7 +59,9 @@ RANDOM_STATE = 0
 C_GRID: Tuple[float, ...] = (0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0)
 L1_RATIO_GRID: Tuple[float, ...] = (0.0, 0.25, 0.5, 0.75, 1.0)
 
-SYNTHETIC_MODEL_ID = 'synthetic-demo-v3'
+#: Carries the feature spec version, because the app filters trends by model id. Features
+#: computed under an older spec are not comparable with these, and must not share an id.
+SYNTHETIC_MODEL_ID = 'synthetic-demo-v4'
 PITT_MODEL_ID = 'pitt-cookie-v2'
 
 SYNTHETIC_TRAINED_ON = 'synthetic data (not clinical)'

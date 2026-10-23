@@ -4,6 +4,42 @@ Project rules: [AGENTS.md](AGENTS.md). Algorithms and contracts:
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). This is the current implementation and verification
 snapshot; build success does not imply that the device checklist has passed.
 
+## 2026-10-23: feature spec v4 — the threshold was above real speech
+
+The first real voice check found what no fixture could. `rms_threshold: 0.01` sat **above the 90th
+percentile of real speech**: on two recordings at 28 dB SNR, one on AirPods and one on the MacBook
+microphone, peak amplitude was about 0.048 and the loud decile of frames reached only 0.0087. The
+adaptive term computed a correct threshold (~0.0009) and `Math.max(0.01, …)` discarded it, so 93–95%
+of normal speaking read as silence. Two checks scraped past the gate with impossible features
+(`pause_time_ratio` 0.89, 183–224 wpm) and scored "Worth watching"; two fell below
+`min_active_fraction` and were rejected as "too noisy" — one of them by 0.001.
+
+v4 makes the threshold scale-free when speech and silence are separated:
+
+    threshold = hasContrast
+      ? max(noiseFloor * noise_margin, loud * loud_fraction, rms_threshold)
+      : rms_threshold
+
+- `loud_fraction: 0.1` anchors it to the recording's own loud level, which absolute RMS cannot do.
+- `rms_threshold` drops 0.01 → **0.004**, keeping its real job as the minimum energy worth calling
+  speech. 0.004 is the lowest value that still rejects the constant-noise case in
+  `test_audio_boundaries_noise_and_short_clicks`; the project's own test caught that regression.
+- `hasContrast` now requires `loud > 0`. Digital silence makes both percentiles 0, and `0 >= 0`
+  reported contrast, drove the threshold to 0 and marked an empty recording as continuous speech —
+  another regression the existing tests caught.
+
+Measured on the two real recordings: `pause_time_ratio` 0.89 → 0.28 and 0.92 → 0.19, `mean_pause_s`
+2.51 → 0.86 and 4.14 → 0.64, speaking rate 183 → 169 and 224 → 200 wpm, active fraction 6.7% → 43%
+and 4.9% → 47%. The rejected recording now passes the gate and scores **Typical** (probability 0.248
+against a 0.325 threshold); the other fell 0.897 → 0.419.
+
+Noise robustness is **unchanged**, verified by re-running the v3 cases: at −40, −30, −25, −20 and
+−15 dB the new threshold produces byte-identical results, because the noise floor dominates both
+terms once noise is present.
+
+`model_id` is now `synthetic-demo-v4`, carrying the spec version, so sessions scored under v3 are
+correctly excluded from trends rather than mixed with incomparable measurements.
+
 ## 2026-10-21: CI
 
 `.github/workflows/ci.yml` runs on push to main, on pull requests and on demand: typecheck, the 379

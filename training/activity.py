@@ -67,9 +67,23 @@ def measure_activity(samples: Sequence[int], sample_rate: int) -> AudioTiming:
     # range (a steady hum, or speech at a perfectly constant level) would otherwise get a threshold
     # above its own level, and every frame would read as silence. Falling back to the fixed floor
     # marks the whole recording active instead, which active_fraction then reports honestly.
-    has_contrast = loud >= noise_floor * config['noise_margin']
+    #
+    # When there is contrast, the threshold is scaled to this recording rather than to an absolute
+    # level. ``rms_threshold`` used to be a hard minimum here, and on quiet input it sat *above*
+    # the 90th percentile of real speech: a 28 dB-SNR recording of someone talking normally came
+    # out 95% silent, which read as enormous pauses and an impossible speaking rate. Anchoring to
+    # the recording's own loud level keeps the detector scale-free, which absolute RMS cannot be.
+    # Under noise this changes nothing, because the noise floor then dominates both terms.
+    # ``loud > 0`` matters: digital silence makes both percentiles 0, and ``0 >= 0`` would
+    # otherwise report contrast, drive the threshold to 0 and mark an empty recording as
+    # continuous speech.
+    has_contrast = loud > 0 and loud >= noise_floor * config['noise_margin']
     threshold = (
-        max(config['rms_threshold'], noise_floor * config['noise_margin'])
+        max(
+            noise_floor * config['noise_margin'],
+            loud * config['loud_fraction'],
+            config['rms_threshold'],
+        )
         if has_contrast
         else config['rms_threshold']
     )

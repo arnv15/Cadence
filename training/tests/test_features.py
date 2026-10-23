@@ -116,6 +116,30 @@ def test_heavy_noise_is_reported_unmeasurable_rather_than_guessed():
 def test_clean_audio_is_unchanged_by_threshold_adaptation():
     audio = measure_activity(_speech_with_gap(), 16000)
     quality = audio['quality']
-    assert quality['threshold_rms'] == 0.01
+    # The threshold is derived from the recording, not fixed: it is the loud percentile scaled by
+    # loud_fraction, which for this fixture lands above the absolute minimum. What must not change
+    # is the segmentation of clean audio.
+    config = spec.FEATURE_SPEC['audio_activity']
+    assert quality['threshold_rms'] > config['rms_threshold']
+    assert quality['threshold_rms'] == pytest.approx(0.0122070, abs=1e-6)
     assert quality['noise_floor_rms'] == 0
     assert audio['speech_intervals'] == [{'start': 1, 'end': 2}, {'start': 3, 'end': 4}]
+
+
+def test_quiet_speech_is_measured_rather_than_read_as_silence():
+    """The failure a real voice found: `rms_threshold` used to sit above real speech.
+
+    A recording at a fifth of the old fixed threshold, with clean separation between speech and
+    silence, must segment correctly. Before `loud_fraction`, every frame of this read as silence,
+    which reported an empty recording as enormous pauses.
+    """
+    quiet = (_speech_with_gap().astype(np.float64) * 0.05).astype(np.int16)
+    audio = measure_activity(quiet, 16000)
+
+    assert audio['speech_intervals'] == [{'start': 1, 'end': 2}, {'start': 3, 'end': 4}]
+    # And the quality block must land inside the gate's bounds, so the app does not call this
+    # clean recording unmeasurable. (The gate itself, isTooNoisy, lives in the app.)
+    gate = spec.FEATURE_SPEC['quality_gate']
+    quality = audio['quality']
+    assert gate['min_active_fraction'] < quality['active_fraction'] < gate['max_active_fraction']
+    assert quality['snr_db'] >= gate['min_snr_db']

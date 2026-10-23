@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { measureActivity, SNR_CEILING_DB } from '@/audio/activity';
 import { decodeWav, encodeWav } from '@/audio/wav';
-import { computeFeatures } from '@/features';
+import { computeFeatures, isTooNoisy } from '@/features';
+import spec from '@/shared/feature_spec.json';
 import { segmentsToWords } from '@/words';
 import reference from '@/shared/parity/sample_pauses_python.json';
 
@@ -104,20 +105,37 @@ it('reports heavy noise as unmeasurable instead of inventing pauses', () => {
   const audio = measureActivity(withNoise(signal(SPEECH_WITH_GAP), 6000), rate);
   const quality = audio.quality!;
 
-  expect(quality.threshold_rms).toBe(0.01);
+  expect(quality.threshold_rms).toBe(spec.audio_activity.rms_threshold);
   expect(quality.active_fraction).toBe(1);
   expect(quality.snr_db).toBeLessThan(12);
   expect(audio.speech_intervals).toHaveLength(1);
 });
 
-it('leaves clean audio exactly as the fixed threshold did', () => {
+it('segments clean audio the same way the fixed threshold did', () => {
   const audio = measureActivity(signal(SPEECH_WITH_GAP), rate);
   const quality = audio.quality!;
 
-  expect(quality.threshold_rms).toBe(0.01);
+  // The threshold is derived from the recording now, so it is the loud percentile scaled by
+  // loud_fraction rather than a constant. The segmentation is what must not change.
+  expect(quality.threshold_rms).toBeGreaterThan(spec.audio_activity.rms_threshold);
+  expect(quality.threshold_rms).toBeCloseTo(0.0122070, 6);
   expect(quality.noise_floor_rms).toBe(0);
   expect(quality.snr_db).toBe(SNR_CEILING_DB);
   expect(audio.speech_intervals).toEqual([{ start: 1, end: 2 }, { start: 3, end: 4 }]);
+});
+
+it('measures quiet speech instead of reading it as silence', () => {
+  // The failure a real voice found. rms_threshold used to be 0.01, which sat above the 90th
+  // percentile of a 28 dB-SNR recording of someone speaking normally: 95% of it read as silence,
+  // which surfaced as enormous pauses and an impossible speaking rate. A recording at a twentieth
+  // of full level, with clean separation, must still segment correctly.
+  const quiet = Int16Array.from(signal(SPEECH_WITH_GAP), (value) => Math.round(value * 0.05));
+  const audio = measureActivity(quiet, rate);
+  const quality = audio.quality!;
+
+  expect(audio.speech_intervals).toEqual([{ start: 1, end: 2 }, { start: 3, end: 4 }]);
+  expect(isTooNoisy(quality)).toBe(false);
+  expect(quality.active_fraction).toBeCloseTo(0.4, 1);
 });
 
 it('flags a steady hum, with no dynamic range, as fully active', () => {
