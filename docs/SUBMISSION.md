@@ -283,6 +283,8 @@ sentence would bury the warnings that matter in noise, which for this audience i
 
 ## Video plan (suggested timing, not a completed video)
 
+The full timed narration, shot list and rubric mapping are in [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md).
+
 | Time | Show and explain |
 |---|---|
 | 0:00–0:20 | Participant(s), Cadence, intended audience, one-sentence purpose |
