@@ -48,9 +48,9 @@ export function RecordingScreen({ task }: { task: TaskKind }) {
   const remaining = Math.max(0, Math.ceil(spec.recording.max_duration_s - recorder.elapsedS));
   return <Screen testID={`record-${task}`} footer={
     <>
-      {active ? <Button label="Finish recording" disabled={recorder.elapsedS < spec.recording.min_duration_s}
+      {active ? <Button label="Finish recording" icon="stop" size="large" disabled={recorder.elapsedS < spec.recording.min_duration_s}
         onPress={() => void recorder.stop().then(deliver)} /> :
-        <Button label="Start recording" disabled={loading || !!loadError} busy={busy}
+        <Button label="Start recording" icon="mic" size="large" disabled={loading || !!loadError} busy={busy}
           onPress={() => { setNotice(null); void recorder.start(); }} />}
       <Button label="Cancel" variant="quiet" disabled={recorder.state === 'finishing'} onPress={cancel} />
     </>

@@ -22,7 +22,7 @@ const MONTHS = [
   'December',
 ];
 
-const WEEKDAYS = [
+export const WEEKDAYS = [
   'Sunday',
   'Monday',
   'Tuesday',
@@ -43,6 +43,26 @@ export function formatShortDay(localDay: string): string {
   const date = parseLocalDay(localDay);
   if (!date) return localDay;
   return `${MONTHS[date.getMonth()].slice(0, 3)} ${date.getDate()}`;
+}
+
+/**
+ * How a saved check's day reads in a list, relative to `today`: 'Today', 'Yesterday',
+ * 'Thursday, Oct 22' within the past week, then 'Oct 12', with the year once it is not this
+ * year's. A weekday never stands alone, because a bare 'Thursday' leaves a person working out
+ * which one. `localDay` is a 'YYYY-MM-DD' key from `localDayKey`.
+ */
+export function formatRelativeDay(localDay: string, today: Date): string {
+  const date = parseLocalDay(localDay);
+  if (!date) return localDay;
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  // Rounded, not floored: a day that crosses a clock change is 23 or 25 hours long.
+  const daysAgo = Math.round((start.getTime() - date.getTime()) / 86_400_000);
+  if (daysAgo === 0) return 'Today';
+  if (daysAgo === 1) return 'Yesterday';
+  const short = formatShortDay(localDay);
+  // A day in the future (travel, a changed clock) gets a plain date rather than a wrong word.
+  if (daysAgo > 1 && daysAgo < 7) return `${WEEKDAYS[date.getDay()]}, ${short}`;
+  return date.getFullYear() === today.getFullYear() ? short : `${short}, ${date.getFullYear()}`;
 }
 
 /** 'Monday, September 15' for headings. */

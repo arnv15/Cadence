@@ -1,11 +1,14 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import { BackButton } from '@/components/back-button';
 import { Banner } from '@/components/banner';
+import { BulletList } from '@/components/bullet-list';
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { Collapsible } from '@/components/collapsible';
 import { Glyph } from '@/components/glyph';
+import { ListGroup, ListRow } from '@/components/list';
 import { ResultDisclaimer } from '@/components/result-disclaimer';
 import { ResultShareButton } from '@/components/result-share-button';
 import { SampleDataBanner } from '@/components/sample-data-banner';
@@ -123,6 +126,7 @@ export default function ResultScreen() {
 
   const header = (
     <>
+      <BackButton onPress={goBack} />
       <View style={styles.header}>
         <Title>{session.task === 'fluency' ? 'Your naming check' : 'Your voice check'}</Title>
         <Caption>
@@ -150,20 +154,21 @@ export default function ResultScreen() {
 
   const footerLinks = (
     <View style={styles.links}>
-      <Button
-        label="See your trends"
-        onPress={() => router.push('/trends')}
-        variant="quiet"
-        icon="chart"
-        hint="Opens the charts of your checks over time"
-      />
-      <Button
-        label="What Cadence cannot tell you"
-        onPress={() => router.push('/about')}
-        variant="quiet"
-        icon="info"
-        hint="Opens the limitations section in About"
-      />
+      <ListGroup>
+        <ListRow
+          icon="chart"
+          title="See your trends"
+          onPress={() => router.push('/trends')}
+          accessibilityHint="Opens the charts of your checks over time"
+        />
+        <ListRow
+          icon="info"
+          tone="neutral"
+          title="What Cadence cannot tell you"
+          onPress={() => router.push('/about')}
+          accessibilityHint="Opens the limitations section in About"
+        />
+      </ListGroup>
       <Button label="Done" onPress={goBack} variant="quiet" />
     </View>
   );
@@ -319,14 +324,7 @@ export default function ResultScreen() {
 
       <Card title="Why Cadence said that">
         {session.reasons.length > 0 ? (
-          <View style={styles.reasons}>
-            {session.reasons.map((reason) => (
-              <View key={reason} style={styles.bullet}>
-                <Glyph name="info" color={colors.textSecondary} size={20} />
-                <AppText style={styles.bulletText}>{reasonCopy(reason)}</AppText>
-              </View>
-            ))}
-          </View>
+          <BulletList items={session.reasons.map(reasonCopy)} />
         ) : (
           <AppText tone="secondary">No reasons were recorded for this check.</AppText>
         )}
@@ -334,14 +332,7 @@ export default function ResultScreen() {
 
       {standouts.length > 0 ? (
         <Card title="What stood out in this check">
-          <View style={styles.reasons}>
-            {standouts.map((line) => (
-              <View key={line} style={styles.bullet}>
-                <Glyph name="chevron-right" color={colors.textSecondary} size={20} />
-                <AppText style={styles.bulletText}>{line}</AppText>
-              </View>
-            ))}
-          </View>
+          <BulletList items={standouts} />
           <Caption>
             {demoModel
               ? 'These compare you with the demonstration model’s invented data, not with yourself ' +
@@ -411,13 +402,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.md,
   },
-  reasons: { gap: Spacing.md },
-  bullet: {
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    gap: Spacing.md,
-  },
-  bulletText: { flex: 1 },
   stats: { marginTop: Spacing.sm },
-  links: { gap: Spacing.sm, marginTop: Spacing.md },
+  links: { gap: Spacing.md, marginTop: Spacing.md },
 });

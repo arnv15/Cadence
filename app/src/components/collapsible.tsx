@@ -3,7 +3,7 @@ import { LayoutAnimation, Platform, Pressable, StyleSheet, View } from 'react-na
 
 import { Glyph } from '@/components/glyph';
 import { AppText } from '@/components/text';
-import { MinTouch, Radius, Spacing } from '@/constants/theme';
+import { Elevation, MinTouch, Radius, Spacing } from '@/constants/theme';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -35,7 +35,11 @@ export function Collapsible({
 
   return (
     <View
-      style={[styles.wrap, { borderColor: colors.border, backgroundColor: colors.surface }]}
+      style={[
+        styles.wrap,
+        Elevation.card,
+        { borderColor: colors.border, backgroundColor: colors.surface },
+      ]}
       testID={testID}>
       <Pressable
         onPress={toggle}
@@ -60,9 +64,8 @@ export function Collapsible({
 
 const styles = StyleSheet.create({
   wrap: {
-    borderRadius: Radius.md,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    overflow: 'hidden',
   },
   header: {
     alignItems: 'center',

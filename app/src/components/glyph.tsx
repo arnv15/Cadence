@@ -15,7 +15,10 @@ export type GlyphName =
   | 'download'
   | 'info'
   | 'chevron-right'
+  | 'chevron-left'
   | 'chevron-down'
+  | 'check'
+  | 'paw'
   | 'lock'
   | 'share'
   | 'trash'
@@ -113,8 +116,22 @@ function renderGlyph(name: GlyphName, color: string, width: number): ReactElemen
       );
     case 'chevron-right':
       return <Polyline points="9.5,5 16.5,12 9.5,19" {...stroke} />;
+    case 'chevron-left':
+      return <Polyline points="14.5,5 7.5,12 14.5,19" {...stroke} />;
     case 'chevron-down':
       return <Polyline points="5,9.5 12,16.5 19,9.5" {...stroke} />;
+    case 'check':
+      return <Polyline points="5,12.6 9.6,17.2 19,7.2" {...stroke} />;
+    case 'paw':
+      return (
+        <>
+          <Path d="M12 12.2c-3 0-5.6 3.3-5.6 5.6 0 1.7 1.4 2.6 3 2.6.9 0 1.7-.5 2.6-.5s1.7.5 2.6.5c1.6 0 3-.9 3-2.6 0-2.3-2.6-5.6-5.6-5.6Z" {...stroke} />
+          <Circle cx={5.2} cy={10.4} r={1.9} {...stroke} />
+          <Circle cx={9.2} cy={5.6} r={1.9} {...stroke} />
+          <Circle cx={14.8} cy={5.6} r={1.9} {...stroke} />
+          <Circle cx={18.8} cy={10.4} r={1.9} {...stroke} />
+        </>
+      );
     case 'lock':
       return (
         <>

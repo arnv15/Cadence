@@ -13,10 +13,11 @@ import { Screen } from '@/components/screen';
 import { StatRow } from '@/components/stat-row';
 import { AppText, Caption, Heading, Title } from '@/components/text';
 import { TierBadge } from '@/components/tier-badge';
+import { MARKER_SIZE, NumberMarker, TimelineRow } from '@/components/timeline';
 import { errorMessage, formatPercent } from '@/constants/format';
-import { Brand, Spacing } from '@/constants/theme';
+import { Brand, Spacing, Type } from '@/constants/theme';
 import {
-  HOW_IT_WORKS,
+  howItWorks,
   LIMITATIONS,
   PRIVACY_POINTS,
   TALK_TO_A_DOCTOR,
@@ -62,6 +63,8 @@ export default function AboutScreen() {
 
   const unverified = unverifiedCitations();
   const model = data?.model ?? null;
+  // Demo wording until a trained model is confirmed, including while it loads or if it is unreadable.
+  const steps = howItWorks(model?.trained === true);
 
   return (
     <Screen tabBarInset testID="about">
@@ -74,14 +77,20 @@ export default function AboutScreen() {
 
       {/* ------------------------------------------------------------------ how it works */}
       <Card title="How it works">
-        {HOW_IT_WORKS.map((section) => (
-          <View key={section.title} style={styles.section}>
-            <Heading>{section.title}</Heading>
-            {section.body.map((paragraph) => (
-              <AppText key={paragraph}>{paragraph}</AppText>
-            ))}
-          </View>
-        ))}
+        <View>
+          {steps.map((section, index) => (
+            <TimelineRow
+              key={section.title}
+              marker={<NumberMarker value={index + 1} />}
+              last={index === steps.length - 1}
+              contentOffset={(MARKER_SIZE - Type.heading.lineHeight) / 2}>
+              <Heading>{section.title}</Heading>
+              {section.body.map((paragraph) => (
+                <AppText key={paragraph}>{paragraph}</AppText>
+              ))}
+            </TimelineRow>
+          ))}
+        </View>
       </Card>
 
       {/* ------------------------------------------------------------------ tiers */}

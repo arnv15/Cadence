@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'rea
 
 import { Glyph } from '@/components/glyph';
 import { AppText, Heading } from '@/components/text';
-import { Radius, Spacing } from '@/constants/theme';
+import { Elevation, Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 export interface CardProps {
@@ -53,6 +53,7 @@ export function Card({
 
   const cardStyle: StyleProp<ViewStyle> = [
     styles.card,
+    tone === 'default' && Elevation.card,
     {
       backgroundColor: tone === 'soft' ? colors.surfaceAlt : colors.surface,
       borderColor: colors.border,

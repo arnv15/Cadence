@@ -147,6 +147,20 @@ export const Type = {
   mono: { fontSize: 15, lineHeight: 22, fontWeight: '400' },
 } as const;
 
+/**
+ * Soft lift for cards. The border still carries the edge (white on the warm page is nearly
+ * invisible to low vision); the shadow only separates layers. Android draws `elevation`.
+ */
+export const Elevation = {
+  card: {
+    shadowColor: '#3B2F1E',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
+    elevation: 1,
+  },
+} as const;
+
 /** Minimum interactive height. The brief asks for 56 pt. */
 export const MinTouch = 56;
 /** Comfortable reading measure on a phone or tablet. */

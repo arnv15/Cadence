@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Glyph } from '@/components/glyph';
 import { AppText } from '@/components/text';
-import { Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing, Type } from '@/constants/theme';
 import { SCREENING_DISCLAIMER } from '@/content/about';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -25,7 +25,9 @@ export function ResultDisclaimer({ detail, testID }: ResultDisclaimerProps) {
       accessibilityLabel={detail ? `${SCREENING_DISCLAIMER} ${detail}` : SCREENING_DISCLAIMER}
       testID={testID ?? 'screening-disclaimer'}
       style={[styles.row, { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]}>
-      <Glyph name="info" color={colors.textSecondary} size={22} />
+      <View style={styles.icon}>
+        <Glyph name="info" color={colors.textSecondary} size={22} />
+      </View>
       <View style={styles.text}>
         <AppText variant="bodyStrong" tone="secondary">
           {SCREENING_DISCLAIMER}
@@ -42,7 +44,7 @@ export function ResultDisclaimer({ detail, testID }: ResultDisclaimerProps) {
 
 const styles = StyleSheet.create({
   row: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     borderRadius: Radius.md,
     borderWidth: 1,
     flexDirection: 'row',
@@ -50,5 +52,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
   },
+  // Sit the icon on the first line of the heading rather than the middle of a long paragraph.
+  icon: { marginTop: (Type.bodyStrong.lineHeight - 22) / 2 },
   text: { flex: 1, gap: 2 },
 });

@@ -68,6 +68,8 @@ export function Button({
           borderColor,
           minHeight: size === 'large' ? 68 : MinTouch,
           opacity: inactive ? 0.55 : pressed ? 0.82 : 1,
+          // A slight press-in, so the finger gets a physical answer as well as a fade.
+          transform: [{ scale: pressed && !inactive ? 0.98 : 1 }],
         },
         style,
       ]}>

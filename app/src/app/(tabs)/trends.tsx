@@ -5,6 +5,7 @@ import { Banner } from '@/components/banner';
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { ChartTrend } from '@/components/chart-trend';
+import { DayDots } from '@/components/day-dots';
 import { Glyph } from '@/components/glyph';
 import { ResultShareButton } from '@/components/result-share-button';
 import { Screen } from '@/components/screen';
@@ -104,7 +105,8 @@ export default function TrendsScreen() {
       </View>
 
       <Card title="Your personal baseline" subtitle={baseline.ready ? 'Complete' : 'Still building'}>
-        <AppText>{BASELINE_EXPLANATION}</AppText>
+        <DayDots done={baseline.count} total={baseline.target} />
+        <AppText tone="secondary">{BASELINE_EXPLANATION}</AppText>
         <AppText variant="bodyStrong">
           {baseline.ready
             ? `Your baseline is complete, built from ${baseline.target} days of checks.`

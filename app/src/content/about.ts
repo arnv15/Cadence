@@ -13,38 +13,59 @@ export interface Section {
   body: string[];
 }
 
-export const HOW_IT_WORKS: Section[] = [
+/**
+ * Step 4 describes the model comparison, which only means something once the model is trained
+ * on real recordings. Until then it says what the demonstration model actually is.
+ */
+function comparisonsBody(trained: boolean): string[] {
+  const baseline =
+    'The second comparison is with you. Your first five days of checks become your personal baseline, and after that every check is measured against how you normally sound.';
+  if (!trained) {
+    return [
+      'The first comparison is with a statistical model. In this version it is a demonstration model built from invented data, not real recordings, so this comparison shows how Cadence works rather than saying anything about your health.',
+      baseline,
+      'The second comparison matters more, and with the demonstration model it is the only one that means anything. Everyone speaks differently, so a change from your own usual pattern says more than any comparison with other people.',
+    ];
+  }
+  return [
+    'The first comparison is with research data: a statistical model gives a rough probability that speech with this shape resembles the concern group in the studies Cadence is based on.',
+    baseline,
+    'The second comparison matters more. Everyone speaks differently, so a change from your own usual pattern says more than a comparison with strangers.',
+  ];
+}
+
+/**
+ * `trained` comes from the bundled model. Pass false when the model could not be read: without
+ * it nothing is known about the model, so the copy must not claim research data behind it.
+ */
+export const howItWorks = (trained: boolean): Section[] => [
   {
-    title: '1. You describe a picture',
+    title: 'You describe a picture',
     body: [
       'Cadence shows you a busy picture and asks you to say what is going on in it, out loud, for about a minute. There is no right answer and nothing to memorize.',
       'Describing a picture is used in memory research because it asks a lot of the brain at once: looking, finding the words, keeping track of what you have already said, and keeping the sentence going.',
     ],
   },
   {
-    title: '2. Your phone turns it into words',
+    title: 'Your phone turns it into words',
     body: [
       'A speech-recognition model called Whisper runs on this phone and writes down what you said, along with the time of every word.',
       'Nothing is sent anywhere. The model is downloaded once, then works offline.',
     ],
   },
   {
-    title: '3. Cadence measures how you spoke',
+    title: 'Cadence measures how you spoke',
     body: [
       'From the words and their timings, Cadence works out things like how many words a minute you spoke, how often you paused for half a second or more, how much of the time you spent pausing, how varied your vocabulary was, how often you leaned on words like "it" and "that", and how often you repeated yourself.',
       'It measures how you said it, not whether what you said was right.',
     ],
   },
   {
-    title: '4. Two comparisons, not one',
-    body: [
-      'The first comparison is with research data: a statistical model gives a rough probability that speech with this shape resembles the concern group in the studies Cadence is based on.',
-      'The second comparison is with you. Your first five days of checks become your personal baseline, and after that every check is measured against how you normally sound.',
-      'The second comparison matters more. Everyone speaks differently, so a change from your own usual pattern says more than a comparison with strangers.',
-    ],
+    title: 'Two comparisons, not one',
+    body: comparisonsBody(trained),
   },
   {
-    title: '5. You get a tier and the reasons for it',
+    title: 'You get a tier and the reasons for it',
     body: [
       'Cadence shows one of three tiers, always with the reasons behind it, and always labelled a screening estimate rather than a diagnosis.',
       'It deliberately will not escalate because of one unusual day. A worrying pattern has to show up more than once.',

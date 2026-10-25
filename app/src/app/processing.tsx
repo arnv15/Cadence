@@ -5,15 +5,18 @@ import { BackHandler } from 'react-native';
 import { Banner } from '@/components/banner';
 import { Button } from '@/components/button';
 import { ProgressBar } from '@/components/progress-bar';
+import { Card } from '@/components/card';
 import { Screen } from '@/components/screen';
+import { StepList } from '@/components/step-list';
 import { AppText, Title } from '@/components/text';
 import { errorMessage } from '@/constants/format';
 import { recordingsDirectory } from '@/audio/paths';
 import { parseRecordingInput } from '@/recording-input';
 import { processRecording } from '@/pipeline';
-import type { PipelineProgress, SessionRecord } from '@/types';
+import type { PipelineProgress, PipelineStage, SessionRecord } from '@/types';
 
-const LABELS = { model: 'Preparing speech model', transcribing: 'Listening to your recording', analyzing: 'Measuring your speech', saving: 'Saving your check' };
+const LABELS: Record<PipelineStage, string> = { model: 'Preparing speech model', transcribing: 'Listening to your recording', analyzing: 'Measuring your speech', saving: 'Saving your check' };
+const STAGES: PipelineStage[] = ['model', 'transcribing', 'analyzing', 'saving'];
 
 export default function ProcessingScreen() {
   const params = useLocalSearchParams<{ wavUri: string; durationS: string; task: string; promptId: string }>();
@@ -47,6 +50,9 @@ export default function ProcessingScreen() {
       <Banner title="Could not finish the check" body={error} tone="caution" />
       {input && <Button label="Try again" onPress={() => { job.current = null; setError(null); setAttempt(value => value + 1); }} />}
       <Button label="Discard and return to Today" variant="quiet" onPress={discard} />
-    </> : <ProgressBar progress={progress.progress} label={LABELS[progress.stage]} />}
+    </> : <Card>
+      <StepList steps={STAGES.map(stage => LABELS[stage])} current={STAGES.indexOf(progress.stage)} testID="processing-steps" />
+      {progress.progress !== null && <ProgressBar progress={progress.progress} label={LABELS[progress.stage]} />}
+    </Card>}
   </Screen>;
 }
