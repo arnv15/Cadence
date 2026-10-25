@@ -6,18 +6,11 @@ import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { ChartTrend } from '@/components/chart-trend';
 import { Glyph } from '@/components/glyph';
-import { ResultDisclaimer } from '@/components/result-disclaimer';
 import { ResultShareButton } from '@/components/result-share-button';
-import { SampleDataBanner } from '@/components/sample-data-banner';
 import { Screen } from '@/components/screen';
 import { AppText, Caption, Title } from '@/components/text';
 import { Spacing } from '@/constants/theme';
-import {
-  BASELINE_EXPLANATION,
-  baselineProgress,
-  buildTrendSeries,
-  READING_GUIDE,
-} from '@/content/trends';
+import { BASELINE_EXPLANATION, baselineProgress, buildTrendSeries } from '@/content/trends';
 import { listSessions } from '@/db';
 import { useAsync } from '@/hooks/use-async';
 import { useReloadOnReturn } from '@/hooks/use-reload-on-return';
@@ -110,9 +103,6 @@ export default function TrendsScreen() {
         <Caption>{`${sessions.length} ${sessions.length === 1 ? 'check' : 'checks'} saved on this phone`}</Caption>
       </View>
 
-      {sessions.some(session => session.isSample) && <SampleDataBanner scope="screen" />}
-      <ResultDisclaimer detail="These charts describe how you spoke. They do not measure your memory or your health." />
-
       <Card title="Your personal baseline" subtitle={baseline.ready ? 'Complete' : 'Still building'}>
         <AppText>{BASELINE_EXPLANATION}</AppText>
         <AppText variant="bodyStrong">
@@ -126,17 +116,6 @@ export default function TrendsScreen() {
             the difference-from-baseline chart below stays empty.
           </Caption>
         ) : null}
-      </Card>
-
-      <Card title="How to read these charts">
-        <View style={styles.guide}>
-          {READING_GUIDE.map((line) => (
-            <View key={line} style={styles.bullet}>
-              <Glyph name="info" color={colors.textSecondary} size={20} />
-              <AppText style={styles.bulletText}>{line}</AppText>
-            </View>
-          ))}
-        </View>
       </Card>
 
       {series.map((item) => (

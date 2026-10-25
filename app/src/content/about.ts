@@ -71,44 +71,40 @@ export const TIER_GUIDE: Record<Tier, string> = {
 
 export const LIMITATIONS: Section[] = [
   {
-    title: 'The research behind it studied a different problem',
+    title: 'The research studied a different problem',
     body: [
-      'The published models Cadence is built on were trained on the DementiaBank Pitt corpus, which is mostly recordings from people already diagnosed with Alzheimer’s disease.',
-      'Telling established Alzheimer’s disease apart from healthy speech is a much easier problem than noticing the earliest change in one person. Accuracy reported on the first problem does not carry over to the second, and Cadence is attempting the second.',
+      'The published work Cadence builds on separated people already diagnosed with Alzheimer\u2019s disease from healthy speakers. Noticing the earliest change in one person is a much harder problem, and that is what Cadence attempts, so those accuracy figures do not carry over.',
     ],
   },
   {
     title: 'The transcription is the small, fast model',
     body: [
-      'Cadence uses Whisper tiny.en, the smallest English speech model, so it runs on a phone in a reasonable time without an internet connection.',
-      'It mishears words, drops quiet words, invents the occasional word, and places timestamps imperfectly. Every number Cadence reports is computed from that imperfect transcript. You can open the transcript on any result to see exactly what it heard.',
+      'Whisper tiny.en runs on a phone without an internet connection, but it mishears words, drops quiet ones and places timestamps imperfectly. Every number here comes from that imperfect transcript \u2014 you can open it on any result and see what it heard.',
     ],
   },
   {
-    title: 'Doing the same task repeatedly makes you better at it',
+    title: 'Practice makes you better at the task',
     body: [
-      'This is called a practice effect. People get faster and more fluent at describing a picture simply because they have done it before, which can mask a real change.',
-      'Cadence varies the picture, but it cannot remove the effect.',
+      'People get more fluent at describing a picture simply because they have done it before, which can mask a real change. Varying the picture reduces this but cannot remove it.',
     ],
   },
   {
     title: 'Ordinary life changes how you speak',
     body: [
-      'Tiredness, a cold, a poor night’s sleep, a noisy room, a new medication, alcohol, low mood, anxiety, hearing difficulty, a strong accent, or simply not being in the mood to talk all change speech measurably.',
-      'Cadence cannot tell any of those apart from a change in memory. This is the main reason it compares you with yourself over time instead of judging a single recording.',
+      'Tiredness, a cold, a noisy room, low mood, a new medication or simply not feeling like talking all change speech measurably, and Cadence cannot tell any of them apart from a change in memory. That is why it compares you with yourself over time rather than judging one recording.',
     ],
   },
   {
-    title: 'Some people it will simply not fit',
+    title: 'Some people it will not fit',
     body: [
-      'The research data is overwhelmingly American English speakers. If you speak with an accent the model was not trained on, speak English as a second language, stammer, or have a condition that affects your voice or speech, Cadence’s numbers will be less meaningful for you.',
+      'The research data is overwhelmingly American English. If you speak with an accent the model was not trained on, speak English as a second language, stammer, or have a condition affecting your voice, the numbers mean less for you.',
     ],
   },
   {
-    title: 'It has not been validated, and it is not a medical device',
+    title: 'It is not a medical device',
     body: [
-      'Cadence is a student research prototype built for the Congressional App Challenge. It has not been tested in a clinical study, it has not been reviewed or cleared by the FDA or any other regulator, and no clinician has signed off on its results.',
-      'It cannot diagnose, rule out, or monitor any condition. If you are worried about your memory, or someone close to you is worried about yours, please talk to a doctor. Do that whatever this app says.',
+      'Cadence has not been tested in a clinical study, has not been reviewed or cleared by the FDA or any other regulator, and no clinician has signed off on its results. It cannot diagnose, rule out or monitor any condition.',
+      'If you are worried about your memory, talk to a doctor \u2014 whatever this app says.',
     ],
   },
 ];

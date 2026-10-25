@@ -3,7 +3,7 @@ import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { LineChart, type lineDataItem } from 'react-native-gifted-charts';
 
 import { AppText, Heading } from '@/components/text';
-import { MaxFontScale, Radius, Spacing, Type } from '@/constants/theme';
+import { Radius, Spacing, Type } from '@/constants/theme';
 import { niceAxis, type TrendSeries } from '@/content/trends';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useTheme } from '@/hooks/use-theme';
@@ -124,10 +124,7 @@ export function ChartTrend({ series, referenceValue, referenceLabel, testID }: C
     <View
       style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
       testID={testID ?? `chart-${series.key}`}>
-      <View style={styles.header}>
-        <Heading>{series.title}</Heading>
-        <AppText tone="secondary">{series.description}</AppText>
-      </View>
+      <Heading>{series.title}</Heading>
 
       {points.length === 0 ? (
         <View
@@ -210,10 +207,6 @@ export function ChartTrend({ series, referenceValue, referenceLabel, testID }: C
           </View>
         </>
       )}
-
-      <AppText variant="caption" tone="secondary" maxFontSizeMultiplier={MaxFontScale.loose}>
-        {series.reading}
-      </AppText>
     </View>
   );
 }

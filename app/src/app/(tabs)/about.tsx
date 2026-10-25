@@ -72,17 +72,6 @@ export default function AboutScreen() {
 
       <ResultDisclaimer detail={TALK_TO_A_DOCTOR} />
 
-      <Banner
-        tone="caution"
-        title="An educational research prototype"
-        body={
-          'Cadence is a student project for the Congressional App Challenge. It is not a medical ' +
-          'device, it has not been cleared by any regulator, and it has not been validated in a ' +
-          'clinical study. Nothing it shows you is a diagnosis.'
-        }
-        testID="about-prototype-notice"
-      />
-
       {/* ------------------------------------------------------------------ how it works */}
       <Card title="How it works">
         {HOW_IT_WORKS.map((section) => (
