@@ -19,6 +19,9 @@ export type GlyphName =
   | 'chevron-down'
   | 'check'
   | 'paw'
+  | 'phone'
+  | 'sun'
+  | 'moon'
   | 'lock'
   | 'share'
   | 'trash'
@@ -27,6 +30,9 @@ export type GlyphName =
   | 'clock'
   | 'calendar'
   | 'wrench';
+
+/** The check mark's path, shared with DrawnCheck so the drawn and still checks are one shape. */
+export const CHECK_POINTS = '5,12.6 9.6,17.2 19,7.2';
 
 export interface GlyphProps {
   name: GlyphName;
@@ -121,7 +127,30 @@ function renderGlyph(name: GlyphName, color: string, width: number): ReactElemen
     case 'chevron-down':
       return <Polyline points="5,9.5 12,16.5 19,9.5" {...stroke} />;
     case 'check':
-      return <Polyline points="5,12.6 9.6,17.2 19,7.2" {...stroke} />;
+      return <Polyline points={CHECK_POINTS} {...stroke} />;
+    case 'phone':
+      return (
+        <>
+          <Rect x={6.5} y={2.5} width={11} height={19} rx={2.6} {...stroke} />
+          <Line x1={10.6} y1={18.4} x2={13.4} y2={18.4} {...stroke} />
+        </>
+      );
+    case 'sun':
+      return (
+        <>
+          <Circle cx={12} cy={12} r={4} {...stroke} />
+          <Line x1={12} y1={2.6} x2={12} y2={4.6} {...stroke} />
+          <Line x1={12} y1={19.4} x2={12} y2={21.4} {...stroke} />
+          <Line x1={2.6} y1={12} x2={4.6} y2={12} {...stroke} />
+          <Line x1={19.4} y1={12} x2={21.4} y2={12} {...stroke} />
+          <Line x1={5.4} y1={5.4} x2={6.8} y2={6.8} {...stroke} />
+          <Line x1={17.2} y1={17.2} x2={18.6} y2={18.6} {...stroke} />
+          <Line x1={5.4} y1={18.6} x2={6.8} y2={17.2} {...stroke} />
+          <Line x1={17.2} y1={6.8} x2={18.6} y2={5.4} {...stroke} />
+        </>
+      );
+    case 'moon':
+      return <Path d="M20 14.6A8.4 8.4 0 0 1 9.4 4a8.4 8.4 0 1 0 10.6 10.6Z" {...stroke} />;
     case 'paw':
       return (
         <>

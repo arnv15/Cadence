@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Glyph } from '@/components/glyph';
+import { DrawnCheck } from '@/components/drawn-check';
 import { AppText } from '@/components/text';
 import { MaxFontScale, Radius, Spacing } from '@/constants/theme';
+import { useArrivals } from '@/hooks/use-arrivals';
 import { useTheme } from '@/hooks/use-theme';
 
 export interface DayDotsProps {
@@ -22,6 +23,8 @@ const SIZE = 44;
 export function DayDots({ done, total, testID }: DayDotsProps) {
   const { colors } = useTheme();
   const count = Math.max(0, Math.min(total, done));
+  // A day finished while this is on screen draws its check in; days already done are just shown.
+  const isNew = useArrivals(Array.from({ length: count }, (_unused, index) => String(index)));
 
   return (
     <View
@@ -47,7 +50,7 @@ export function DayDots({ done, total, testID }: DayDotsProps) {
                   },
             ]}>
             {finished ? (
-              <Glyph name="check" color={colors.onPrimary} size={22} strokeWidth={2.6} />
+              <DrawnCheck color={colors.onPrimary} size={22} animate={isNew(String(index))} />
             ) : (
               <AppText
                 variant="label"

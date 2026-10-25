@@ -1,9 +1,10 @@
 import { StyleSheet, View } from 'react-native';
 
-import { Glyph } from '@/components/glyph';
+import { DrawnCheck } from '@/components/drawn-check';
 import { AppText } from '@/components/text';
 import { MaxFontScale, Radius, Spacing } from '@/constants/theme';
 import { describeWeek, type WeekDay } from '@/content/week';
+import { useArrivals } from '@/hooks/use-arrivals';
 import { useTheme } from '@/hooks/use-theme';
 
 const SIZE = 38;
@@ -14,6 +15,7 @@ const SIZE = 38;
  */
 export function WeekStrip({ days, testID }: { days: WeekDay[]; testID?: string }) {
   const { colors } = useTheme();
+  const isNew = useArrivals(days.filter((day) => day.checked).map((day) => day.key));
 
   return (
     <View
@@ -42,7 +44,7 @@ export function WeekStrip({ days, testID }: { days: WeekDay[]; testID?: string }
                 : { borderColor: day.isToday ? colors.primary : 'transparent' },
             ]}>
             {day.checked ? (
-              <Glyph name="check" color={colors.onPrimary} size={20} strokeWidth={2.6} />
+              <DrawnCheck color={colors.onPrimary} size={20} animate={isNew(day.key)} />
             ) : (
               <AppText
                 variant="label"

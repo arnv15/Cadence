@@ -45,6 +45,11 @@ export interface ListRowProps {
   value?: string;
   /** Makes the row a button and shows a chevron. */
   onPress?: () => void;
+  /**
+   * Makes the row one choice in a set: a radio for assistive tech, a check when chosen, and no
+   * chevron, because choosing does not navigate anywhere.
+   */
+  selected?: boolean;
   disabled?: boolean;
   accessibilityHint?: string;
   testID?: string;
@@ -57,6 +62,7 @@ export function ListRow({
   tone,
   value,
   onPress,
+  selected,
   disabled = false,
   accessibilityHint,
   testID,
@@ -80,7 +86,13 @@ export function ListRow({
           {value}
         </AppText>
       ) : null}
-      {onPress ? <Glyph name="chevron-right" color={colors.textSecondary} size={22} /> : null}
+      {selected !== undefined ? (
+        <View style={styles.trailing}>
+          {selected ? <Glyph name="check" color={colors.primary} size={24} strokeWidth={2.6} /> : null}
+        </View>
+      ) : onPress ? (
+        <Glyph name="chevron-right" color={colors.textSecondary} size={22} />
+      ) : null}
     </>
   );
 
@@ -96,10 +108,10 @@ export function ListRow({
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      accessibilityRole="button"
+      accessibilityRole={selected !== undefined ? 'radio' : 'button'}
       accessibilityLabel={label}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled }}
+      accessibilityState={selected !== undefined ? { disabled, checked: selected } : { disabled }}
       testID={testID}
       style={({ pressed }) => [
         styles.row,
@@ -138,5 +150,7 @@ const styles = StyleSheet.create({
     maxWidth: '40%',
     textAlign: 'right',
   },
+  // Same width whether or not the check shows, so choosing does not shift the titles.
+  trailing: { alignItems: 'center', width: 24 },
   disabled: { opacity: 0.55 },
 });

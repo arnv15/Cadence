@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 
 import { DayDots } from '@/components/day-dots';
-import { Glyph } from '@/components/glyph';
+import { DrawnCheck } from '@/components/drawn-check';
 import { ListGroup, ListRow } from '@/components/list';
 import { StepList } from '@/components/step-list';
 
@@ -31,7 +31,7 @@ describe('DayDots', () => {
   it('reports progress in words and draws a check per finished day', () => {
     const tree = render(<DayDots done={3} total={5} />);
     expect(labels(tree)).toContain('3 of 5 baseline days done');
-    expect(tree.root.findAllByType(Glyph).filter((node) => node.props.name === 'check')).toHaveLength(3);
+    expect(tree.root.findAllByType(DrawnCheck)).toHaveLength(3);
     // Unfinished days are numbered, so the state does not depend on color.
     const numbers = tree.root.findAllByType(Text).map((node) => node.props.children);
     expect(numbers).toEqual([4, 5]);

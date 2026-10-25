@@ -6,11 +6,13 @@ import { ActivityIndicator, Alert, Pressable, StyleSheet, Switch, TextInput, Vie
 import { Banner } from '@/components/banner';
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
-import { Glyph } from '@/components/glyph';
+import { Glyph, type GlyphName } from '@/components/glyph';
+import { ListGroup, ListRow } from '@/components/list';
 import { ProgressBar } from '@/components/progress-bar';
 import { ResultShareButton } from '@/components/result-share-button';
 import { SampleDataBanner } from '@/components/sample-data-banner';
 import { Screen } from '@/components/screen';
+import { SectionHeader } from '@/components/section-header';
 import { StatRow } from '@/components/stat-row';
 import { AppText, Caption, Title } from '@/components/text';
 import { errorMessage, formatShortDay } from '@/constants/format';
@@ -29,12 +31,19 @@ import {
 } from '@/content/profile';
 import { BASELINE_EXPLANATION } from '@/content/trends';
 import { deleteAllData, deleteSampleSessions, getSetting, listSessions, setSetting } from '@/db';
+import { APPEARANCE_OPTIONS, useAppearance, type AppearancePreference } from '@/hooks/use-appearance';
 import { useAsync } from '@/hooks/use-async';
 import { useConsent } from '@/hooks/use-consent';
 import { useReloadOnReturn } from '@/hooks/use-reload-on-return';
 import { useTheme } from '@/hooks/use-theme';
 import { getModel } from '@/model';
 import type { CadenceModel } from '@/types';
+
+const APPEARANCE_COPY: Record<AppearancePreference, { title: string; subtitle?: string; icon: GlyphName }> = {
+  system: { title: 'Match phone', subtitle: 'Light or dark, following your phone’s setting', icon: 'phone' },
+  light: { title: 'Light', icon: 'sun' },
+  dark: { title: 'Dark', icon: 'moon' },
+};
 
 interface YouData {
   baseline: BaselineDetail;
@@ -73,6 +82,8 @@ async function loadYou(): Promise<YouData> {
  */
 export default function YouScreen() {
   const { refresh } = useConsent();
+  const { preference: appearancePreference, setPreference: setAppearance, reset: resetAppearance } =
+    useAppearance();
   const { colors } = useTheme();
   const { data, error, loading, reload } = useAsync<YouData>(loadYou, []);
 
@@ -136,6 +147,8 @@ export default function YouScreen() {
       .then(() => deleteAllData())
       .then(() => {
         setDeleted(true);
+        // The stored choice went with every other setting; stop showing it.
+        resetAppearance();
         setKeepAudio(false);
         setNameDraft('');
         reload();
@@ -143,7 +156,15 @@ export default function YouScreen() {
       })
       .catch((cause: unknown) => setActionError(errorMessage(cause)))
       .then(() => setDeleting(false));
-  }, [reload, refresh]);
+  }, [reload, refresh, resetAppearance]);
+
+  const chooseAppearance = useCallback(
+    (next: AppearancePreference) => {
+      setActionError(null);
+      setAppearance(next).catch((cause: unknown) => setActionError(errorMessage(cause)));
+    },
+    [setAppearance],
+  );
 
   const confirmDelete = useCallback(() => {
     Alert.alert(
@@ -281,6 +302,22 @@ export default function YouScreen() {
           </Caption>
         ) : null}
       </Card>
+
+      {/* ------------------------------------------------------------------ appearance */}
+      <SectionHeader title="Appearance" />
+      <ListGroup testID="you-appearance">
+        {APPEARANCE_OPTIONS.map((option) => (
+          <ListRow
+            key={option}
+            testID={`you-appearance-${option}`}
+            icon={APPEARANCE_COPY[option].icon}
+            title={APPEARANCE_COPY[option].title}
+            subtitle={APPEARANCE_COPY[option].subtitle}
+            selected={appearancePreference === option}
+            onPress={() => chooseAppearance(option)}
+          />
+        ))}
+      </ListGroup>
 
       {/* ------------------------------------------------------------------ data */}
       <Card title="Your data">

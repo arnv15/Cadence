@@ -9,6 +9,7 @@ import { Card } from '@/components/card';
 import { Collapsible } from '@/components/collapsible';
 import { Glyph } from '@/components/glyph';
 import { ListGroup, ListRow } from '@/components/list';
+import { FadeUp } from '@/components/motion';
 import { ResultDisclaimer } from '@/components/result-disclaimer';
 import { ResultShareButton } from '@/components/result-share-button';
 import { SampleDataBanner } from '@/components/sample-data-banner';
@@ -179,21 +180,23 @@ export default function ResultScreen() {
       <Screen testID="result-too-noisy">
         {header}
         <ResultDisclaimer />
-        <Card>
-          <View style={styles.friendly}>
-            <Glyph name="mic" color={colors.primary} size={40} />
-            <Heading>It was too noisy to measure</Heading>
-          </View>
-          <AppText>
-            Your words came through, but there was too much background sound to tell your pauses
-            apart from the room. A fan, a television, traffic or several people talking is usually
-            enough to hide them.
-          </AppText>
-          <AppText tone="secondary">
-            Cadence does not score a check it cannot measure, because background noise fills the
-            quiet moments and would make any voice look steady. Try again in a quieter room.
-          </AppText>
-        </Card>
+        <FadeUp>
+          <Card>
+            <View style={styles.friendly}>
+              <Glyph name="mic" color={colors.primary} size={40} />
+              <Heading>It was too noisy to measure</Heading>
+            </View>
+            <AppText>
+              Your words came through, but there was too much background sound to tell your pauses
+              apart from the room. A fan, a television, traffic or several people talking is usually
+              enough to hide them.
+            </AppText>
+            <AppText tone="secondary">
+              Cadence does not score a check it cannot measure, because background noise fills the
+              quiet moments and would make any voice look steady. Try again in a quieter room.
+            </AppText>
+          </Card>
+        </FadeUp>
         <Button
           label="Try another check"
           onPress={() => router.push('/record')}
@@ -212,22 +215,24 @@ export default function ResultScreen() {
       <Screen testID="result-insufficient">
         {header}
         <ResultDisclaimer />
-        <Card>
-          <View style={styles.friendly}>
-            <Glyph name="mic" color={colors.primary} size={40} />
-            <Heading>We couldn&rsquo;t hear enough speech</Heading>
-          </View>
-          <AppText>
-            Try again somewhere quiet. It helps to hold the phone about a hand&rsquo;s width from
-            your mouth and to keep talking about the picture even when you are not sure what to
-            say next.
-          </AppText>
-          <AppText tone="secondary">
-            {`Cadence needs roughly ${QUALITY_GATE.min_words} words and ` +
-              `${QUALITY_GATE.min_speaking_time_s} seconds of speech before it will score a check. ` +
-              'Nothing is wrong — this one just came up short.'}
-          </AppText>
-        </Card>
+        <FadeUp>
+          <Card>
+            <View style={styles.friendly}>
+              <Glyph name="mic" color={colors.primary} size={40} />
+              <Heading>We couldn&rsquo;t hear enough speech</Heading>
+            </View>
+            <AppText>
+              Try again somewhere quiet. It helps to hold the phone about a hand&rsquo;s width from
+              your mouth and to keep talking about the picture even when you are not sure what to
+              say next.
+            </AppText>
+            <AppText tone="secondary">
+              {`Cadence needs roughly ${QUALITY_GATE.min_words} words and ` +
+                `${QUALITY_GATE.min_speaking_time_s} seconds of speech before it will score a check. ` +
+                'Nothing is wrong — this one just came up short.'}
+            </AppText>
+          </Card>
+        </FadeUp>
         <Button
           label="Try another check"
           onPress={() => router.push('/record')}
@@ -246,31 +251,33 @@ export default function ResultScreen() {
     return (
       <Screen testID="result-fluency">
         {header}
-        <Card title="Animals you named">
-          <AppText variant="display">{`${fluency?.validCount ?? 0}`}</AppText>
-          <AppText tone="secondary">
-            different animals, counting each one once
-          </AppText>
-          <AppText>
-            {fluency && fluency.uniqueAnimals.length > 0
-              ? joinWords(fluency.uniqueAnimals)
-              : 'Cadence did not recognise any animal names in this recording.'}
-          </AppText>
-          {fluency && (fluency.repetitions > 0 || fluency.intrusions > 0) ? (
-            <View style={styles.stats}>
-              <StatRow
-                label="Said more than once"
-                value={`${fluency.repetitions}`}
-                hint="Repeating yourself in a timed naming task is very common"
-              />
-              <StatRow
-                label="Other words"
-                value={`${fluency.intrusions}`}
-                hint="Words that were not animal names"
-              />
-            </View>
-          ) : null}
-        </Card>
+        <FadeUp>
+          <Card title="Animals you named">
+            <AppText variant="display">{`${fluency?.validCount ?? 0}`}</AppText>
+            <AppText tone="secondary">
+              different animals, counting each one once
+            </AppText>
+            <AppText>
+              {fluency && fluency.uniqueAnimals.length > 0
+                ? joinWords(fluency.uniqueAnimals)
+                : 'Cadence did not recognise any animal names in this recording.'}
+            </AppText>
+            {fluency && (fluency.repetitions > 0 || fluency.intrusions > 0) ? (
+              <View style={styles.stats}>
+                <StatRow
+                  label="Said more than once"
+                  value={`${fluency.repetitions}`}
+                  hint="Repeating yourself in a timed naming task is very common"
+                />
+                <StatRow
+                  label="Other words"
+                  value={`${fluency.intrusions}`}
+                  hint="Words that were not animal names"
+                />
+              </View>
+            ) : null}
+          </Card>
+        </FadeUp>
         <ResultDisclaimer detail="Naming checks are not scored into a tier. They are here as a second, different kind of check alongside your picture checks." />
         <AppText tone="secondary">
           Counts bounce around by several animals from one try to the next, for everyone. One low
@@ -295,7 +302,9 @@ export default function ResultScreen() {
       {header}
 
       {tier !== null && copy !== null ? (
-        <TierBadge tier={tier} title={copy.title} summary={copy.summary} />
+        <FadeUp testID="result-tier">
+          <TierBadge tier={tier} title={copy.title} summary={copy.summary} />
+        </FadeUp>
       ) : (
         <Card title="This check was not scored">
           <AppText>

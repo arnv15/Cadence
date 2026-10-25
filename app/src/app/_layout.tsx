@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useMemo } from 'react';
 
+import { AppearanceProvider, useAppearance } from '@/hooks/use-appearance';
 import { ConsentProvider, useConsent } from '@/hooks/use-consent';
 import { useReducedMotion } from '@/hooks/use-reduced-motion';
 import { useTheme } from '@/hooks/use-theme';
@@ -14,7 +15,10 @@ void SplashScreen.preventAutoHideAsync();
 function RootNavigator() {
   const { colors, scheme } = useTheme();
   const reducedMotion = useReducedMotion();
-  const { loading, consented } = useConsent();
+  const { loading: consentLoading, consented } = useConsent();
+  // The splash also waits for the stored appearance, so a dark-mode choice never opens in light.
+  const { loading: appearanceLoading } = useAppearance();
+  const loading = consentLoading || appearanceLoading;
 
   useEffect(() => {
     if (!loading) {
@@ -74,8 +78,10 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <ConsentProvider>
-      <RootNavigator />
-    </ConsentProvider>
+    <AppearanceProvider>
+      <ConsentProvider>
+        <RootNavigator />
+      </ConsentProvider>
+    </AppearanceProvider>
   );
 }

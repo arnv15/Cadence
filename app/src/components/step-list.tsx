@@ -1,9 +1,10 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { Glyph } from '@/components/glyph';
+import { DrawnCheck } from '@/components/drawn-check';
 import { AppText } from '@/components/text';
 import { MARKER_SIZE, TimelineRow } from '@/components/timeline';
 import { Radius, Type } from '@/constants/theme';
+import { useArrivals } from '@/hooks/use-arrivals';
 import { useTheme } from '@/hooks/use-theme';
 
 export interface StepListProps {
@@ -15,10 +16,11 @@ export interface StepListProps {
 
 /**
  * Work that takes a while, shown as the steps it goes through, so a person can see it moving
- * rather than watch one bar. The line fills in behind each finished step.
+ * rather than watch one bar. A finished step draws its check, then the line below it fills.
  */
 export function StepList({ steps, current, testID }: StepListProps) {
   const { colors } = useTheme();
+  const isNew = useArrivals(steps.slice(0, Math.max(0, current)));
 
   return (
     <View testID={testID}>
@@ -30,7 +32,7 @@ export function StepList({ steps, current, testID }: StepListProps) {
           <View key={step} accessible accessibilityLabel={`${step}, ${state}`}>
             <TimelineRow
               last={index === steps.length - 1}
-              lineColor={done ? colors.primary : undefined}
+              filled={done}
               contentOffset={(MARKER_SIZE - Type.body.lineHeight) / 2}
               marker={
                 <View
@@ -41,7 +43,7 @@ export function StepList({ steps, current, testID }: StepListProps) {
                       : { borderColor: active ? colors.primary : colors.borderStrong },
                   ]}>
                   {done ? (
-                    <Glyph name="check" color={colors.onPrimary} size={18} strokeWidth={2.6} />
+                    <DrawnCheck color={colors.onPrimary} size={18} animate={isNew(step)} />
                   ) : active ? (
                     <ActivityIndicator size="small" color={colors.primary} />
                   ) : null}

@@ -219,4 +219,4 @@ export interface PipelineProgress {
   progress: number | null;
 }
 
-export type SettingKey = 'consent_version' | 'keep_audio' | 'display_name';
+export type SettingKey = 'consent_version' | 'keep_audio' | 'display_name' | 'appearance';

@@ -8,6 +8,7 @@ import { Button } from '@/components/button';
 import { LevelMeter } from '@/components/level-meter';
 import { ProgressRing } from '@/components/progress-ring';
 import { Screen } from '@/components/screen';
+import { VoiceHalo } from '@/components/voice-halo';
 import { AppText, Title } from '@/components/text';
 import { errorMessage } from '@/constants/format';
 import { listSessions } from '@/db';
@@ -15,6 +16,9 @@ import { useAsync } from '@/hooks/use-async';
 import { pickPrompt } from '@/prompts';
 import spec from '@/shared/feature_spec.json';
 import type { TaskKind } from '@/types';
+
+/** The countdown ring's diameter; the voice halo behind it starts at the same size. */
+const RING_SIZE = 200;
 
 /** The picture leads; the countdown and microphone feedback support a single recording action. */
 export function RecordingScreen({ task }: { task: TaskKind }) {
@@ -58,8 +62,9 @@ export function RecordingScreen({ task }: { task: TaskKind }) {
     <Title>{task === 'picture' ? prompt.title : 'Name some animals'}</Title>
     <AppText>{task === 'picture' ? 'Describe what you see happening in the picture. Speak naturally, in English. There are no right or wrong details.' : 'Name as many different animals as you can, in English. You have one minute.'}</AppText>
     {task === 'picture' && <prompt.Scene />}
-    <View style={{ alignItems: 'center' }}>
-      <ProgressRing progress={recorder.elapsedS / spec.recording.max_duration_s} label={String(remaining)}
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <VoiceHalo level={recorder.level} active={active} size={RING_SIZE} />
+      <ProgressRing size={RING_SIZE} progress={recorder.elapsedS / spec.recording.max_duration_s} label={String(remaining)}
         sublabel="seconds left" accessibilityLabel={`${remaining} seconds left`} />
     </View>
     <LevelMeter level={recorder.level} active={active} caption={active ? 'Recording on this phone' : 'Your microphone is off'} />

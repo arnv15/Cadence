@@ -1,8 +1,13 @@
+import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
 import Svg, { Circle, G } from 'react-native-svg';
 
+import { Motion } from '@/components/motion';
 import { AppText } from '@/components/text';
 import { useTheme } from '@/hooks/use-theme';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export interface ProgressRingProps {
   /** 0..1. Values outside the range are clamped. */
@@ -36,6 +41,15 @@ export function ProgressRing({
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
+  // The countdown updates ten times a second; the arc glides between updates instead of stepping.
+  const shown = useSharedValue(clamped);
+  useEffect(() => {
+    shown.set(withTiming(clamped, Motion.follow));
+  }, [clamped, shown]);
+  const arcProps = useAnimatedProps(() => ({
+    strokeDashoffset: circumference * (1 - shown.value),
+  }));
+
   return (
     <View
       accessible
@@ -54,7 +68,7 @@ export function ProgressRing({
             strokeWidth={strokeWidth}
             fill="none"
           />
-          <Circle
+          <AnimatedCircle
             cx={center}
             cy={center}
             r={radius}
@@ -62,7 +76,7 @@ export function ProgressRing({
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeDasharray={`${circumference} ${circumference}`}
-            strokeDashoffset={circumference * (1 - clamped)}
+            animatedProps={arcProps}
             fill="none"
           />
         </G>
