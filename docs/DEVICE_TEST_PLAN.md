@@ -29,6 +29,35 @@ Debug build driven through adb on the booted emulator.
 | **Trends can stall on its loading state after a configuration change** | **Open defect, partly mitigated.** Switching dark mode or the system font size while Trends is open leaves "Gathering your checks..." on screen. Instrumentation proved the loader completes (`listSessions returned 10`) while the screen stays on `loading`, so a state update is being dropped, most likely by a duplicate or stale screen instance after the Android configuration change. It recovers by switching tabs or on the next remount. Mitigated by a "Try again" button that appears after 6 s (`useSlowLoad`), and by `useReloadOnReturn`, which stops the initial load and the focus reload from fighting. Root cause still unidentified |
 | Android cold-start deep link to /trends | Same stall as above. Not on a user path: people tap the tab |
 
+## Full re-verification on feature spec v4 (2026-10-24)
+
+Everything re-run after the v4 threshold change and the generator recalibration, on both platforms.
+
+| Check | Result |
+|---|---|
+| Typecheck, Jest, config plugin, pytest | 380 Jest / 30 pytest / 3 plugin, `tsc` clean |
+| CI on `6f5aeab` | Both jobs green |
+| Release export, both platforms | Clean. v4 model id and `loud_fraction` present in both bundles; **`synthetic-demo-v3` absent**, confirming the retrained model shipped |
+| **iOS on-device parity** | **Pass.** "Bundled sample check passed — 5 long pauses; 23.56 s speech span / 23.79 s audio", all nine features difference `0.000000` |
+| **Android on-device parity** | **Pass.** All nine features difference `0.000000` under v4 — three-way agreement across Python, iOS and Android holds after the spec change |
+| iOS delete-all | **Pass.** sessions 0, settings 0, recordings directory empty, speech model kept, app returned to onboarding |
+| iOS sample history on v4 | **Pass.** 7 picture + 2 fluency, baseline Complete, built from Oct 18 to Oct 22, 2 checks since. Tiers: 5 typical / 2 watch / **0 doctor** — the drift now shows as the last two days moving to "watch", which demonstrates the mechanism |
+| iOS PDF audit | **Clean.** No accuracy figures, no bare probability, no reference-data claim, no stale v3 id. Demo notice, "no measured performance", "Demo-model output … carries no clinical meaning" and the sample-data notice all present |
+| Android PDF audit | **Clean** on the same probes |
+| Android sample history on v4 | **Pass**, identical to iOS after a reload |
+
+Three things worth keeping:
+
+- **The model-id filter proved itself.** Android still held sample history generated under
+  `synthetic-demo-v3`, and the v4 report excluded all 7 picture checks and said so: "7 checks from an
+  earlier model are excluded from this summary so incompatible measurements are not combined." The
+  missing probability line in that PDF was the filter working, not a defect. Reloading sample history
+  regenerates it under v4.
+- **"System UI isn't responding"** appeared once on the emulator under swiftshader. Cadence rendered
+  correctly behind the dialog; it is an emulator artefact, not an app fault.
+- Loading sample history from Debug leaves an already-mounted You or Trends tab showing stale counts
+  until a tab switch — the same staleness the `useReloadOnReturn` mitigation addresses.
+
 ## Release-mode bundle check (2026-10-21)
 
 `npx expo export --platform ios --platform android` from `app/`. Metro's dev server resolves things a
