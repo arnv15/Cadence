@@ -299,21 +299,17 @@ export default function ResultScreen() {
         </Card>
       )}
 
-      <ResultDisclaimer detail={TALK_TO_A_DOCTOR} />
-
-      {demoModel ? (
-        <Banner
-          tone="caution"
-          title="This is the demonstration model"
-          body={
-            'The model bundled with this app was built on made-up data, not on real clinical ' +
-            'recordings, because Cadence has not been granted access to the research corpus. It ' +
-            'shows how the app works and it has learned nothing about real speech or real ' +
-            'illness. Treat the tier above as a demonstration.'
-          }
-          testID="demo-model-notice"
-        />
-      ) : null}
+      {/* The demo-model disclosure is explained in full on About. Here it is one clause on the
+          line that is already present, because a tier is on screen and AGENTS.md requires the
+          label wherever a result appears — but a second caution block was clutter. */}
+      <ResultDisclaimer
+        detail={
+          demoModel
+            ? `This tier came from the demonstration model, not a trained one. ${TALK_TO_A_DOCTOR}`
+            : TALK_TO_A_DOCTOR
+        }
+        testID={demoModel ? 'demo-model-notice' : undefined}
+      />
 
       {copy !== null ? (
         <Card title="What to do with this">

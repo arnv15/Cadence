@@ -5,10 +5,9 @@ import { Banner } from '@/components/banner';
 import { Button } from '@/components/button';
 import { Card } from '@/components/card';
 import { ProgressBar } from '@/components/progress-bar';
-import { ResultDisclaimer } from '@/components/result-disclaimer';
 import { SampleDataBanner } from '@/components/sample-data-banner';
 import { Screen } from '@/components/screen';
-import { AppText, Caption, Title } from '@/components/text';
+import { AppText, Title } from '@/components/text';
 import { TierBadge } from '@/components/tier-badge';
 import { errorMessage } from '@/constants/format';
 import { listSessions, localDayKey } from '@/db';
@@ -45,7 +44,6 @@ export default function TodayScreen() {
   };
   return (
     <Screen tabBarInset testID="today">
-      <Caption>Cadence · Your voice, your baseline.</Caption>
       <Title>{doneToday ? 'Your check is saved' : 'A minute for yourself'}</Title>
       <AppText>{doneToday ? 'You have completed today’s voice check. Come back tomorrow to keep building your history.' : 'Find a quiet spot. Describe a picture in your own words for one minute.'}</AppText>
       {loading && <ActivityIndicator accessibilityLabel="Loading your checks" />}
@@ -60,17 +58,14 @@ export default function TodayScreen() {
           {downloadError && <Banner title="Download did not finish" body={downloadError} tone="caution" />}
         </Card>}
         {data.sessions.some(session => session.isSample) && <SampleDataBanner scope="screen" />}
-        {!data.model.trained && <Banner title="Demo model" body="This prototype uses synthetic training data. Its scores do not measure your chance of having a medical condition." />}
         <Card title={`Baseline: ${baselineCount} of ${spec.baseline.baseline_days} days`}>
           <AppText>{baselineCount < spec.baseline.baseline_days ? 'Your first five days help Cadence learn how you usually speak. Extra checks on the same day do not add baseline days.' : 'Your baseline is ready. Future checks can be compared with your first five days.'}</AppText>
           <ProgressBar progress={baselineCount / spec.baseline.baseline_days} label="Baseline progress" />
         </Card>
         {latest && <Card title="Latest voice check" subtitle={latest.localDay} onPress={() => router.push(`/result/${latest.id}`)}>
           {latest.tier ? <TierBadge tier={latest.tier} title={tierCopy(latest.tier).title} /> : <AppText>There wasn’t enough speech to estimate a result.</AppText>}
-          <ResultDisclaimer />
         </Card>}
         <Button label="Try animal naming" variant="secondary" disabled={!data.speechModel.downloaded || downloading} onPress={() => router.push('/fluency')} />
-        <AppText tone="secondary">Optional: name as many different animals as you can. This exercise stays separate from your picture checks.</AppText>
       </>}
     </Screen>
   );

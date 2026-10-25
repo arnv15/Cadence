@@ -111,7 +111,6 @@ export default function TrendsScreen() {
       </View>
 
       {sessions.some(session => session.isSample) && <SampleDataBanner scope="screen" />}
-      {!getModel().trained && <Banner title="Demo model" body="This prototype’s model uses synthetic data. Charts show speech measurements, not a medical assessment." />}
       <ResultDisclaimer detail="These charts describe how you spoke. They do not measure your memory or your health." />
 
       <Card title="Your personal baseline" subtitle={baseline.ready ? 'Complete' : 'Still building'}>
