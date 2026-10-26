@@ -126,24 +126,51 @@ synthetic model, added missing application screens and recorder recovery, added 
 native bundling, revised research copy, generated waveform artwork, and ran builds and automated
 checks.
 
-### Student — **to be filled in by the owner, honestly**
+### Student — Arnav Gupta
 
-Fill in the specific decisions, code, experiments, debugging and design work you actually performed.
-Do not describe AI-generated code as independently written.
+Drafted by Claude on 2026-10-25 from Arnav's own account of the project. **Arnav must read every line
+and correct anything that is not exactly accurate before this is submitted.** The code itself was
+written largely by the AI assistants, as recorded above; this section covers the part that was mine.
 
-What the repository can tell you, to help you write this accurately:
+**Design decisions.** Every design decision in Cadence was mine:
 
-- The original plan reserved three pieces as your own learning exercises: `decideTier` in
-  `src/scorer.ts`, the pause-gap threshold `pause_gap_s`, and the noise policy `isTooNoisy`. The first
-  two were left unchanged by both assistants; `isTooNoisy` was implemented during the Codex window.
-  Check each against your own memory before claiming it.
-- The product constraints that shape the whole app are yours and are worth describing as design
-  decisions: never present a result as a diagnosis, keep the `trained` flag honest, never let a demo
-  model push anyone toward "Talk to a doctor", never let an unmeasurable recording score as normal,
-  and keep audio on the device.
-- The direction-setting during these sessions — which bug to chase next, what to verify, rejecting an
-  unverified fix, asking for the baseline copy to be written — is in the session history and is a real
-  contribution, but it is project direction, not authorship of code. Describe it as what it was.
+- **The task and what it measures.** A 60-second picture description, scored on nine speech features:
+  speaking pace, pause frequency, average pause length, time spent pausing, word variety, pronoun use,
+  filler words, descriptive words and repeated words, with half a second as the shortest gap that
+  counts as a pause.
+- **The scoring model.** A logistic regression, chosen because it is interpretable: every result can
+  say which features drove it, in plain words. Its threshold is set to catch at least 90% of positive
+  cases at the cost of more false alarms, because in screening a missed case costs more than a false
+  alarm.
+- **The personal baseline.** The first check from each of the first five distinct days, so each person
+  is compared with themselves rather than with a population. Extra checks on one day do not count, so
+  one busy day cannot fake a trend.
+- **The three tiers and the rules in `decideTier`.** Never escalate on a single bad day; drift cannot
+  count while the baseline is still building; and an untrained model can never produce "Talk to a
+  doctor".
+- **The safety and honesty rules.** Never present a result as a diagnosis. Label the demo model
+  everywhere, and keep `trained` false until a model is fitted on real clinical data. A recording that
+  cannot be measured gets no tier, because background noise fills silences and would otherwise make
+  it look like fluent speech. Audio never leaves the phone.
+- **The audience.** Adults aged 50–85, which set the accessibility rules: body text at least 17 pt,
+  touch targets at least 56 pt, tiers never shown by colour alone, light and dark mode.
+
+**Debugging and testing.** I directed the debugging:
+
+- I ran the first real voice checks, on my own voice, on 2026-10-23. Their results could not be
+  right: over 90% of normal speech read as silence, and an ordinary speaker scored "Worth watching".
+  I directed the investigation that traced this first to the speech cutoff sitting above real speech
+  (feature spec v4), then to the synthetic training data's pause scale, and required each fix to be
+  re-checked against the real recordings. All three now score "Typical".
+- I chose which problem to chase next and what had to be verified on a device, and I rejected fixes
+  that had not been verified.
+- I ran the built-in sample check on iOS and supplied the screenshot confirming that all nine features
+  match the Python reference.
+
+**What I did not do.** I did not write most of the code. Claude and Codex wrote the app's screens and
+flow, and also the pipeline code that implements the pause measurement, the noise handling and the
+training scripts, and they ran much of the build and device testing, as recorded above. The design
+and the direction were mine; the implementation was largely theirs.
 
 ### Understanding you should be able to demonstrate
 
