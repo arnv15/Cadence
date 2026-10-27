@@ -23,31 +23,31 @@ line**, not at a fixed time.
 
 ### Required in the video (official rules, §4)
 
-| Requirement | Where |
-|---|---|
-| The name of each participant | §1, plus a caption |
-| The name of the app | §2 |
-| The app's purpose in one clear sentence | §2, one sentence, not split |
-| The target audience | §3 |
-| The tools and coding languages used | §9 narration plus clip 14; Whisper also in §5 |
-| A showcase of the app's functionality | §4 to §6, one real check from start to finish |
-| 1–3 minutes, on YouTube or Vimeo, set to **Public** | "Unlisted" does not meet the rule |
+| Requirement                                         | Where                                         |
+| --------------------------------------------------- | --------------------------------------------- |
+| The name of each participant                        | §1, plus a caption                            |
+| The name of the app                                 | §2                                            |
+| The app's purpose in one clear sentence             | §2, one sentence, not split                   |
+| The target audience                                 | §3                                            |
+| The tools and coding languages used                 | §9 narration plus clip 14; Whisper also in §5 |
+| A showcase of the app's functionality               | §4 to §6, one real check from start to finish |
+| 1–3 minutes, on YouTube or Vimeo, set to **Public** | "Unlisted" does not meet the rule             |
 
 ### How it is scored
 
 Rules §7 lists three criteria: the quality of the idea (creativity and originality), the
 implementation (user experience and design), and coding skill. The national judges page links an
-example rubric, the *2021 CAC Rubric Guide*. It has six rows scored 1–5, for 30 points. A district can
+example rubric, the _2021 CAC Rubric Guide_. It has six rows scored 1–5, for 30 points. A district can
 use its own rubric, but this is the published one:
 
-| Row | What earns a 5 | Where the script earns it |
-|---|---|---|
-| **Ideology** | The issue or need is extremely relevant | §3: why speech, and who it is for |
-| **Impact** | Creativity is evident while the impact is explained | §2 and §6: compared with *your own* baseline, private, a PDF for your doctor |
-| **Structure** | Innovative, engaging, within the time limit | Reel-style cuts, four locations, overlay clips; must finish under 3:00 |
-| **Function** | Functional, with complex features | §4 and §5: a real recording, on-device speech recognition, a scored result |
-| **Code** | "Explanation of code indicates immense understanding" | §7, with clips 10 to 13. This row is scored from the video ("Video does not explain code" scores 1), so do not cut it |
-| **UI** | Highly innovative design and interface | §3 and §4: built for ages 50–85, reasons written out, tier never shown by colour alone |
+| Row           | What earns a 5                                        | Where the script earns it                                                                                             |
+| ------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Ideology**  | The issue or need is extremely relevant               | §3: why speech, and who it is for                                                                                     |
+| **Impact**    | Creativity is evident while the impact is explained   | §2 and §6: compared with _your own_ baseline, private, a PDF for your doctor                                          |
+| **Structure** | Innovative, engaging, within the time limit           | Reel-style cuts, four locations, overlay clips; must finish under 3:00                                                |
+| **Function**  | Functional, with complex features                     | §4 and §5: a real recording, on-device speech recognition, a scored result                                            |
+| **Code**      | "Explanation of code indicates immense understanding" | §7, with clips 10 to 13. This row is scored from the video ("Video does not explain code" scores 1), so do not cut it |
+| **UI**        | Highly innovative design and interface                | §3 and §4: built for ages 50–85, reasons written out, tier never shown by colour alone                                |
 
 ### Two rules that matter as much as the rubric
 
@@ -64,40 +64,40 @@ use its own rubric, but this is the published one:
 
 ### Locations
 
-| | Where | Sections | Why there |
-|---|---|---|---|
-| **A** | Milpitas High (outside the building, or a classroom) | §1 | Shows "sophomore at Milpitas High" instead of only saying it. Check the school's filming rules first |
-| **B** | A calm room at home: living room or kitchen | §3, §4 | The kind of place someone 50–85 would actually do a check. **Must be quiet**: the noise gate refuses recordings it cannot measure |
-| **C** | Your desk, laptop open with code on screen | §5, §7, §8 | The technical part, filmed where the work happened |
-| **D** | Outdoors, walking or standing | §9 | A change of scene for the close |
+|       | Where                                                | Sections   | Why there                                                                                                                         |
+| ----- | ---------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **A** | Milpitas High (outside the building, or a classroom) | §1         | Shows "sophomore at Milpitas High" instead of only saying it. Check the school's filming rules first                              |
+| **B** | A calm room at home: living room or kitchen          | §3, §4     | The kind of place someone 50–85 would actually do a check. **Must be quiet**: the noise gate refuses recordings it cannot measure |
+| **C** | Your desk, laptop open with code on screen           | §5, §7, §8 | The technical part, filmed where the work happened                                                                                |
+| **D** | Outdoors, walking or standing                        | §9         | A change of scene for the close                                                                                                   |
 
 Use the same microphone in every location so your voice sounds the same. Outdoors, watch for wind.
 
 ### Screen recordings (iPhone screen recording, then dropped in full-screen)
 
-| | What to record | Used in |
-|---|---|---|
-| **R1** | Home screen → tap the Cadence icon → Today tab | §2 |
-| **R2** | Today tab with the iPhone's text size at its largest (Settings → Accessibility → Display & Text Size → Larger Text) | §3 |
-| **R3** | Today → start a picture check → "The busy kitchen" → recorder with countdown and level meter → processing | §4 |
-| **R4** | Result screen: the tier badge and the line under it saying the tier "came from the demonstration model", then "Why Cadence said that", then a slow scroll through "All the measurements" | §4, §5 |
-| **R5** | Trends tab **with the Sample data banner visible** → You tab → **Share a PDF of my trends** → share sheet showing the PDF | §6 |
-| **R6** | Laptop terminal running `cd app && npm test`, ending on the passing summary. Film the laptop screen with your phone, or screen-record it and crop to portrait | §7 |
+|        | What to record                                                                                                                                                                           | Used in |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| **R1** | Home screen → tap the Cadence icon → Today tab                                                                                                                                           | §2      |
+| **R2** | Today tab with the iPhone's text size at its largest (Settings → Accessibility → Display & Text Size → Larger Text)                                                                      | §3      |
+| **R3** | Today → start a picture check → "The busy kitchen" → recorder with countdown and level meter → processing                                                                                | §4      |
+| **R4** | Result screen: the tier badge and the line under it saying the tier "came from the demonstration model", then "Why Cadence said that", then a slow scroll through "All the measurements" | §4, §5  |
+| **R5** | Trends tab **with the Sample data banner visible** → You tab → **Share a PDF of my trends** → share sheet showing the PDF                                                                | §6      |
+| **R6** | Laptop terminal running `cd app && npm test`, ending on the passing summary. Film the laptop screen with your phone, or screen-record it and crop to portrait                            | §7      |
 
 Phone screen recordings are already portrait, so they fill the frame. While one is on screen, keep
 yourself as a small circle in a bottom corner (picture-in-picture) so it still feels like you talking.
 
 ### Pictures
 
-| | What | Used in |
-|---|---|---|
-| **P1** | Screenshot of the title of one of the papers behind §3 (Jafari et al. 2025, *Age and Ageing*, or Mekulu et al. 2026, *PLOS Digital Health*; links in `app/src/content/citations.ts`) | §3, 2 seconds |
-| **P2** | Optional: a photo of a family member in the 50–85 range, **only** with their permission and only if they are part of your real reason for building this | §3 |
+|        | What                                                                                                                                                                                 | Used in       |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- |
+| **P1** | Screenshot of the title of one of the papers behind §3 (Jafari et al. 2025, _Age and Ageing_, or Mekulu et al. 2026, _PLOS Digital Health_; links in `app/src/content/citations.ts`) | §3, 2 seconds |
+| **P2** | Optional: a photo of a family member in the 50–85 range, **only** with their permission and only if they are part of your real reason for building this                              | §3            |
 
 ### Layout in the frame
 
 - The overlay clips sit near the top of the frame (the Overlays stage puts cards at `--card-top:
-  280px`). Frame yourself in the lower half, eyes about 60% of the way down.
+280px`). Frame yourself in the lower half, eyes about 60% of the way down.
 - Burn in captions (Edits' auto-captions are fine) in the lower middle, below the cards and above
   your chin. Judges may watch muted, and captions also help an older audience.
 - Keep text clear of the very top and bottom of the frame.
@@ -254,24 +254,24 @@ The full build spec, written so it can be handed straight to the `Overlays` proj
 time, and a fact-check table for every number on a card. This table is the quick reference for the
 edit: drop each clip when you start saying its line.
 
-| # | Clip | Starts when you say… | Length | Priority |
-|---|---|---|---|---|
-| 01 | `what-is-cadence` | "This is Cadence…" | 13.5 s | Must |
-| 02 | `speech-clues` | "…changes in everyday speech…" | 7.0 s | Nice |
-| 03 | `built-for-50-to-85` | "Cadence is for adults 50 to 85…" | 10.4 s | Nice |
-| 04 | `shortened-for-video` | (the recorder appears) | 4.0 s | Must |
-| 05 | `on-device-pipeline` | "Whisper, an open-source speech model…" | 8.4 s | Must |
-| 06 | `nine-features` | "Cadence computes nine speech features…" | 2.6 s | Must |
-| 07 | `three-tiers` | "…and picks one of three tiers…" | 7.4 s | Must |
-| 08 | `demo-model-lock` | "I don't have clinical data yet…" | 12.8 s | Must |
-| 09 | `personal-baseline` | "Your first five days…" | 7.0 s | Must |
-| 10 | `timestamps-miss-silence` | "The hardest part was measuring pauses." | 7.4 s | Must |
-| 11 | `cutoff-too-high` | "On my first real test…" | 11.2 s | Must |
-| 12 | `cutoff-adapts` | "Now the cutoff adapts…" | 5.4 s | Must |
-| 13 | `same-numbers-two-languages` | "The same features run in TypeScript and Python…" | 7.0 s | Must |
-| 14 | `tools-and-ai` | "Cadence is written in TypeScript…" | 14.0 s | Must |
-| 15 | `whats-next` | "Next: real clinical data…" | 4.0 s | Nice |
-| 16 | `end-card` | (after "Thanks for watching!") | 3.0 s | Must |
+| #   | Clip                         | Starts when you say…                              | Length | Priority |
+| --- | ---------------------------- | ------------------------------------------------- | ------ | -------- |
+| 01  | `what-is-cadence`            | "This is Cadence…"                                | 13.1 s | Must     |
+| 02  | `speech-clues`               | "…changes in everyday speech…"                    | 7.0 s  | Nice     |
+| 03  | `built-for-50-to-85`         | "Cadence is for adults 50 to 85…"                 | 9.9 s  | Nice     |
+| 04  | `shortened-for-video`        | (the recorder appears)                            | 4.0 s  | Must     |
+| 05  | `on-device-pipeline`         | "Whisper, an open-source speech model…"           | 8.0 s  | Must     |
+| 06  | `nine-features`              | "Cadence computes nine speech features…"          | 2.2 s  | Must     |
+| 07  | `three-tiers`                | "…and picks one of three tiers…"                  | 7.4 s  | Must     |
+| 08  | `demo-model-lock`            | "I don't have clinical data yet…"                 | 12.4 s | Must     |
+| 09  | `personal-baseline`          | "Your first five days…"                           | 7.0 s  | Must     |
+| 10  | `timestamps-miss-silence`    | "The hardest part was measuring pauses."          | 7.4 s  | Must     |
+| 11  | `cutoff-too-high`            | "On my first real test…"                          | 11.0 s | Must     |
+| 12  | `cutoff-adapts`              | "Now the cutoff adapts…"                          | 4.2 s  | Must     |
+| 13  | `same-numbers-two-languages` | "The same features run in TypeScript and Python…" | 6.6 s  | Must     |
+| 14  | `tools-and-ai`               | "Cadence is written in TypeScript…"               | 13.8 s | Must     |
+| 15  | `whats-next`                 | "Next: real clinical data…"                       | 4.0 s  | Nice     |
+| 16  | `end-card`                   | (after "Thanks for watching!")                    | 3.0 s  | Must     |
 
 If time runs short, skip the three "Nice" clips. Clips 10 to 13 are the ones that earn the Code row.
 
@@ -306,7 +306,7 @@ Keep §1, §7, §8 and the disclosure in §9.
 
 The application also asks six questions (rules §4). The script gives you material for three:
 
-- **What inspired you?** Answer in your own words. §3 states the general need, but judges want *your*
+- **What inspired you?** Answer in your own words. §3 states the general need, but judges want _your_
   reason.
 - **What technical difficulty did you face?** §7 is the short version. The full story is the
   2026-10-23 feature spec v4 entry in [HANDOFF.md](../HANDOFF.md), together with the 2026-10-13

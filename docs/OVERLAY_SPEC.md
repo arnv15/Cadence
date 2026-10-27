@@ -42,7 +42,9 @@ creativity, design and coding skill, and the rules require an honest account of 
 
 The `--at` values below assume a calm reel pace of about 150 words a minute (2.5 words a second),
 counted from the first word of each clip's `data-line`. Each clip should start when Arnav starts
-saying its line and end shortly after the line finishes.
+saying its line and end about 0.3 s after the line finishes, so a card is never still on screen when
+the next one comes in. Every `data-dur` below follows that rule, and the last element of each clip
+finishes animating before its exit begins.
 
 `--dur` currently changes only the hold before the exit: `retime()` in `shared/overlay.js` returns
 the original delay unchanged (it is still marked for Arnav to write). So if a take runs much faster
@@ -143,20 +145,20 @@ arrow (and a strike line through it), padlock, scissors, checkmark, empty checkb
 
 | # | Clip (`data-name`) | Starts when Arnav says… | `data-dur` | Priority |
 |---|---|---|---|---|
-| 01 | `what-is-cadence` | "This is Cadence…" | 13.5 | Must |
+| 01 | `what-is-cadence` | "This is Cadence…" | 13.1 | Must |
 | 02 | `speech-clues` | "…changes in everyday speech…" | 7.0 | Nice |
-| 03 | `built-for-50-to-85` | "Cadence is for adults 50 to 85…" | 10.4 | Nice |
+| 03 | `built-for-50-to-85` | "Cadence is for adults 50 to 85…" | 9.9 | Nice |
 | 04 | `shortened-for-video` | (the recorder appears on screen) | 4.0 | Must |
-| 05 | `on-device-pipeline` | "Whisper, an open-source speech model…" | 8.4 | Must |
-| 06 | `nine-features` | "Cadence computes nine speech features…" | 2.6 | Must |
+| 05 | `on-device-pipeline` | "Whisper, an open-source speech model…" | 8.0 | Must |
+| 06 | `nine-features` | "Cadence computes nine speech features…" | 2.2 | Must |
 | 07 | `three-tiers` | "…and picks one of three tiers…" | 7.4 | Must |
-| 08 | `demo-model-lock` | "I don't have clinical data yet…" | 12.8 | Must |
+| 08 | `demo-model-lock` | "I don't have clinical data yet…" | 12.4 | Must |
 | 09 | `personal-baseline` | "Your first five days…" | 7.0 | Must |
 | 10 | `timestamps-miss-silence` | "The hardest part was measuring pauses." | 7.4 | Must |
-| 11 | `cutoff-too-high` | "On my first real test…" | 11.2 | Must |
-| 12 | `cutoff-adapts` | "Now the cutoff adapts…" | 5.4 | Must |
-| 13 | `same-numbers-two-languages` | "The same features run in TypeScript and Python…" | 7.0 | Must |
-| 14 | `tools-and-ai` | "Cadence is written in TypeScript…" | 14.0 | Must |
+| 11 | `cutoff-too-high` | "On my first real test…" | 11.0 | Must |
+| 12 | `cutoff-adapts` | "Now the cutoff adapts…" | 4.2 | Must |
+| 13 | `same-numbers-two-languages` | "The same features run in TypeScript and Python…" | 6.6 | Must |
+| 14 | `tools-and-ai` | "Cadence is written in TypeScript…" | 13.8 | Must |
 | 15 | `whats-next` | "Next: real clinical data…" | 4.0 | Nice |
 | 16 | `end-card` | (right after "Thanks for watching!") | 3.0 | Must |
 
@@ -170,7 +172,7 @@ story when they are placed back to back.
 
 ---
 
-### 01 · `what-is-cadence` — 13.5 s
+### 01 · `what-is-cadence` — 13.1 s
 
 `data-line`: This is Cadence: a 60-second daily voice check that measures how you speak, like your
 pace, pauses and word variety, and compares each day with your own baseline, all on your phone.
@@ -202,7 +204,7 @@ The clip starts on "changes", about 0.8 s into the line.
 | 3.2 | Row 2, "Smaller vocabulary": four word chips, "pot", "boiling", "cat", "jar", that turn one at a time into "thing", "thing", "it", "it" |
 | 5.2 | Small footer, 26 px: "Jafari et al., Age and Ageing 2025 · Mekulu et al., PLOS Digital Health 2026" |
 
-### 03 · `built-for-50-to-85` — 10.4 s
+### 03 · `built-for-50-to-85` — 9.9 s
 
 `data-line`: Cadence is for adults 50 to 85, including people worried about their memory, so it's
 built with big text, big buttons and calm wording.
@@ -229,7 +231,7 @@ readable at about 70% scale.
 
 Keep it compact, about 200 px tall, so it can sit above or below the recorder's countdown.
 
-### 05 · `on-device-pipeline` — 8.4 s
+### 05 · `on-device-pipeline` — 8.0 s
 
 `data-line`: Whisper, an open-source speech model, turns my voice into text on the phone itself, so
 the audio never leaves it.
@@ -243,7 +245,7 @@ the audio never leaves it.
 | 5.4 | A phone outline draws around the whole flow (`.draw`), labelled "On the phone itself" |
 | 6.4 | Above the phone: cloud icon with the upload arrow struck through, "Nothing uploaded" |
 
-### 06 · `nine-features` — 2.6 s
+### 06 · `nine-features` — 2.2 s
 
 `data-line`: Cadence computes nine speech features
 
@@ -266,7 +268,7 @@ not a diagnosis.
 | 2.4 | Under the rows, a reason revealed with `.in` (too long for one `.type` line), in quotes: "You paused more often than this model expects." This is real copy from the app |
 | 4.6 | Footer: "Screening estimate, not a diagnosis" |
 
-### 08 · `demo-model-lock` — 12.8 s
+### 08 · `demo-model-lock` — 12.4 s
 
 `data-line`: I don't have clinical data yet, so this is a demo model trained on synthetic data. It's
 labeled on every result, and it can never say "Talk to a doctor."
@@ -310,7 +312,7 @@ Cadence measures loudness every 20 milliseconds.
 
 The bars at the end of this clip are the bars clips 11 and 12 start from.
 
-### 11 · `cutoff-too-high` — 11.2 s
+### 11 · `cutoff-too-high` — 11.0 s
 
 `data-line`: On my first real test, it said I was silent over 90 percent of the time, because the
 cutoff for speech was louder than most real speech.
@@ -324,7 +326,7 @@ cutoff for speech was louder than most real speech.
 | 6.6 | The cutoff label gains its value: "Speech cutoff 0.010" |
 | 8.4 | A bracket under the line: "90% of the recording was quieter than 0.0087" |
 
-### 12 · `cutoff-adapts` — 5.4 s
+### 12 · `cutoff-adapts` — 4.2 s
 
 `data-line`: Now the cutoff adapts to each recording's noise and loudness.
 
@@ -338,7 +340,7 @@ cutoff for speech was louder than most real speech.
 
 The formula is the app's real rule when speech and silence are separable (feature spec v4).
 
-### 13 · `same-numbers-two-languages` — 7.0 s
+### 13 · `same-numbers-two-languages` — 6.6 s
 
 `data-line`: The same features run in TypeScript and Python, and tests check that both give
 identical numbers.
@@ -360,7 +362,7 @@ value column about 190 px.
 Placed over: the talking head at the desk, then a laptop terminal showing the tests passing from "tests check".
 The terminal's passing summary sits in the lower half, below this card.
 
-### 14 · `tools-and-ai` — 14.0 s
+### 14 · `tools-and-ai` — 13.8 s
 
 `data-line`: Cadence is written in TypeScript with React Native and Expo, and its scoring model is
 trained in Python. I used AI coding assistants, Claude and Codex, and my submission discloses
